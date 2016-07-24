@@ -1,0 +1,52 @@
+== PngOptimizerCL Changelog ==
+
+Note: for engine optimization, see PngOptimizer Changelog instead.
+
+-----------------
+2016-07-24 (2.4.3)
+
+- change: executable name is now in lower case: pngoptimizercl
+- misc: updated file structure for git first commit
+
+-----------------
+2014-05-25 (2.4.1)
+
+- fixed: Windows XP compatibility for 32 bits build
+
+-----------------
+2014-05-18 (2.4)
+
+- new: Linux version
+- fixed: redirection to file had no effect
+- change: removed batch summary for single file
+
+-----------------
+2013-04-14 (2.3)
+
+- new: use of the latest version of the PngOptimizer optimization engine
+
+-----------------
+2012-09-09 (2.2)
+
+- new: support of the ".apng" file extension
+- fixed: only lower case file extensions were managed. The extension case is not relevant anymore.
+
+-----------------
+2012-05-17 (2.1)
+
+- new: recursive option (-recurs)
+- new: filtering according to multiple file types by using "|" (ex: -file:"*.png|*.tga")
+- new: added PixelPhysicalDimensions option (-KeepPhysicalPixelDimensions)
+
+- change: output displays "Done" when more than two files where processed
+- change: output uses colors
+
+-----------------
+2011-04-25 (2.0)
+
+- new: x64 version
+- new: more background color options.
+- new: added IgnoreAnimatedGif option.
+- new: textual data options added.
+
+- fixed: returns 0 upon success or if no argument provided. Returns 1 if an error occurred.

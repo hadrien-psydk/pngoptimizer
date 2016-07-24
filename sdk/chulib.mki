@@ -1,0 +1,125 @@
+# This the Makefile fragment to be included by SDK, Projects and UnitTests Makefiles
+#
+# Makefile inputs:
+# PROJECT_NAME    same as directory name
+# PROJECT_TYPE    lib or app
+# PROJECT_FILES   all files or wildcard like *.cpp
+# SDK_DEPS        needed library names in SDK/
+# EXT_DEPS        external libraries, like gtk got GTK+
+# INCDIRS         additional include directories
+#
+# Command line options:
+# (default)       builds all with debug configuration
+# CONFIG=release  builds all with release configuration
+# clean           cleans current project and its dependencies
+# rebuild         cleans then builds
+
+INCDIRS += ../../sdk
+CONFIG ?= debug
+OUTDIR := linux-$(CONFIG)
+
+CFLAGS := -Wall -Wmissing-braces -fdata-sections -ffunction-sections -Wunused-parameter
+LDFLAGS := --gc-sections
+
+# In Debug, store debug symbols (-g)
+# In Release, optimize and strip symbols with the linker
+ifeq ($(CONFIG),debug)
+	CFLAGS += -g
+else
+	CFLAGS += -O2 -Werror
+	LDFLAGS := $(LDFLAGS),-s
+endif
+
+GCC := gcc
+GPP := g++
+CPPFLAGS := $(CFLAGS) -std=c++0x $(addprefix -I,$(INCDIRS))
+EXTLIBS := -pthread -lrt
+
+# Most includes for GTK+ are in /usr/include but some of them are
+# very specific. pkg-config gives us all the needed paths.
+ifeq ($(EXT_DEPS),gtk)
+	CPPFLAGS += $(shell pkg-config --cflags gtk+-3.0)
+	EXTLIBS += $(shell pkg-config --libs gtk+-3.0)
+endif
+
+ifeq ($(PROJECT_TYPE), lib)
+	OUTPATH := $(OUTDIR)/lib$(PROJECT_NAME).a
+else
+	OUTPATH := $(OUTDIR)/$(PROJECT_NAME)
+	SDK_DIRS := $(addprefix ../../sdk/,$(SDK_DEPS))
+	SDK_LIBDIRS := $(addsuffix /linux-$(CONFIG)/,$(SDK_DIRS))
+	SDK_LIBNAMES := $(addprefix lib,$(SDK_DEPS))
+	SDK_LIBNAMES := $(addsuffix .a,$(SDK_LIBNAMES))
+	SDK_LIBPATHS := $(join $(SDK_LIBDIRS),$(SDK_LIBNAMES))
+endif
+
+PCHPATH := $(OUTDIR)/stdafx.h.gch
+
+PROJECT_FILES := $(foreach filename,$(PROJECT_FILES),$(wildcard $(filename)))
+OBJS := $(subst .cpp,.o, $(PROJECT_FILES))
+OBJS := $(subst .c,.o, $(OBJS))
+SUBDIRS := $(dir $(OBJS))
+SUBDIRS := $(sort $(SUBDIRS))
+SUBDIRS := $(subst ./,, $(SUBDIRS))
+SUBDIRS := $(addprefix $(OUTDIR)/,$(SUBDIRS))
+OBJS := $(addprefix $(OUTDIR)/,$(OBJS))
+
+#$(info $(OBJS))
+#$(info $(SUBDIRS))
+#$(info $(SDK_LIBPATHS))
+#$(info $(CFLAGS))
+
+all: build_deps build
+
+welcome_msg:
+	$(info ----------------------- $(PROJECT_NAME) $(CONFIG) -----------------------)
+
+build_deps:
+ifneq ($(PROJECT_TYPE), lib)
+	@for dir in $(SDK_DIRS); do $(MAKE) --no-print-directory -C $$dir; done
+endif
+
+build: welcome_msg $(OUTDIR) $(SUBDIRS) $(OUTPATH)
+
+clean: clean_deps welcome_msg
+	$(info cleaning...)
+	@rm -rf $(OUTDIR)
+
+clean_deps:
+ifneq ($(PROJECT_TYPE), lib)
+	@for dir in $(SDK_DIRS); do $(MAKE) --no-print-directory -C $$dir clean; done
+endif
+
+$(OUTDIR):
+	@mkdir $(OUTDIR)
+
+$(SUBDIRS):
+	@mkdir $@
+
+$(OUTPATH): $(SDK_LIBPATHS) $(PCHPATH) $(OBJS)
+ifeq ($(PROJECT_TYPE), lib)
+	$(info creating library $(OUTPATH))
+	@ar rcs $(OUTPATH) $(OBJS)
+else
+	$(info linking application $(OUTPATH))
+	@$(GPP) $(OBJS) $(SDK_LIBPATHS) -Wl,$(LDFLAGS) $(EXTLIBS) -o $(OUTPATH)
+endif
+
+$(PCHPATH): stdafx.h
+	$(info stdafx.h (precompiled header))
+	@$(GPP) $(CPPFLAGS) -c stdafx.h -o $(PCHPATH)
+
+-include $(subst .o,.d, $(OBJS))
+
+$(OUTDIR)/%.o: %.cpp $(PCHPATH)
+	$(info $<)
+	@$(GPP) $(CPPFLAGS) -c -MMD $< -o $@
+
+$(OUTDIR)/%.o: %.c
+	$(info $<)
+	@$(GCC) $(CFLAGS) -c -MMD $< -o $@
+
+rebuild: clean all
+
+run:
+	$(OUTPATH)

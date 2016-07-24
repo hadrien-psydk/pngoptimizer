@@ -1,0 +1,374 @@
+== PngOptimizer Changelog ==
+
+-----------------
+2016-07-24 (2.4.3)
+
+- misc: updated file structure for git first commit
+
+-----------------
+2014-06-08 (2.4.2)
+
+- fixed: x64 build failed to open dialog boxes on Windows 8
+
+-----------------
+2014-05-25 (2.4.1)
+
+- fixed: Windows XP compatibility for 32 bits build
+
+-----------------
+2014-05-18 (2.4)
+
+- misc: updated source code for Visual Studio 2012
+- misc: welcome message is centered and appears only when the log window is empty
+- fixed: some errors found with VS2012 static analysis tool
+- fixed: small UI problem in the screenshots dialog
+- change: removed batch summary for single file
+
+-----------------
+2013-04-14 (2.3)
+
+- new: multithreaded optimization for faster processing on multicore CPUs
+- new: better optimization in some cases of greyscale images
+
+- misc: updated ZLib 1.2.5 to 1.2.7 (compression library)
+
+-----------------
+2012-09-09 (2.2)
+
+- new: support of the ".apng" file extension
+- fixed: only lower case file extensions were managed. The extension case is not relevant anymore.
+
+-----------------
+2012-06-09 (2.1)
+
+- new: option to keep or force pixel physical dimensions (pHYs chunk)
+- new: better compatibility for old Windows versions (NT based)
+- new: Windows Seven taskbar icon now shows progression of an optimization
+- new: better automatic dialogs placement when near screen borders, near taskbar or with multiple monitors
+- new: the list is now scrollable with the keyboard
+- new: "Done" written at the end of multiple files optimization
+- new: screenshot directory dialog can be resized
+
+-----------------
+2011-04-25 (2.0)
+
+- new: support for APNG for both optimization and conversion (animated GIFs)
+- new: x64 version
+- new: PNG options moved to their own dialog window
+- new: option to ignore animated GIFs
+- new: option to keep original file date and time
+- new: option to force background color (bkGD chunk)
+- new: option to keep or force textual information (tEXt chunk)
+- new: always on top option for the main window in the contextual menu
+- new: suggested screenshot filename now keeps leading "0" for file number (file 001.png, file 002.png...)
+- new: suggested screenshot filename now accepts "-" as a number separator (file-01.png file-02.png...)
+
+- change: AvoidGreyWithSimpleTransparency is now disabled by default (was for IE6 compatibility)
+- change: keyboard shortcut to clear the list is slightly less complicated: Ctrl+Delete instead of Ctrl+Shift+Delete
+
+- misc: better results with some cases of indexed color images
+- misc: updated ZLib 1.2.3 to 1.2.5 (compression library)
+
+- fixed: bad % reported for large files
+- fixed: hangs at startup when loading an empty configuration file (PngOptimizer.ini)
+- fixed: could not load GIFs containing non-Netscape application extensions blocks 
+         (like XMP data from Photoshop CS)
+- fixed: could not load GIFs with a compressed block ending with a terminator 
+         instead of an end-of-information code
+
+-----------------
+2009-12-13 (1.9)
+
+Internal version
+
+-----------------
+2008-11-02 (1.8)
+
+- new: uses Windows XP and Windows Vista theme on those platforms
+- new: uses a lot less memory when optimizing
+- new: when asking for a screenshot file name: does not select the .png part of the file name
+- new: when asking for a screenshot file name: proposes a new file name based on the previous file name
+
+- corrected: freezes on Windows Vista
+- corrected: better anti-aliased text in the list
+
+-----------------
+2008-09-11 (1.7)
+
+Private release by Paul Higginbottom
+
+-----------------
+2007-04-22 (1.6.1)
+
+- corrected : more robust clipboard code to avoid crash whith strange bitmap data (MSN messenger, again)
+
+-----------------
+2007-04-16 (1.6)
+
+- new: optimization engine improved
+- new: dump of a clean copy of the source PNG file if the compression cannot be improved
+- new: directories accepted for drag-and-drop (with recursive optimization)
+- new: TGA files accepted
+- new: more BMP formats accepted
+- new: added an option to optimize screenshots
+- new: added an option to ask for the file name of a screenshot
+- new: settings stored in a configuration file instead of the registry
+
+- corrected: bug for 32 bits images converted to palette images that contained more than one fully transparent color
+- corrected: could not load 24 bits BMP with a colorcount set to 16777216 (expected 0 for the colorcount)
+- corrected: bug when decoding a transparent GIF with a local palette
+- corrected: screenshot drag-and-drop could not be done to some applications
+- corrected: PngOptimizer was complaining when the source file was read-only even when a new file was created
+- corrected: no blocking anymore when optimizing files given through the command line
+
+- internal: use of the chustd framework instead of the dkstd
+- internal: improved software architecture
+
+- misc: PngOptimizer is now Open Source software
+- misc: dropped support for Windows 98/Me
+
+
+-----------------
+2006-01-09 (1.5.4 aka 1.54)
+
+- uneeded bKGD chunk inserted when the « Keep background color » option was set.
+
+-----------------
+2006-01-07 (1.5.3 aka 1.53)
+
+- Use of critical section to avoid potential conflict between the user interface and the working thread.
+- Corrected 24 bits & 32 bits BMP decoding errors.
+- Support for 16 bits BMPs.
+- "Clear" option in the context menu to clear the list.
+- Better previous window positionning :
+   - When PngOptimizer was minimized then closed, the window was unreachable at relaunch.
+   - When other instances of PngOptimizer are running, the window is now offseted respectively to the previous
+     instance window.
+
+-----------------
+2005-11-20 (1.5.2 aka 1.52)
+
+- Use of the latest zlib (v1.2.3 ; 2005-07-18) instead of the zlib++ based on v1.1.4
+- Further compression for 24 bits images :
+
+  Checking size without filtering : slower optimization but improves file size (no more +50% increase)
+
+- Further compression for 32 bits images :
+   
+   Checking size without filtering (same method than for 24 bits images).
+
+   A 32 bits image which could be converted to a 24 bits image was then stored to the disk.
+   Now PngOptimizer feeds the 24 bits image to the 24 bits optimizer (which can lead to a palette image).
+
+- Improved general compression by changing the ZLib compression strategy :
+   
+   Filtered images are stored with the Z_FILTERED strategy, otherwise Z_DEFAULT_STRATEGY is used.
+   
+   For 32 bits images, both strategy are used and compared, as Z_FILTERED does not always give
+   the best results for 32 bits filtered pictures.
+
+- Warning when converting animated GIF
+
+2005-08-15 (1.5.1 aka 1.51)
+
+- BMP decoder crash with 32 bits BMPs
+- Crashed when a fake bitmap was stored in the clipboard :
+  IsClipboardFormatAvailable(CF_BITMAP) returned true, GetClipboardData(CF_BITMAP) returned NULL
+  Case found when copying & pasting MSN Messenger smileys
+
+-----------------
+2005-03-11 (1.5)
+
+- Full Unicode support (except for PngOptimizerCL).
+- Corrected two memory leaks when decoding BMP and GIF files.
+- Added an option to keep the background color (bKGD). Please note that the background color is
+  not kept with indexed (palette mode) pictures. This option only works with true-color or grey
+  pictures.
+- PngOptimizer remembers the last window position and size.
+- The main text window has been enhanced. Printing is faster in some cases. You can now scroll
+  inside with the keyboard and the mouse wheel. The scrolling position is not lost anymore when
+  you resize the window.
+- For the first time in PngOptimizer history, introducing multithreading :) You can now move
+  the interface while PngOptimizer is working.
+- Support for compressed BMP added.
+- Support for bitmap stored in the clipboard. Primary used for screenshots, but can be used
+  for any bitmap stored in the clipboard.
+
+  .:: More Info
+
+  1) Take a screenshot with the "Print Screen" key or Alt+"Print Screen" for the current window only.
+  2) Press Ctrl+V or Shift+Insert in the PngOptimizer window, or right-click in PngOptimizer and
+     choose "Paste screenshot"
+  3) PngOptimizer creates a PNG file from your screenshot, and prints the filename in its window.
+  4) You can drag the file name out of the PngOptimizer window in any application which accepts
+     dragged files.
+  5) You can also double-click on the file name to display your picture in your favorite picture 
+     viewer.
+
+  By default, those files are stored in your Temp directory in your Windows profile. For example :
+
+  C:\Documents and Settings\YourName\Local Settings\Temp
+
+  In Windows 98, the default storage location is located in the global Temp directory. For example :
+
+  C:\WINDOWS\TEMP
+
+  You can change the storage location : Right click in PngOptimizer and 
+  select "Change screenshots directory". A dialog box will allow you to select 
+  the screenshots location.
+
+  You can view the content of the screenshots directory by right-clicking in the PngOptimizer window
+  and choose "Show screenshots directory".
+
+  Those PNG files are compressed with a medium ratio (zlib compression 6), in order to reduce 
+  the creation time. If you want to reduce the size a bit more, you can drag them from a file 
+  explorer to the PngOptimizer window.
+
+  .:: Even More Info
+
+  About dragging operations.
+  
+  The dragging result can be either a move or a copy of the screenshot file.
+
+  The dragging behaviour is the same you are used to in Windows. For example, if you drag the file out
+  of PngOptimizer to a file manager window, in the same partition than the screenshot directory, this
+  will result in a move.
+  
+  To force a copy, press the Control key during the dragging.
+  To force a move, press the Shift key during the dragging.
+
+  As usual in Windows, the mouse cursor will show a "+" symbol if the dragging will result in a copy.
+  No "+" appears if the dragging will result in a move.
+
+  If the result of the dragging is a move, the link in the PngOptimizer is disabled, and its
+  color changes.
+
+- Support for command line filenames.
+
+  .:: More Info
+
+  It means you can select several files in the file explorer and drag them to the PngOptimizer 
+  executable file. You can also create a PngOptimizer shortcut into your « SendTo » folder. Then you
+  select several files in the file explorer and send them to PngOptimizer.
+
+- A new icon provided by Guillaume Schaeffer.
+
+-----------------
+2004-07-12 (1.4)
+- Unicode support (for filenames and the log window). 
+
+  .:: More Info
+
+  PngOptimizer uses the same font than the file explorer. To display correctly Unicode strings in both
+  Windows and PngOptimizer, set the icon font to a complete unicode font, such as "Arial Unicode MS".
+
+  Note that Windows 95/98/Me do not support Unicode filenames, so I had to add compatibility routines
+  to deal with ANSI strings instead.
+
+- A new icon :)
+- Stability improvement when loading corrupted GIFs.
+- Support for 32 bits BMPs.
+- Better management of grayscale mode PNGs.
+- New compression strategy. PngOptimizer now also checks compression with the palette sorted
+  according to the number of color occurrences. It also checks the compression result with
+  and without adaptive filtering. The optimization can be now a little more slower but the
+  compression should be better.
+  
+  .:: More Info
+  
+  Adaptive filtering is a way of reordering byte values in PNGs in order to improve
+  the compression. But sometimes the compression library performs better without
+  this reordering.
+
+- I also created a Command Line version of PngOptimizer. It's called PngOptimizerCL. Here are
+  the arguments :
+
+  For one file :
+
+	PngOptimizerCL -file:"my file cool picture.png"
+
+  You can use wildcards to specify several files at once :
+
+	PngOptimizerCL -file:"Some Folder/*.png"
+
+  The options have the same meanings than the GUI version. Here you are :
+	-BackupOldPngFiles
+	-KeepInterlacing
+	-AvoidGreyWithSimpleTransparency
+
+  Example :
+	PngOptimizerCL -file:"my-logo.png" -KeepInterlacing -BackupOldPngFiles
+
+  Note : the options set in the GUI version DO NOT impact on the Command Line version. This
+         behaviour is by design.
+
+  Note : you will get some information if you call PngOptimizerCL without any parameter.
+
+
+-----------------
+2003-12-04 (1.3.2)
+- Public release with the MMX bug correction.
+
+-----------------
+2003-12-03 (1.3.1)
+- Private release for F. Constantineau. Corrected a crash on CPUs without MMX support.
+
+-----------------
+2003-11-12 (1.3)
+- Added support for interlaced PNG files.
+- Added an option to keep or remove interlacing for interlaced PNG files.
+- New compression strategies.
+
+ .:: More Info
+
+  For palettized images, the palette is now sorted according to color luminances.
+  This sometimes increases compression, like for fadings. In some cases this could decrease
+  compression of some bytes in comparison with the older version.
+ 
+  In some cases, PngOptimizer will now perform the conversion with several parameters
+  to get the best compression method. This may slow down the optimization in somes cases
+  but will lead to better results.
+
+
+-----------------
+2003-03-21 (1.2)
+- Gif transparency was not correctly detected when color 0 was used for transparency
+- Optimization for 32 bits png : 
+	* if all alpha values are 100%, the alpha channel is discarded
+	* if all alpha values are 100%, but one color has an alpha of 0%, the alpha channel is
+	  discarded and the image is saved as RGB + simple transparency
+- Optimization for 24 bits images :
+	* if 256 or less different colors are used in the image, and if the image is big enough,
+	the image is converted to palette mode.
+	The image is declared big enough if (pixelcount * 3) >= (pixelcount + colcount * 3 + 12).
+	Example : an image of 256 pixels with 256 different colors is kept in 24 bits.
+
+
+-----------------
+2002-08-27 (1.1)
+- Improved support for black & white pictures
+- The settings are now read and stored in the registry
+- Added new option : "Avoid grey + simple transparency (IE Bug)"
+  
+  .:: Explanation :
+
+  Internet Explorer does not support greyscaled images with simple transparency, but it supports
+  palettized images with simple transparency. This option tells PngOptimizer to avoid conversion
+  from palettized images into greyscale ones if simple transparency is used.
+
+  .:: More Info : 
+ 
+  * for greyscale images, simple transparency means one grey index has an alpha value of 0%
+    (completely transparent), while the other indexes have an alpha of 100% (fully opaque).
+  * for palettized images, it means that for each palette entry an alpha value is assigned.
+  * for true color images it means one color value has an alpha of 0%, while the others have an 
+    alpha of 100%.
+
+  .:: Even More Info :
+ 
+  Simple transparency is managed through a PNG chunk called tRNS
+
+
+-----------------
+2002-08-08 (1.0)
+- First release
