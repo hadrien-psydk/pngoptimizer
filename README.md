@@ -22,7 +22,7 @@ How to build PngOptimizer?
 
 For Windows:
 
- 1. Use Microsoft Visual Studio 2012 and open projects/pngoptimizer/PngOptimizer.sln
+ 1. Use Microsoft Visual Studio 2015 and open projects/pngoptimizer/PngOptimizer.sln
  2. Build the solution, in either Debug or Release mode, and for Win32 (x86) or x64.
 
 The library build results are located in each library directory of the SDK directory:
