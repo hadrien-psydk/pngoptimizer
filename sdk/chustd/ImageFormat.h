@@ -64,42 +64,42 @@ public:
 	static Color32 magenta;
 
 public:
-	inline void ToRgb(uint8& r, uint8& g, uint8& b) const
+	inline void ToRgb(uint8& rx, uint8& gx, uint8& bx) const
 	{
 		uint32 color = value32;
 
-		b = uint8((color >> 0) & 0x00ff);
-		g = uint8((color >> 8) & 0x00ff);
-		r = uint8((color >> 16) & 0x00ff);
+		bx = uint8((color >> 0) & 0x00ff);
+		gx = uint8((color >> 8) & 0x00ff);
+		rx = uint8((color >> 16) & 0x00ff);
 	}
 
-	inline void ToRgb(uint32& r, uint32& g, uint32& b) const
+	inline void ToRgb(uint32& rx, uint32& gx, uint32& bx) const
 	{
 		uint32 color = value32;
 
-		b = uint32((color >> 0) & 0x00ff);
-		g = uint32((color >> 8) & 0x00ff);
-		r = uint32((color >> 16) & 0x00ff);
+		bx = uint32((color >> 0) & 0x00ff);
+		gx = uint32((color >> 8) & 0x00ff);
+		rx = uint32((color >> 16) & 0x00ff);
 	}
 
-	inline void ToRgba(uint8& r, uint8& g, uint8& b, uint8& a) const
+	inline void ToRgba(uint8& rx, uint8& gx, uint8& bx, uint8& ax) const
 	{
 		uint32 color = value32;
 
-		b = uint8((color >> 0) & 0x00ff);
-		g = uint8((color >> 8) & 0x00ff);
-		r = uint8((color >> 16) & 0x00ff);
-		a = uint8((color >> 24) & 0x00ff);
+		bx = uint8((color >> 0) & 0x00ff);
+		gx = uint8((color >> 8) & 0x00ff);
+		rx = uint8((color >> 16) & 0x00ff);
+		ax = uint8((color >> 24) & 0x00ff);
 	}
 
-	inline void ToRgba(uint32& r, uint32& g, uint32& b, uint32& a) const
+	inline void ToRgba(uint32& rx, uint32& gx, uint32& bx, uint32& ax) const
 	{
 		uint32 color = value32;
 
-		b = ((color >> 0) & 0x00ff);
-		g = ((color >> 8) & 0x00ff);
-		r = ((color >> 16) & 0x00ff);
-		a = ((color >> 24) & 0x00ff);
+		bx = ((color >> 0) & 0x00ff);
+		gx = ((color >> 8) & 0x00ff);
+		rx = ((color >> 16) & 0x00ff);
+		ax = ((color >> 24) & 0x00ff);
 	}
 
 	Color32()
@@ -118,19 +118,19 @@ public:
 		value32 = (a << 24) | (r << 16) | (g << 8) | b;
 	}
 
-	void SetRgb(uint8 r, uint8 g, uint8 b)
+	void SetRgb(uint8 rx, uint8 gx, uint8 bx)
 	{
-		value32 = (value32 & 0xff000000) | (r << 16) | (g << 8) | b;
+		value32 = (value32 & 0xff000000) | (rx << 16) | (gx << 8) | bx;
 	}
 
-	void SetRgba(uint8 r, uint8 g, uint8 b, uint8 a)
+	void SetRgba(uint8 rx, uint8 gx, uint8 bx, uint8 ax)
 	{
-		value32 = (a << 24) | (r << 16) | (g << 8) | b;
+		value32 = (ax << 24) | (rx << 16) | (gx << 8) | bx;
 	}
 
-	void SetAlpha(uint8 a)
+	void SetAlpha(uint8 ax)
 	{
-		value32 = (value32 & 0x00ffffff) | (a << 24);
+		value32 = (value32 & 0x00ffffff) | (ax << 24);
 	}
 
 	uint8 GetAlpha() const

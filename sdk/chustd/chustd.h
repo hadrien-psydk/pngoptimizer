@@ -6,7 +6,7 @@
 //  
 ///////////////////////////////////////////////////////////////////////////////
 //
-// Copyright (C) 2005/2014 ChuTeam
+// Copyright (C) 2005/2016 ChuTeam
 //
 // This software is provided 'as-is', without any express or implied warranty.
 // In no event will the author be held liable for any damages arising from 
@@ -34,7 +34,7 @@
 #ifndef CHUSTD_CHUSTD_H
 #define CHUSTD_CHUSTD_H
 
-#define CHUSTD_VERSION 231
+#define CHUSTD_VERSION 232
 
 #include "CppExtension.h"
 #include "String.h"

@@ -61,7 +61,7 @@ int main(int argc, char** argv)
 #elif defined(_M_IX86)  
 		version = version + String(" (x86)");
 #endif
-		Console::WriteLine(version + " \xA9 2002/2014 Hadrien Nilsson - psydk.org");
+		Console::WriteLine(version + " \xA9 2002/2016 Hadrien Nilsson - psydk.org");
 		Console::WriteLine("Converts GIF, BMP and TGA files to optimized PNG files.");
 		Console::WriteLine("Optimizes and cleans PNG files.");
 		Console::WriteLine("");

@@ -12,7 +12,7 @@
 #ifndef CHUSTD_STDAFX_H
 #define CHUSTD_STDAFX_H
 
-////////////////////////////////
+#define _HAS_EXCEPTIONS 0
 #include <math.h> // cos, sin, tan, pow
 #include <new> // Placement new
 //////////////////////////////////////////////////////////////////////

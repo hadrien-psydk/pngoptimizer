@@ -700,6 +700,36 @@ bool POEngine::FindUnusedColor(const Buffer& aRgb, uint8& nRed, uint8& nGreen, u
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+// When a 32 bpp image actually uses a simple yes/no transparency, we want to check what color can
+// be used as the transparent color in order to convert the image into 24 bpp. Black would be nice
+// but we must ensure that it never appears in the image.
+///////////////////////////////////////////////////////////////////////////////////////////////////
+static bool CanBlackBeUsedAsTransparentColor32BppRGBX(const PngDumpData& dd)
+{
+	const int pixelCount = dd.width * dd.height;
+	const uint8* pPixelsRgba = dd.pixels.GetReadPtr();
+
+	for(int i = 0; i < pixelCount; ++i)
+	{
+		uint8 r = pPixelsRgba[0];
+		uint8 g = pPixelsRgba[1];
+		uint8 b = pPixelsRgba[2];
+		uint8 a = pPixelsRgba[3];
+		if( a == 255 )
+		{
+			if( r == 0 && g == 0 && b == 0 )
+			{
+				// Black is a used color, we cannot use it as a the transparent color
+				return false;
+			}
+		}
+		pPixelsRgba += 4;
+	}
+	// Black never appears as a visible color, we can use it
+	return true;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 bool POEngine::Optimize32BitsMode(PngDumpData& dd)
 {
 	ASSERT(dd.pixelFormat == PF_32bppRgba);
@@ -795,27 +825,7 @@ bool POEngine::Optimize32BitsMode(PngDumpData& dd)
 		////////////////////////////////////////////////////
 		// First, check if black is a used color
 		
-		bool bBlackAsTransparentColor = true;
-		uint8* pPixelsRgba = dd.pixels.GetWritePtr();
-
-		for(int32 i = 0; i < pixelCount; ++i)
-		{
-			uint8 r = pPixelsRgba[0];
-			uint8 g = pPixelsRgba[1];
-			uint8 b = pPixelsRgba[2];
-			uint8 nAlpha = pPixelsRgba[3];
-			if( nAlpha == 255 )
-			{
-				if( r == 0 && g == 0 && b == 0 )
-				{
-					// Yes, black is a used color, we cannot use it as a the transparent color
-					bBlackAsTransparentColor = false;
-					break;
-				}
-			}
-			
-			pPixelsRgba += 4;
-		}
+		bool bBlackAsTransparentColor = CanBlackBeUsedAsTransparentColor32BppRGBX(dd);
 		////////////////////////////////////////////////////
 		
 		uint8 nTransRed = 0;

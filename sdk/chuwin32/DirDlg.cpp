@@ -61,11 +61,11 @@ int DirDlg::DoModal()
 		if( pItemIDList != NULL )
 		{
 			// Converion ID répertoire sélectionné vers chaîne de carcatères
-			wchar szBuffer[MAX_PATH];
-			if( ::SHGetPathFromIDListW(pItemIDList, szBuffer) )
+			wchar szBuffer2[MAX_PATH];
+			if( ::SHGetPathFromIDListW(pItemIDList, szBuffer2) )
 			{ 
 				// Save the result
-				m_strDir = szBuffer;
+				m_strDir = szBuffer2;
 				nReturn = IDOK;
 			}
 			// Free the PIDL allocated by SHBrowseForFolder.

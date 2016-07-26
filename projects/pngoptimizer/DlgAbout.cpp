@@ -78,7 +78,6 @@ LRESULT DlgAbout::DlgProc(UINT nMsg, WPARAM wParam, LPARAM lParam)
 		PNMLINK pNMLink = (PNMLINK)lParam;
 		if( pNMLink->hdr.code == NM_CLICK || pNMLink->hdr.code == NM_RETURN )
 		{
-			PNMLINK pNMLink = (PNMLINK)lParam;
 			LITEM item = pNMLink->item;
 			if( item.iLink == 0 )
 			{

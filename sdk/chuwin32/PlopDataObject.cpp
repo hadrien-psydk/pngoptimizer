@@ -340,7 +340,7 @@ HGLOBAL GlobalClone(HGLOBAL hglobIn)
 	if (pvIn)
 	{
 		DWORD cb = (DWORD) GlobalSize(hglobIn);
-		HGLOBAL hglobOut = GlobalAlloc(GMEM_FIXED, cb);
+		hglobOut = GlobalAlloc(GMEM_FIXED, cb);
 		if (hglobOut)
 		{
 			chustd::Memory::Copy(hglobOut, pvIn, cb);

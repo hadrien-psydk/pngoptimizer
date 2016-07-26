@@ -1,7 +1,7 @@
 set POVER=2.4.3
 
 set ZIP="C:\Program Files\7-Zip\7z.exe" a -tzip -mx=5
-set VCBUILD="C:\Program Files (x86)\Microsoft Visual Studio 11.0\Common7\IDE\WDExpress.exe"
+set VCBUILD="C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\devenv"
 
 cd /d %~dp0
 
@@ -20,25 +20,25 @@ mkdir PngOptimizer
 mkdir PngOptimizerCL
 chdir ..
 
-%VCBUILD% ../../Projects/PngOptimizer/PngOptimizer.sln       /build "Release|x64"   || goto Fail
-%VCBUILD% ../../Projects/PngOptimizer/PngOptimizer.sln       /build "Release|Win32" || goto Fail
-%VCBUILD% ../../Projects/PngOptimizerCL/PngOptimizerCL.sln   /build "Release|x64"   || goto Fail
-%VCBUILD% ../../Projects/PngOptimizerCL/PngOptimizerCL.sln   /build "Release|Win32" || goto Fail
+%VCBUILD% ../../projects/PngOptimizer/PngOptimizer.sln       /build "Release|x64"   || goto Fail
+%VCBUILD% ../../projects/PngOptimizer/PngOptimizer.sln       /build "Release|Win32" || goto Fail
+%VCBUILD% ../../projects/PngOptimizerCL/PngOptimizerCL.sln   /build "Release|x64"   || goto Fail
+%VCBUILD% ../../projects/PngOptimizerCL/PngOptimizerCL.sln   /build "Release|Win32" || goto Fail
 
-copy "../../Projects/PngOptimizer/x64-Release\PngOptimizer.exe"  "x64/PngOptimizer/" || goto Fail
-copy "../../Projects/PngOptimizer\Readme.txt"                    "x64/PngOptimizer/" || goto Fail
-copy "../../Projects/PngOptimizer\License.txt"                   "x64/PngOptimizer/" || goto Fail
-copy "../../Projects/PngOptimizer\Changelog.txt"                 "x64/PngOptimizer/" || goto Fail
+copy "../../projects/PngOptimizer/x64-Release\PngOptimizer.exe"  "x64/PngOptimizer/" || goto Fail
+copy "../../projects/PngOptimizer\Readme.txt"                    "x64/PngOptimizer/" || goto Fail
+copy "../../projects/PngOptimizer\License.txt"                   "x64/PngOptimizer/" || goto Fail
+copy "../../projects/PngOptimizer\Changelog.txt"                 "x64/PngOptimizer/" || goto Fail
 
-copy "../../Projects/PngOptimizer/Win32-Release\PngOptimizer.exe"  "x86/PngOptimizer/" || goto Fail
+copy "../../projects/PngOptimizer/Win32-Release\PngOptimizer.exe"  "x86/PngOptimizer/" || goto Fail
 copy "x64/PngOptimizer\*.txt" "x86/PngOptimizer/"  || goto Fail
 
-copy "../../Projects/PngOptimizerCL/x64-Release\PngOptimizerCL.exe"  "x64/PngOptimizerCL/" || goto Fail
-copy "../../Projects/PngOptimizerCL\Readme.txt"                      "x64/PngOptimizerCL/" || goto Fail
-copy "../../Projects/PngOptimizerCL\License.txt"                     "x64/PngOptimizerCL/" || goto Fail
-copy "../../Projects/PngOptimizerCL\Changelog.txt"                   "x64/PngOptimizerCL/" || goto Fail
+copy "../../projects/PngOptimizerCL/x64-Release\PngOptimizerCL.exe"  "x64/PngOptimizerCL/" || goto Fail
+copy "../../projects/PngOptimizerCL\Readme.txt"                      "x64/PngOptimizerCL/" || goto Fail
+copy "../../projects/PngOptimizerCL\License.txt"                     "x64/PngOptimizerCL/" || goto Fail
+copy "../../projects/PngOptimizerCL\Changelog.txt"                   "x64/PngOptimizerCL/" || goto Fail
 
-copy "../../Projects/PngOptimizerCL/Win32-Release\PngOptimizerCL.exe" "x86/PngOptimizerCL/" || goto Fail
+copy "../../projects/PngOptimizerCL/Win32-Release\PngOptimizerCL.exe" "x86/PngOptimizerCL/" || goto Fail
 copy "x64/PngOptimizerCL\*.txt" "x86/PngOptimizerCL/"  || goto Fail
 
 rem Archives

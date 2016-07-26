@@ -42,7 +42,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 1
 {
     ICON            IDI_MAIN, IDC_STATIC_LOGO, 10, 18, 32, 30, SS_ICON | SS_REALSIZEIMAGE
     CTEXT           "PngOptimizer ", IDC_STATIC_VERSION, 50, 13, 110, 8, SS_CENTER
-    CTEXT           "© 2002/2014 Hadrien Nilsson", IDC_STATIC, 50, 29, 96, 8, SS_CENTER
+    CTEXT           "© 2002/2016 Hadrien Nilsson", IDC_STATIC, 50, 29, 96, 8, SS_CENTER
     CTEXT           "http://pngoptimizer.org", IDC_STATIC_URL, 58, 45, 84, 8, SS_CENTER
     LTEXT           "This program is free software released under the GNU General Public License.", IDC_STATIC, 20, 64, 147, 18, SS_LEFT
     DEFPUSHBUTTON   "OK", IDOK, 122, 88, 50, 14

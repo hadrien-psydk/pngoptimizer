@@ -384,7 +384,7 @@ int TraceCtl::OnLButtonDown(WPARAM, LPARAM lParam)
 	if( pTP != null )
 	{
 		// Transforme le curseur
-		HCURSOR hCurs = LoadCursor(NULL, MAKEINTRESOURCE(IDC_HAND));
+		HCURSOR hCurs = LoadCursor(NULL, IDC_HAND);
 		SetCursor(hCurs);
 
 		m_bDragStart = true;
@@ -409,7 +409,7 @@ int TraceCtl::OnLButtonUp(WPARAM, LPARAM lParam)
 	if( pTP != null )
 	{
 		// Transforme le curseur
-		HCURSOR hCurs = LoadCursor(NULL, MAKEINTRESOURCE(IDC_HAND));
+		HCURSOR hCurs = LoadCursor(NULL, IDC_HAND);
 		SetCursor(hCurs);
 	}
 
@@ -425,7 +425,7 @@ int TraceCtl::OnLButtonDblClk(WPARAM, LPARAM lParam)
 	if( pTP != null )
 	{
 		// Transforme le curseur
-		HCURSOR hCurs = LoadCursor(NULL, MAKEINTRESOURCE(IDC_HAND));
+		HCURSOR hCurs = LoadCursor(NULL, IDC_HAND);
 		SetCursor(hCurs);
 
 		OnLinkDoubleClick(pTP->url);
@@ -483,7 +483,7 @@ int TraceCtl::OnMouseMove(WPARAM wParam, LPARAM lParam)
 	if( pTP != null )
 	{
 		// Transforme le curseur
-		HCURSOR hCurs = LoadCursor(NULL, MAKEINTRESOURCE(IDC_HAND));
+		HCURSOR hCurs = LoadCursor(NULL, IDC_HAND);
 		SetCursor(hCurs);
 	}
 	return 0;

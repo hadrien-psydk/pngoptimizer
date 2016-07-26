@@ -83,8 +83,8 @@ protected:
 		uint16 depth; // Bits per pixel. Possible values : 1, 4, 8, 16, 24, 32
 		uint32 compression; // Possible values : 0=None (BI_RGB), 1=RLE 8bits, 2=RLE 4bits, 3=BI_BITFIELDS
 		uint32 bitmapDataSize; // Rounded to the next 4 byte boundary
-		int32  nXPelsPerMeter;
-		int32  nYPelsPerMeter;
+		int32  xPelsPerMeter;
+		int32  yPelsPerMeter;
 		int32  colorCount; // Number of colors
 		uint32 importantColors;
 

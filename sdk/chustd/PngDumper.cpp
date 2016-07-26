@@ -294,6 +294,8 @@ bool PngDumper::Dump(IFile& fileDst, const PngDumpData& dd, const PngDumpSetting
 	
 	/////////////////////////////////////////////////
 	// Write remaining APNG frames
+	ByteArray frameImageData;
+
 	for(; iFrame < frameCount; ++iFrame)
 	{
 		const ApngFrame* pFrame = dd.frames[iFrame];
@@ -321,12 +323,11 @@ bool PngDumper::Dump(IFile& fileDst, const PngDumpData& dd, const PngDumpSetting
 		const int32 frameWidth = pFrame->GetWidth();
 		const int32 frameHeight = pFrame->GetHeight();
 
-		ByteArray abImageData;
-		if( !CreateImageData(pFramePixels, frameWidth, frameHeight, dd, ds, abImageData) )
+		if( !CreateImageData(pFramePixels, frameWidth, frameHeight, dd, ds, frameImageData) )
 		{
 			return false;
 		}
-		if( !file.Write(abImageData.GetPtr(), abImageData.GetSize()) )
+		if( !file.Write(frameImageData.GetPtr(), frameImageData.GetSize()) )
 		{
 			return false;
 		}

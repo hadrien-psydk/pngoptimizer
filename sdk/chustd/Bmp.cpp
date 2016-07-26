@@ -28,8 +28,8 @@ void Bmp::BmpHeader::SwapBytes()
 	depth =  IFile::Swap16(depth);
 	compression =     IFile::Swap32(compression);
 	bitmapDataSize =  IFile::Swap32(bitmapDataSize);
-	nXPelsPerMeter =   IFile::Swap32(nXPelsPerMeter);
-	nYPelsPerMeter =   IFile::Swap32(nYPelsPerMeter);
+	xPelsPerMeter =   IFile::Swap32(xPelsPerMeter);
+	yPelsPerMeter =   IFile::Swap32(yPelsPerMeter);
 	colorCount =      IFile::Swap32(colorCount);
 	importantColors = IFile::Swap32(importantColors);
 }
@@ -747,8 +747,8 @@ bool Bmp::Dump(IFile& file, const BmpDumpSettings& ds)
 	bh.depth = depth;  // Possible values : 1, 4, 8, 16, 24, 32
 	bh.compression = 0; // 0=None (BI_RGB), 1=RLE 8bits, 2=RLE 4bits, 3=BI_BITFIELDS
 	bh.bitmapDataSize = 0; // Rounded to the next 4 byte boundary
-	bh.nXPelsPerMeter = 2834;
-	bh.nYPelsPerMeter = 2834;
+	bh.xPelsPerMeter = 2834;
+	bh.yPelsPerMeter = 2834;
 	bh.colorCount = colorCount;
 	bh.importantColors = 0;
 
@@ -765,12 +765,11 @@ bool Bmp::Dump(IFile& file, const BmpDumpSettings& ds)
 
 	////////////////////////////////////////////////
 	// Write the palette
-	if( ds.palette.m_count != 0 )
+	if( colorCount != 0 )
 	{
 		uint8 aPalBuf[256 * 4];
 		uint8* pPal = aPalBuf;
 
-		const int colorCount = ds.palette.m_count;
 		for(int i = 0; i < colorCount; ++i)
 		{
 			ds.palette.m_colors[i].ToRgba( pPal[2], pPal[1], pPal[0], pPal[3]);

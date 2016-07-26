@@ -459,7 +459,7 @@ TextEncoding::ExtractStatus TextEncodingUtf8::ExtractCodePoint(const uint8* buf,
 
 	for(int i = 0; i < byteSequence; ++i)
 	{
-		uint8 byte = pSrc[start + i];
+		byte = pSrc[start + i];
 
 		// Remaining bytes
 		if( (byte & 0xC0) != 0x80 )
