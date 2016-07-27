@@ -74,13 +74,13 @@ uint32 DeflateStream::GetOutTotalRead() const
 
 const char* DeflateStream::GetLastError() const
 {
-	if( m_pImpl == null )
+	if( m_pImpl == nullptr )
 	{
 		return "";
 	}
 	
 	const char* psz = m_pImpl->m_ZLibStream.msg;
-	if( psz == null )
+	if( psz == nullptr )
 	{
 		return "";
 	}

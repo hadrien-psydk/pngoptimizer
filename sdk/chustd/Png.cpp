@@ -21,7 +21,7 @@ using namespace chustd;
 ///////////////////////////////////////////////////////////////////////////////
 void Png::ImageDataInfo::Clear()
 {
-	pPixels = null;
+	pPixels = nullptr;
 	width = 0;
 	height = 0;
 	byteWidth = 0;
@@ -670,7 +670,7 @@ bool Png::BeginImageDataProcessing()
 	}
 
 	// The first time we meet an IDAT chunk, we initialize the zstream structure
-	m_deflateUncompressor.SetBuffers(null, 0, null, 0);
+	m_deflateUncompressor.SetBuffers(nullptr, 0, nullptr, 0);
 	
 	const int nZErr = m_deflateUncompressor.Init();
 	if( nZErr != DF_RET_OK )
@@ -837,7 +837,7 @@ bool Png::Handle_fcTL(IFile& file, int32 dataSizeof)
 	m_currentSequenceNumber++; // Incremented for fcTL and fdAT chunks
 
 	ApngFrame* pFrame = new ApngFrame(this);
-	if( pFrame == null )
+	if( pFrame == nullptr )
 	{
 		m_lastError = notEnoughMemory;
 		return false;
@@ -1049,8 +1049,8 @@ bool Png::UnfilterAndUninterlace()
 	static const uint8 masks1[8] = { 0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01 };
 	static const uint8 shifts1[8] = { 7, 6, 5, 4, 3, 2, 1, 0 };
 	
-	const uint8* paMask = null;
-	const uint8* paShift = null;
+	const uint8* paMask = nullptr;
+	const uint8* paShift = nullptr;
 	int32 dstShift = 0;
 
 	if( m_sizeofPixelInBits < 8 )
@@ -1609,7 +1609,7 @@ const AnimFrame* Png::GetAnimFrame(int index) const
 	int32 frameCount = m_apFrames.GetSize();
 	if( !(0 <= index && index < frameCount) )
 	{
-		return null;
+		return nullptr;
 	}
 	return m_apFrames[index];
 }

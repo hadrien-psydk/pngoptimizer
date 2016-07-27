@@ -18,19 +18,19 @@ static const uint8 k_BmpSignature[2] = {'B', 'M'};
 
 void Bmp::BmpHeader::SwapBytes()
 {
-	fileSize =     IFile::Swap32(fileSize);
-	reserved =     IFile::Swap32(reserved);
+	fileSize     = IFile::Swap32(fileSize);
+	reserved     = IFile::Swap32(reserved);
 	offsetToData = IFile::Swap32(offsetToData);
 	bitmapHeaderSize = IFile::Swap32(bitmapHeaderSize);
-	width =  IFile::Swap32(width);
+	width  = IFile::Swap32(width);
 	height = IFile::Swap32(height);
 	planes = IFile::Swap16(planes);
-	depth =  IFile::Swap16(depth);
-	compression =     IFile::Swap32(compression);
-	bitmapDataSize =  IFile::Swap32(bitmapDataSize);
-	xPelsPerMeter =   IFile::Swap32(xPelsPerMeter);
-	yPelsPerMeter =   IFile::Swap32(yPelsPerMeter);
-	colorCount =      IFile::Swap32(colorCount);
+	depth  = IFile::Swap16(depth);
+	compression     = IFile::Swap32(compression);
+	bitmapDataSize  = IFile::Swap32(bitmapDataSize);
+	xPelsPerMeter   = IFile::Swap32(xPelsPerMeter);
+	yPelsPerMeter   = IFile::Swap32(yPelsPerMeter);
+	colorCount      = IFile::Swap32(colorCount);
 	importantColors = IFile::Swap32(importantColors);
 }
 
@@ -126,15 +126,15 @@ bool Bmp::LoadFromFile(IFile& file)
 	m_width = bh.width;
 	m_height = bh.height;
 
-	bool bRowOrderTopToBottom = false;
+	bool rowOrderTopToBottom = false;
 	if( m_height < 0 )
 	{
 		// The row order is top to bottom
-		bRowOrderTopToBottom = true;
+		rowOrderTopToBottom = true;
 		m_height = -m_height;
 	}
 
-	if( !(compNone <= bh.compression && bh.compression <= compBitfields) )
+	if( bh.compression > compBitfields )
 	{
 		m_lastError = errUnsupportedCompressionFormat;
 		return false;
@@ -183,9 +183,9 @@ bool Bmp::LoadFromFile(IFile& file)
 
 	////////////////////////////////////////////////
 	// Read the palette
-	uint8 aColors[256 * 4];
+	uint8 colors[256 * 4];
 	const int32 paletteSize = bh.colorCount * 4;
-	if( file.Read(aColors, paletteSize) != paletteSize )
+	if( file.Read(colors, paletteSize) != paletteSize )
 	{
 		m_lastError = uncompleteFile;
 		return false;
@@ -195,9 +195,9 @@ bool Bmp::LoadFromFile(IFile& file)
 
 	for(int i = 0; i < bh.colorCount; ++i)
 	{
-		uint8 b = aColors[4 * i + 0];
-		uint8 g = aColors[4 * i + 1];
-		uint8 r = aColors[4 * i + 2];
+		uint8 b = colors[4 * i + 0];
+		uint8 g = colors[4 * i + 1];
+		uint8 r = colors[4 * i + 2];
 		
 		m_ColorTable.m_colors[i].SetRgb(r, g, b);
 	}
@@ -270,8 +270,8 @@ bool Bmp::LoadFromFile(IFile& file)
 	
 	file.SetPosition(bh.offsetToData);
 
-	bool bReadOk = ReadPixelData(file, bh);
-	if( bReadOk )
+	bool readOk = ReadPixelData(file, bh);
+	if( readOk )
 	{
 		if( pf == PF_32bppBgra && maskAlpha != 0xFF000000 )
 		{
@@ -279,7 +279,7 @@ bool Bmp::LoadFromFile(IFile& file)
 			SetAlphaFullOpaque();
 		}
 
-		if( !bRowOrderTopToBottom )
+		if( !rowOrderTopToBottom )
 		{
 			// Flip is needed
 			FlipVertical();
@@ -287,7 +287,7 @@ bool Bmp::LoadFromFile(IFile& file)
 	}
 
 	file.SetPosition(bh.fileSize);
-	return bReadOk;
+	return readOk;
 }
 
 

@@ -99,7 +99,7 @@ bool ColorButton::Create(const RECT& rc, HWND hParent, int nId)
 //////////////////////
 LRESULT CALLBACK ColorButton::WndProcStatic(HWND hWnd, UINT nMsg, WPARAM wParam, LPARAM lParam)
 {
-	ColorButton* pWin = null;
+	ColorButton* pWin = nullptr;
 
 	if( nMsg == WM_NCCREATE )
 	{
@@ -118,7 +118,7 @@ LRESULT CALLBACK ColorButton::WndProcStatic(HWND hWnd, UINT nMsg, WPARAM wParam,
 		pWin = (ColorButton*) (nLong);
 	}
 	
-	if( pWin == null )
+	if( pWin == nullptr )
 	{
 		// Can occur in very rare cases
 		return ::DefWindowProc(hWnd, nMsg, wParam, lParam);

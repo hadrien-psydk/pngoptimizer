@@ -370,7 +370,7 @@ bool PngDumper::WriteSignature(IFile& file)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 bool PngDumper::WriteChunk_bkGD(ChunkedFile& cf, uint8 colorType, const PngChunk_bkGD& content)
 {
-	if( colorType == 0x03 && content.index >= 0 )
+	if( colorType == 0x03 )
 	{
 		// Indexed color
 		cf.BeginChunkWrite(PngChunk_bKGD::Name);
@@ -378,7 +378,7 @@ bool PngDumper::WriteChunk_bkGD(ChunkedFile& cf, uint8 colorType, const PngChunk
 		if( !cf.EndChunkWrite() )
 			return false;
 	}
-	else if( (colorType == 0x00 || colorType == 0x04) && content.grey >= 0 )
+	else if( colorType == 0x00 || colorType == 0x04 )
 	{
 		// Grey or Grey+Alpha
 		cf.BeginChunkWrite(PngChunk_bKGD::Name);
@@ -386,7 +386,7 @@ bool PngDumper::WriteChunk_bkGD(ChunkedFile& cf, uint8 colorType, const PngChunk
 		if( !cf.EndChunkWrite() )
 			return false;
 	}
-	else if( (colorType == 0x02 || colorType == 0x06) && content.red >= 0 )
+	else if( colorType == 0x02 || colorType == 0x06 )
 	{
 		// TrueColor or TrueColor+Alpha
 		cf.BeginChunkWrite(PngChunk_bKGD::Name);
@@ -640,7 +640,7 @@ bool PngDumper::CreateImageData(const uint8* pSrc, int32 width, int32 height,
 	}
 	
 	int32 bufferToCompressSize = 0;
-	uint8* pBufferToCompress = null;
+	uint8* pBufferToCompress = nullptr;
 
 	if( dd.interlaced )
 	{
@@ -760,8 +760,8 @@ bool PngDumper::InterlaceAndFilter(uint8* pDst, const uint8* pSrc,
 	static const uint8 masks1[8] = { 0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01 };
 	static const uint8 shifts1[8] = { 7, 6, 5, 4, 3, 2, 1, 0 };
 	
-	const uint8* paMask = null;
-	const uint8* paShift = null;
+	const uint8* paMask = nullptr;
+	const uint8* paShift = nullptr;
 	int32 srcShift = 0;
 
 	if( sizeofPixelInBits < 8 )

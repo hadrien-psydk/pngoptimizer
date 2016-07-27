@@ -90,7 +90,7 @@ public:
 		{}
 
 		Handler()
-			: m_papObservers(null), m_pObserver(null), m_bShouldDeleteObserver(false) {}
+			: m_papObservers(nullptr), m_pObserver(nullptr), m_bShouldDeleteObserver(false) {}
 
 		~Handler() 
 		{

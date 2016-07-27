@@ -11,7 +11,7 @@ using namespace chustd;
 //////////////////////////////////////////////////////////////////////
 BitBuffer::BitBuffer()
 {
-	m_pBuffer = null;
+	m_pBuffer = nullptr;
 	m_nSize = 0;
 }
 

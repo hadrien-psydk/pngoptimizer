@@ -20,7 +20,7 @@
 using namespace chustd;
 ///////////////////////////////////////////////////////////////////////////////
 
-ImageLoader::ImageLoader() : m_pImageType(null), m_type(Type_None)
+ImageLoader::ImageLoader() : m_pImageType(nullptr), m_type(Type_None)
 {
 
 }
@@ -73,7 +73,7 @@ bool ImageLoader::Instanciate(IFile& file)
 bool ImageLoader::InstanciateLosslessFormat(IFile& file)
 {
 	delete m_pImageType;
-	m_pImageType = null;
+	m_pImageType = nullptr;
 	m_type = Type_None;
 
 	int64 pos = file.GetPosition();

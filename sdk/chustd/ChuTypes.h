@@ -95,14 +95,6 @@ typedef double float64;
 #pragma warning( disable : 4512 ) // Level4 - assignment operator could not be generated
 #endif
 
-#ifndef null
-  #if _MSC_VER >= 1600
-    #define null nullptr
-  #else
-    #define null 0
-  #endif
-#endif
-
 #define MAKE16(u0,u1)       ((u0 << 8) | u1)
 #define MAKE32(u0,u1,u2,u3) ((u0 << 24) | (u1 << 16) | (u2 << 8) | u3)
 

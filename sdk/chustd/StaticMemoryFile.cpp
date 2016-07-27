@@ -12,7 +12,7 @@ namespace chustd {\
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 StaticMemoryFile::StaticMemoryFile()
 {
-	m_buf = null;
+	m_buf = nullptr;
 	m_bufSize = 0;
 	m_position = 0;
 	m_maxPosition = 0;
@@ -121,7 +121,7 @@ void StaticMemoryFile::SetByteOrder(ByteOrder byteOrder)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void StaticMemoryFile::Close()
 {
-	m_buf = null;
+	m_buf = nullptr;
 	m_bufSize = 0;
 	m_position = 0;
 	m_maxPosition = 0;
@@ -132,7 +132,7 @@ void StaticMemoryFile::Close()
 // Opens the StaticMemoryFile for reading from an external read-only buffer
 bool StaticMemoryFile::OpenRead(const void* buf, int size)
 {
-	if( buf == null || size < 0 )
+	if( buf == nullptr || size < 0 )
 	{
 		return false;
 	}
@@ -149,7 +149,7 @@ bool StaticMemoryFile::OpenRead(const void* buf, int size)
 // Opens the StaticMemoryFile for reading from an external write buffer
 bool StaticMemoryFile::OpenWrite(void* buf, int size)
 {
-	if( buf == null || size < 0 )
+	if( buf == nullptr || size < 0 )
 	{
 		return false;
 	}

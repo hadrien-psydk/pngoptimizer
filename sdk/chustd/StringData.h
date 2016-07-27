@@ -59,7 +59,7 @@ public:
 
 	static inline StringData* GetInstance(uint16* psz)
 	{
-		ASSERT(psz != null);
+		ASSERT(psz != nullptr);
 		uint64* pBuf64 = (uint64*) psz;
 		pBuf64 -= 1;
 		

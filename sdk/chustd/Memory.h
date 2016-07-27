@@ -56,7 +56,7 @@ public:
 
 bool Memory::Is16BitsAligned(const void* p)
 {
-	uint8* pNull = null;
+	uint8* pNull = nullptr;
 	uint8* p8 = (uint8*) p;
 	uint32 diff = uint32(p8 - pNull);
 	return (diff & 0x0001) == 0;
@@ -64,7 +64,7 @@ bool Memory::Is16BitsAligned(const void* p)
 
 bool Memory::Is32BitsAligned(const void* p)
 {
-	uint8* pNull = null;
+	uint8* pNull = nullptr;
 	uint8* p8 = (uint8*) p;
 	uint32 diff = uint32(p8 - pNull);
 	return (diff & 0x0003) == 0;
@@ -72,7 +72,7 @@ bool Memory::Is32BitsAligned(const void* p)
 
 bool Memory::Is64BitsAligned(const void* p)
 {
-	uint8* pNull = null;
+	uint8* pNull = nullptr;
 	uint8* p8 = (uint8*) p;
 	uint32 diff = uint32(p8 - pNull);
 	return (diff & 0x0007) == 0;

@@ -803,7 +803,7 @@ const uint16* UnicodeCaseMapping::CodeUnitToLowerMulti(uint16 code)
 	{
 		return g_aUnconditionalMultiToUpper + 1;
 	}
-	return null;
+	return nullptr;
 }
 
 // Gets the upper case transform code unit sequence for 1:N uppercase mapping
@@ -824,7 +824,7 @@ const uint16* UnicodeCaseMapping::CodeUnitToUpperMulti(uint16 code)
 		}
 		if( curCode > code )
 		{
-			return null;
+			return nullptr;
 		}
 	}
 
@@ -844,7 +844,7 @@ const uint16* UnicodeCaseMapping::CodeUnitToUpperMulti(uint16 code)
 			}
 			if( curCode > code )
 			{
-				return null;
+				return nullptr;
 			}
 		}
 	}
@@ -864,11 +864,11 @@ const uint16* UnicodeCaseMapping::CodeUnitToUpperMulti(uint16 code)
 			}
 			if( curCode > code )
 			{
-				return null;
+				return nullptr;
 			}
 		}
 	}
-	return null;
+	return nullptr;
 }
 
 const uint16* const * UnicodeCaseMapping::GetUcs2ToUpperPages()

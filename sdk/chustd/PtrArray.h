@@ -69,14 +69,8 @@ PtrArray<T>::PtrArray()
 ///////////////////////////////////////////////////////////////////////////////
 // Copy constructor
 template <class T>
-PtrArray<T>::PtrArray(const PtrArray<T>& arr)
+PtrArray<T>::PtrArray(const PtrArray<T>& arr) : Array<T*>(arr.m_paTs, arr.m_count)
 {
-	this->m_paTs = nullptr;
-	this->m_count = 0;
-	this->m_capacity = 0;
-
-	Add(arr.m_paTs, arr.m_count);
-
 	// Create copies of pointed data
 	for(int i = 0; i < this->m_count; i++)
 	{

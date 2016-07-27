@@ -14,7 +14,7 @@ POWorkerThread::POWorkerThread()
 	m_jobType = -1;
 	m_success = false;
 	m_created = false;
-	m_pPdd = null;
+	m_pPdd = nullptr;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -185,7 +185,7 @@ void POWorkerThread::Wait()
 	}
 	m_semWait.Wait();
 	m_jobType = -1;
-	m_pPdd = null;
+	m_pPdd = nullptr;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////

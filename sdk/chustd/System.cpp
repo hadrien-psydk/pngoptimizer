@@ -20,7 +20,7 @@ uint32 System::GetTime()
 	return GetTickCount();
 
 #elif defined(__linux__)
-	timespec ts = { 0 };
+	timespec ts = {};
 	clock_gettime(CLOCK_MONOTONIC, &ts);
 	int64 ret = ts.tv_sec;
 	ret *= 1000000000;

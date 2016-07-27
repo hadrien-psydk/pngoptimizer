@@ -128,7 +128,7 @@ const MemIniFile::ValuePtrArray& MemIniFile::Section::GetValues() const
 
 MemIniFile::MemIniFile()
 {
-	m_pCurrentSection = null;
+	m_pCurrentSection = nullptr;
 }
 
 MemIniFile::~MemIniFile()
@@ -170,7 +170,7 @@ bool MemIniFile::Load(const String& filePath)
 
 	m_aSections.Clear();
 	m_aSections.EnsureCapacity(16);
-	m_pCurrentSection = null;
+	m_pCurrentSection = nullptr;
 
 	// Find the sections
 	const int32 stringCount = astr.GetSize();
@@ -196,7 +196,7 @@ bool MemIniFile::Load(const String& filePath)
 				int32 foundAt = str.Find("=", 0);
 				if( foundAt >= 0 )
 				{
-					if( m_pCurrentSection != null )
+					if( m_pCurrentSection != nullptr )
 					{
 						String strValueName = str.Left(foundAt).Trim();
 						String strValue = str.Mid(foundAt + 1).Trim();
@@ -220,7 +220,7 @@ bool MemIniFile::Load(const String& filePath)
 		}
 	}
 
-	m_pCurrentSection = null;
+	m_pCurrentSection = nullptr;
 	m_strCurrentSection.Empty();
 
 	return true;
@@ -283,7 +283,7 @@ bool MemIniFile::Dump(const String& filePath, bool bCrLf)
 
 bool MemIniFile::SetSection(const String& strSection)
 {
-	if( m_pCurrentSection != null )
+	if( m_pCurrentSection != nullptr )
 	{
 		// If we are lucky we are just doing a fast pointer comparison
 		if( m_strCurrentSection == strSection )
@@ -294,7 +294,7 @@ bool MemIniFile::SetSection(const String& strSection)
 
 	String strUpperSection = strSection.ToUpperCase();
 	
-	m_pCurrentSection = null;
+	m_pCurrentSection = nullptr;
 
 	// Find the section (maybe it already exists)
 	for(int i = 0; i < m_aSections.GetSize(); ++i)
@@ -307,7 +307,7 @@ bool MemIniFile::SetSection(const String& strSection)
 		}
 	}
 
-	if( m_pCurrentSection == null )
+	if( m_pCurrentSection == nullptr )
 	{
 		// Create the section
 		int32 pos = m_aSections.Add();
@@ -322,7 +322,7 @@ bool MemIniFile::SetSection(const String& strSection)
 
 bool MemIniFile::GetString(const String& strName, String& strValue) const
 {
-	if( m_pCurrentSection == null )
+	if( m_pCurrentSection == nullptr )
 		return false;
 
 	return m_pCurrentSection->GetValue(strName, strValue);
@@ -330,7 +330,7 @@ bool MemIniFile::GetString(const String& strName, String& strValue) const
 
 bool MemIniFile::GetInt(const String& strName, int& value) const
 {
-	if( m_pCurrentSection == null )
+	if( m_pCurrentSection == nullptr )
 		return false;
 
 	String strValue;
@@ -342,7 +342,7 @@ bool MemIniFile::GetInt(const String& strName, int& value) const
 
 bool MemIniFile::GetBool(const String& strName, bool& bValue) const
 {
-	if( m_pCurrentSection == null )
+	if( m_pCurrentSection == nullptr )
 		return false;
 
 	String strValue;
@@ -354,7 +354,7 @@ bool MemIniFile::GetBool(const String& strName, bool& bValue) const
 
 void MemIniFile::SetString(const String& strName, const String& strValue)
 {
-	if( m_pCurrentSection == null )
+	if( m_pCurrentSection == nullptr )
 		return;
 
 	m_pCurrentSection->SetValue(strName, strValue);	
@@ -362,7 +362,7 @@ void MemIniFile::SetString(const String& strName, const String& strValue)
 
 void MemIniFile::SetInt(const String& strName, int value)
 {
-	if( m_pCurrentSection == null )
+	if( m_pCurrentSection == nullptr )
 		return;
 
 	String strValue = String::FromInt(value);
@@ -371,7 +371,7 @@ void MemIniFile::SetInt(const String& strName, int value)
 
 void MemIniFile::SetBool(const String& strName, bool bValue)
 {
-	if( m_pCurrentSection == null )
+	if( m_pCurrentSection == nullptr )
 		return;
 
 	String strValue = bValue ? "1" : "0";

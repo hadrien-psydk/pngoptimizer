@@ -237,16 +237,16 @@ protected:
 
 		CharGiver()
 		{
-			m_pTextEncoding = null;
-			m_pRawContent = null;
+			m_pTextEncoding = nullptr;
+			m_pRawContent = nullptr;
 		}
 
 		void Empty()
 		{
 			m_state.Empty();
 
-			m_pTextEncoding = null;
-			m_pRawContent = null;
+			m_pTextEncoding = nullptr;
+			m_pRawContent = nullptr;
 		}
 
 		void SetContent(const ByteArray* pContent);

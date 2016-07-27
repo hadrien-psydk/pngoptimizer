@@ -48,8 +48,8 @@ private:
 template <typename TYPE>
 PropertySynchronizer<TYPE>::PropertySynchronizer()
 {
-	m_pProperty1 = null;
-	m_pProperty2 = null;
+	m_pProperty1 = nullptr;
+	m_pProperty2 = nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////

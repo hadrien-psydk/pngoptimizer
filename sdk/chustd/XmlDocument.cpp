@@ -625,7 +625,7 @@ const TextEncoding* XmlDocument::GetTemporaryEncoding()
 	switch(m_eDetectedEncoding)
 	{
 	case encodingUnknown:
-		return null;
+		return nullptr;
 
 	case encodingUtf8:
 		return &TextEncoding::Utf8();
@@ -641,7 +641,7 @@ const TextEncoding* XmlDocument::GetTemporaryEncoding()
 		return &TextEncoding::Utf32Be();
 
 	default:
-		return null;
+		return nullptr;
 	}
 }
 
@@ -715,7 +715,7 @@ const TextEncoding* XmlDocument::GetFinalEncoding()
 	{
 		// This encoding is not supported
 		m_strLastError = "Encoding not supported : " + strEncoding;
-		return null;
+		return nullptr;
 	}
 
 	m_strLastError = "Inconsistency between document encoding detection and declaration. "
@@ -724,7 +724,7 @@ const TextEncoding* XmlDocument::GetFinalEncoding()
 		+ " but the xml header declares the encoding as "
 		+ strEncoding;
 
-	return null;
+	return nullptr;
 }
 
 bool XmlDocument::IsBlankChar(int codePoint)
@@ -1120,7 +1120,7 @@ bool XmlDocument::ParseDocument(XmlElement* pParentNode)
 				if( pParentNode == &m_docnode )
 				{
 					// This is the root of the document !
-					if( GetDocumentElement() != null )
+					if( GetDocumentElement() != nullptr )
 					{
 						// Error, only one root in an xml document
 						m_strLastError = "More than one root in document";
@@ -1173,7 +1173,7 @@ bool XmlDocument::LoadFromContent(const ByteArray& aContent)
 	// We may not know the exact encoding, but we know enough to parse the header, and
 	// get additional character encoding information.
 	const TextEncoding* pTmpTextEncoding = GetTemporaryEncoding();
-	ASSERT(pTmpTextEncoding != null);
+	ASSERT(pTmpTextEncoding != nullptr);
 
 	m_charGiver.SetEncoding(pTmpTextEncoding);
 
@@ -1190,7 +1190,7 @@ bool XmlDocument::LoadFromContent(const ByteArray& aContent)
 
 	// Compare the automatic encoding and the declared encoding to check if they match
 	const TextEncoding* pFinalTextEncoding = GetFinalEncoding();
-	if( pFinalTextEncoding == null )
+	if( pFinalTextEncoding == nullptr )
 	{
 		return false;
 	}
@@ -1283,7 +1283,7 @@ XmlDocument::CharGiver::ExtractStatus XmlDocument::CharGiver::ExtractChar(int& c
 XmlDocument::CharGiver::ExtractStatus XmlDocument::CharGiver::GetNextChar(int& codePoint)
 {
 	// The encoding should be set with SetEncoding before calling this function
-	ASSERT(m_pTextEncoding != null);
+	ASSERT(m_pTextEncoding != nullptr);
 
 	uint32 charLength;
 	ExtractStatus eStatus = ExtractChar(codePoint, charLength);
@@ -1458,7 +1458,7 @@ XmlElement* XmlElement::GetFirstElement()
 			return pChildElement;
 		}
 	}
-	return null;
+	return nullptr;
 }
 
 XmlNode* XmlElement::GetFirstChild()
@@ -1466,7 +1466,7 @@ XmlNode* XmlElement::GetFirstChild()
 	ASSERT( GetType() == xntElement);
 
 	if( m_apChildren.GetSize() == 0 )
-		return null;
+		return nullptr;
 
 	return m_apChildren[0];
 }
@@ -1514,7 +1514,7 @@ bool XmlDocument::UpdateIdMap()
 
 bool XmlDocument::UpdateIdMap(XmlElement* pStartingElement)
 {
-	if( pStartingElement == null )
+	if( pStartingElement == nullptr )
 		return true;
 
 	ASSERT( pStartingElement->GetType() == xntElement);
@@ -1579,6 +1579,6 @@ XmlElement* XmlDocument::GetElementById(const String& strId)
 		}
 	}
 
-	return null;
+	return nullptr;
 }
 

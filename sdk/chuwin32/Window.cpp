@@ -216,7 +216,7 @@ bool Window::CreateEx(uint32 nExStyle, const wchar* pszClassName, const wchar* p
 //////////////////////
 LRESULT CALLBACK Window::WndProcStatic(HWND hWnd, UINT nMsg, WPARAM wParam, LPARAM lParam)
 {
-	Window* pWin = null;
+	Window* pWin = nullptr;
 
 	if( nMsg == WM_NCCREATE )
 	{
@@ -224,7 +224,7 @@ LRESULT CALLBACK Window::WndProcStatic(HWND hWnd, UINT nMsg, WPARAM wParam, LPAR
 		pWin = (Window*) pCreateStruct->lpCreateParams;
 
 		// The pointer must given with the CreateWindow
-		ASSERT(pWin != NULL);
+		ASSERT(pWin != nullptr);
 
 		::SetWindowLongPtr(hWnd, GWLP_USERDATA, LONG_PTR(pWin));
 		pWin->m_hWnd = hWnd;
@@ -235,7 +235,7 @@ LRESULT CALLBACK Window::WndProcStatic(HWND hWnd, UINT nMsg, WPARAM wParam, LPAR
 		pWin = (Window*) (nLong);
 	}
 
-	if( pWin == null )
+	if( pWin == nullptr )
 	{
 		// Can occur in very rare cases
 		return ::DefWindowProc(hWnd, nMsg, wParam, lParam);

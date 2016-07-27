@@ -68,7 +68,7 @@ void CheckPlatformCompatibility()
 
 void ChustdSzCat(char* pszDst, const char* pszSrc, int sizeofBuffer)
 {
-	if( pszSrc == null )
+	if( pszSrc == nullptr )
 	{
 		return;
 	}
@@ -257,7 +257,7 @@ void ChustdDebugPrintLeak(void* p, int size, const char* pszFileName, int32 line
 		}
 	}
 
-	if( pszFileName != null && line > 0 )
+	if( pszFileName != nullptr && line > 0 )
 	{
 		ChustdSzCat(szBuffer, "   ", sizeof(szBuffer));
 		ChustdSzCat(szBuffer, pszFileName, sizeof(szBuffer));

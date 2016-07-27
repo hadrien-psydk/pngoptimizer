@@ -22,7 +22,7 @@ GifAnimFrame::GifAnimFrame(Gif* pGif) : AnimFrame(pGif)
 
 	m_clearIndex = 0;
 
-	m_pPalette = null;
+	m_pPalette = nullptr;
 	m_interlaced = false;
 	m_transparentIndex = -1;
 }
@@ -34,7 +34,7 @@ GifAnimFrame::~GifAnimFrame()
 
 const Palette& GifAnimFrame::GetPalette() const
 {
-	if( m_pPalette == null )
+	if( m_pPalette == nullptr )
 	{
 		// Use global palette
 		return m_pOwner->GetPalette();
@@ -92,7 +92,7 @@ const Palette& Gif::GetPalette() const
 	if( frameCount > 0 )
 	{
 		const GifAnimFrame* pFrame = m_apFrames[0];
-		if( pFrame->m_pPalette != null )
+		if( pFrame->m_pPalette != nullptr )
 		{
 			return *(pFrame->m_pPalette);
 		}
@@ -127,13 +127,13 @@ const AnimFrame* Gif::GetAnimFrame(int32 frameIndex) const
 	if( !(0 <= frameIndex && frameIndex < frameCount) )
 	{
 		ASSERT(0); // Bad index
-		return null;
+		return nullptr;
 	}
 
 	if( !(0 <= frameIndex && frameIndex < frameCount) )
 	{
 		ASSERT(0); // Bad index
-		return null;
+		return nullptr;
 	}
 	
 	const GifAnimFrame* pFrame = m_apFrames[frameIndex];
@@ -267,7 +267,7 @@ bool Gif::LoadFromFile(IFile& file)
 			// 0x2c = ',' = ImageDescriptor
 			
 			GifAnimFrame* pFrame = new GifAnimFrame(this);
-			if( pFrame == null )
+			if( pFrame == nullptr )
 			{
 				// Allocation failure
 				m_lastError = notEnoughMemory;
@@ -298,7 +298,7 @@ bool Gif::LoadFromFile(IFile& file)
 
 				pFrame->m_transparentIndex = m_transparentColorIndex;
 
-				if( pFrame->m_pPalette != null )
+				if( pFrame->m_pPalette != nullptr )
 				{
 					pFrame->m_pPalette->m_colors[ m_transparentColorIndex ].SetAlpha(0);
 				}
@@ -322,7 +322,7 @@ bool Gif::LoadFromFile(IFile& file)
 						{
 							// Transparent index not the same than in global palette, make our own palette
 							Palette* pNewPalette = new Palette;
-							if( pNewPalette == null )
+							if( pNewPalette == nullptr )
 							{
 								m_lastError = notEnoughMemory;
 								return false;
@@ -669,14 +669,14 @@ bool Gif::ReadImageDescriptor(IFile& file, GifAnimFrame* pFrame)
 	if( !bUseLocalColorMap )
 	{
 		// This frame uses the global palette
-		ASSERT(pFrame->m_pPalette == null);
-		pFrame->m_pPalette = null;
+		ASSERT(pFrame->m_pPalette == nullptr);
+		pFrame->m_pPalette = nullptr;
 		return true;
 	}
 
 	// A palette is following
 	pFrame->m_pPalette = new Palette();
-	if( pFrame->m_pPalette == null )
+	if( pFrame->m_pPalette == nullptr )
 	{
 		m_lastError = notEnoughMemory;
 		return false;

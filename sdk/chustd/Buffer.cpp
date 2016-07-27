@@ -36,9 +36,9 @@ struct BufferData
 	{
 		int allocSize = GetAllocSize(dataSize);
 		BufferData* pData = (BufferData*)Memory::Alloc(allocSize);
-		if( pData == null )
+		if( pData == nullptr )
 		{
-			return null;
+			return nullptr;
 		}
 		pData->refCount = 1;
 		pData->size = dataSize;
@@ -56,9 +56,9 @@ struct BufferData
 			return pData->bytes;
 		}
 		BufferData* pData2 = (BufferData*)realloc(pData, allocSize);
-		if( pData2 == null )
+		if( pData2 == nullptr )
 		{
-			return null;
+			return nullptr;
 		}
 		pData2->size = dataSize;
 		return pData2->bytes;
@@ -78,31 +78,31 @@ private:
 ///////////////////////////////////////////////////////////////////////////////
 Buffer::Buffer()
 {
-	m_pBytes = null;
+	m_pBytes = nullptr;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 Buffer::Buffer(const Buffer& buf)
 {
 	uint8* pBytes = buf.m_pBytes;
-	if( pBytes != null )
+	if( pBytes != nullptr )
 	{
 		BufferData::GetPtr(pBytes)->Ref();
 		m_pBytes = pBytes;
 	}
 	else
 	{
-		m_pBytes = null;
+		m_pBytes = nullptr;
 	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 Buffer::~Buffer()
 {
-	if( m_pBytes != null )
+	if( m_pBytes != nullptr )
 	{
 		BufferData::GetPtr(m_pBytes)->Unref();
-		m_pBytes = null;
+		m_pBytes = nullptr;
 	}
 }
 
@@ -110,10 +110,10 @@ Buffer::~Buffer()
 Buffer& Buffer::operator=(const Buffer& buf)
 {
 	uint8* pBytes = buf.m_pBytes;
-	if( pBytes != null )
+	if( pBytes != nullptr )
 	{
 		BufferData::GetPtr(pBytes)->Ref();
-		if( m_pBytes != null )
+		if( m_pBytes != nullptr )
 		{
 			BufferData::GetPtr(m_pBytes)->Unref();
 		}
@@ -121,7 +121,7 @@ Buffer& Buffer::operator=(const Buffer& buf)
 	}
 	else
 	{
-		m_pBytes = null;
+		m_pBytes = nullptr;
 	}
 	return *this;
 }
@@ -136,7 +136,7 @@ bool Buffer::SetSize(int size)
 		ASSERT(0);
 		return false;
 	}
-	if( m_pBytes == null )
+	if( m_pBytes == nullptr )
 	{
 		if( size > 0 )
 		{
@@ -155,12 +155,12 @@ bool Buffer::SetSize(int size)
 			// Have to create our own buffer, unless the new size is 0
 			if( size == 0 )
 			{
-				m_pBytes = null;
+				m_pBytes = nullptr;
 			}
 			else
 			{
 				uint8* pBytes2 = BufferData::Alloc(size);
-				if( pBytes2 != null )
+				if( pBytes2 != nullptr )
 				{
 					int32 oldSize = pData->size;
 					int32 minSize = MIN(oldSize, size);
@@ -174,7 +174,7 @@ bool Buffer::SetSize(int size)
 	
 	if( size > 0 )
 	{
-		return m_pBytes != null;
+		return m_pBytes != nullptr;
 	}
 	return true;
 }
@@ -193,7 +193,7 @@ bool Buffer::EnsureCapacity(int capacity)
 		return true;
 	}
 	int oldSize = 0;
-	if( m_pBytes != null )
+	if( m_pBytes != nullptr )
 	{
 		oldSize = BufferData::GetPtr(m_pBytes)->size;
 	};
@@ -209,7 +209,7 @@ bool Buffer::EnsureCapacity(int capacity)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 int Buffer::GetSize() const
 {
-	if( m_pBytes != null )
+	if( m_pBytes != nullptr )
 	{
 		BufferData* pData = BufferData::GetPtr(m_pBytes);
 		return pData->size;
@@ -226,9 +226,9 @@ const uint8* Buffer::GetReadPtr() const
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 uint8* Buffer::GetWritePtr()
 {
-	if( m_pBytes == null )
+	if( m_pBytes == nullptr )
 	{
-		return null;
+		return nullptr;
 	}
 	BufferData* pData = BufferData::GetPtr(m_pBytes);
 	if( pData->refCount == 1 )
@@ -238,7 +238,7 @@ uint8* Buffer::GetWritePtr()
 	// Force own buffer
 	if( !SetSize(pData->size) )
 	{
-		return null;
+		return nullptr;
 	}
 	return m_pBytes;
 }

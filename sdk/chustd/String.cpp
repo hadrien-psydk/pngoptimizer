@@ -26,7 +26,7 @@ String::String()
 ///////////////////////////////////////////////////////////////////////////////
 String::String(const char* psz)
 {
-	if( psz == null || psz[0] == 0 )
+	if( psz == nullptr || psz[0] == 0 )
 	{
 		m_pszBuffer = StringData::GetNullInstance()->GetBuffer();
 	}
@@ -34,7 +34,7 @@ String::String(const char* psz)
 	{
 		int length = String::SZLength(psz);
 		uint16* pszNew = StringData::CreateInstance(length);
-		if( pszNew == null )
+		if( pszNew == nullptr )
 		{
 			// Raise exception ?
 			m_pszBuffer = StringData::GetNullInstance()->GetBuffer();
@@ -53,14 +53,14 @@ String::String(const char* psz)
 ///////////////////////////////////////////////////////////////////////////////
 String::String(const char* psz, int length)
 {
-	if( psz == null || psz[0] == 0 || length <= 0 )
+	if( psz == nullptr || psz[0] == 0 || length <= 0 )
 	{
 		m_pszBuffer = StringData::GetNullInstance()->GetBuffer();
 	}
 	else
 	{
 		uint16* pszNew = StringData::CreateInstance(length);
-		if( pszNew == null )
+		if( pszNew == nullptr )
 		{
 			// Raise exception ?
 			m_pszBuffer = StringData::GetNullInstance()->GetBuffer();
@@ -79,7 +79,7 @@ String::String(const char* psz, int length)
 ///////////////////////////////////////////////////////////////////////////////
 String::String(const wchar* psz)
 {
-	if( psz == null || psz[0] == 0 )
+	if( psz == nullptr || psz[0] == 0 )
 	{
 		m_pszBuffer = StringData::GetNullInstance()->GetBuffer();
 	}
@@ -96,7 +96,7 @@ String::String(const wchar* psz)
 ///////////////////////////////////////////////////////////////////////////////
 String::String(const wchar* psz, int length)
 {
-	if( psz == null )
+	if( psz == nullptr )
 	{
 		m_pszBuffer = StringData::GetNullInstance()->GetBuffer();
 	}
@@ -113,7 +113,7 @@ String::String(const wchar* psz, int length)
 String::String(const String& str)
 {
 	m_pszBuffer = str.m_pszBuffer;
-	ASSERT(m_pszBuffer != null);
+	ASSERT(m_pszBuffer != nullptr);
 	
 	StringData* pData = GetData();
 	if( pData != StringData::GetNullInstance() )
@@ -140,7 +140,7 @@ void String::SetBuffer(const wchar* pBuffer, int length)
 {
 	Unref();
 
-	if( pBuffer != null && length != 0 )
+	if( pBuffer != nullptr && length != 0 )
 	{
 		m_pszBuffer = StringData::CreateInstance(length);
 		Memory::Copy16(m_pszBuffer, pBuffer, length);
@@ -317,7 +317,7 @@ String String::ToUpperCase() const
 			uint8 subCode = uint8(codePoint & 0x00ff);
 
 			const uint16* const pPage = pPages[page];
-			if( pPage != null && pPage[subCode] != 0 )
+			if( pPage != nullptr && pPage[subCode] != 0 )
 			{
 				codePoint = pPage[subCode];
 			}
@@ -325,7 +325,7 @@ String String::ToUpperCase() const
 			{
 				// Find unconditionnal 1:N mapping
 				const uint16* pMulti = UnicodeCaseMapping::CodeUnitToUpperMulti( uint16(codePoint));
-				if( pMulti != null )
+				if( pMulti != nullptr )
 				{
 					for(int iNew = 0; iNew < 3; ++iNew)
 					{
@@ -377,7 +377,7 @@ String String::ToLowerCase() const
 			uint8 subCode = uint8(codePoint & 0x00ff);
 
 			const uint16* const pPage = pPages[page];
-			if( pPage != null && pPage[subCode] != 0 )
+			if( pPage != nullptr && pPage[subCode] != 0 )
 			{
 				codePoint = pPage[subCode];
 			}
@@ -385,7 +385,7 @@ String String::ToLowerCase() const
 			{
 				// Find unconditionnal 1:N mapping
 				const uint16* pMulti = UnicodeCaseMapping::CodeUnitToLowerMulti( uint16(codePoint));
-				if( pMulti != null )
+				if( pMulti != nullptr )
 				{
 					for(int iNew = 0; iNew < 3; ++iNew)
 					{
@@ -453,7 +453,7 @@ const String operator + (const String& str1, const String& str2)
 ///////////////////////////////////////////////////////////////////////////////
 const String operator + (const String& str1, const wchar* psz)
 {
-	if( psz == null || psz[0] == 0 )
+	if( psz == nullptr || psz[0] == 0 )
 		return str1;
 
 	const int dataLength1 = str1.GetData()->GetLength();
@@ -480,7 +480,7 @@ const String operator + (const String& str1, const wchar* psz)
 ///////////////////////////////////////////////////////////////////////////////
 const String operator + (const wchar* psz, const String& str2)
 {
-	if( psz == null || psz[0] == 0 )
+	if( psz == nullptr || psz[0] == 0 )
 		return str2;
 
 	const int pszLength = String::SZLength(psz);
@@ -500,7 +500,7 @@ const String operator + (const wchar* psz, const String& str2)
 bool String::IsBinaryEqual(const wchar* psz) const
 {
 	const int thisLength = GetData()->GetLength();
-	const int length = (psz != null) ? SZLength(psz) : 0;
+	const int length = (psz != nullptr) ? SZLength(psz) : 0;
 	
 	if( thisLength == 0 && length == 0 )
 		return true;
@@ -1328,10 +1328,10 @@ wchar* String::GetUnsafeBuffer(int wantedLength)
 	Unref();
 
 	uint16* pszNew = StringData::CreateInstance(wantedLength);
-	if( pszNew == null )
+	if( pszNew == nullptr )
 	{
 		m_pszBuffer = StringData::GetNullInstance()->GetBuffer();
-		return null;
+		return nullptr;
 	}
 	
 	m_pszBuffer = pszNew;
@@ -1363,7 +1363,7 @@ String String::InsertAt(int index, const String& str) const
 	const int otherLength = str.GetLength();
 
 	uint16* pszNew = StringData::CreateInstance(length + otherLength);
-	if( pszNew == null )
+	if( pszNew == nullptr )
 	{
 		return String();
 	}
@@ -1396,7 +1396,7 @@ String String::Pad(int length, int codePoint) const
 
 	uint16* pszThis = m_pszBuffer;
 	uint16* pszNew = StringData::CreateInstance(length);
-	if( pszNew == null )
+	if( pszNew == nullptr )
 	{
 		return String(); // Failed
 	}

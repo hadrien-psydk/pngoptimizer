@@ -27,7 +27,7 @@ TraceCtl::TextPiece* TraceCtl::Line::AddOrReusePiece()
 		// Add one
 		if( !m_pieces.SetSize(1) )
 		{
-			return null;
+			return nullptr;
 		}
 	}
 	else
@@ -42,7 +42,7 @@ TraceCtl::TextPiece* TraceCtl::Line::AddOrReusePiece()
 			// Add a new piece
 			if( m_pieces.Add() < 0 )
 			{
-				return null;
+				return nullptr;
 			}
 		}
 	}
@@ -336,7 +336,7 @@ TraceCtl::TextPiece* TraceCtl::GetLinkFromPoint(int x, int y, RECT* /*pLocalRect
 	HDC hResDC = GetDC();
 	SelectObject(hResDC, m_hFont);
 
-	TextPiece* pResult = null;
+	TextPiece* pResult = nullptr;
 
 	int32 nX1 = m_nMarginLeft;
 	int32 nX2 = 0;
@@ -381,10 +381,10 @@ int TraceCtl::OnLButtonDown(WPARAM, LPARAM lParam)
 	int y = GET_Y_LPARAM(lParam); 
 
 	TextPiece* pTP = GetLinkFromPoint(x, y);
-	if( pTP != null )
+	if( pTP != nullptr )
 	{
 		// Transforme le curseur
-		HCURSOR hCurs = LoadCursor(NULL, IDC_HAND);
+		HCURSOR hCurs = LoadCursor(nullptr, IDC_HAND);
 		SetCursor(hCurs);
 
 		m_bDragStart = true;
@@ -403,13 +403,13 @@ int TraceCtl::OnLButtonUp(WPARAM, LPARAM lParam)
 	int y = GET_Y_LPARAM(lParam);
 
 	m_bDragStart = false;
-	m_pDragText = null;
+	m_pDragText = nullptr;
 
 	TextPiece* pTP = GetLinkFromPoint(x, y);
-	if( pTP != null )
+	if( pTP != nullptr )
 	{
 		// Transforme le curseur
-		HCURSOR hCurs = LoadCursor(NULL, IDC_HAND);
+		HCURSOR hCurs = LoadCursor(nullptr, IDC_HAND);
 		SetCursor(hCurs);
 	}
 
@@ -422,10 +422,10 @@ int TraceCtl::OnLButtonDblClk(WPARAM, LPARAM lParam)
 	int y = GET_Y_LPARAM(lParam);
 
 	TextPiece* pTP = GetLinkFromPoint(x, y);
-	if( pTP != null )
+	if( pTP != nullptr )
 	{
 		// Transforme le curseur
-		HCURSOR hCurs = LoadCursor(NULL, IDC_HAND);
+		HCURSOR hCurs = LoadCursor(nullptr, IDC_HAND);
 		SetCursor(hCurs);
 
 		OnLinkDoubleClick(pTP->url);
@@ -480,10 +480,10 @@ int TraceCtl::OnMouseMove(WPARAM wParam, LPARAM lParam)
 	}
 
 	TextPiece* pTP = GetLinkFromPoint(x, y);
-	if( pTP != null )
+	if( pTP != nullptr )
 	{
 		// Transforme le curseur
-		HCURSOR hCurs = LoadCursor(NULL, IDC_HAND);
+		HCURSOR hCurs = LoadCursor(nullptr, IDC_HAND);
 		SetCursor(hCurs);
 	}
 	return 0;
@@ -675,7 +675,7 @@ void TraceCtl::Refresh()
 void TraceCtl::AddText(const chustd::String& text, COLORREF cr)
 {
 	AddTextInfo* pAddTextInfo = new AddTextInfo;
-	if( pAddTextInfo == null )
+	if( pAddTextInfo == nullptr )
 	{
 		return;
 	}
@@ -689,7 +689,7 @@ void TraceCtl::AddText(const chustd::String& text, COLORREF cr)
 void TraceCtl::AddText(const TextPiece& tp)
 {
 	AddTextInfo* pAddTextInfo = new AddTextInfo;
-	if( pAddTextInfo == null )
+	if( pAddTextInfo == nullptr )
 	{
 		return;
 	}
@@ -708,7 +708,7 @@ void TraceCtl::AddLine(const chustd::String& text, COLORREF cr)
 void TraceCtl::AddTextAtLine(int32 line, const chustd::String& text, COLORREF cr)
 {
 	AddTextInfo* pAddTextInfo = new AddTextInfo;
-	if( pAddTextInfo == null )
+	if( pAddTextInfo == nullptr )
 	{
 		return;
 	}
@@ -722,7 +722,7 @@ void TraceCtl::AddTextAtLine(int32 line, const chustd::String& text, COLORREF cr
 void TraceCtl::AddLink(const chustd::String& text, const chustd::String& strUrl)
 {
 	AddTextInfo* pAddTextInfo = new AddTextInfo;
-	if( pAddTextInfo == null )
+	if( pAddTextInfo == nullptr )
 	{
 		return;
 	}
@@ -736,7 +736,7 @@ void TraceCtl::AddLink(const chustd::String& text, const chustd::String& strUrl)
 void TraceCtl::ClearLineAt(int32 line)
 {
 	AddTextInfo* pAddTextInfo = new AddTextInfo;
-	if( pAddTextInfo == null )
+	if( pAddTextInfo == nullptr )
 	{
 		return;
 	}
@@ -753,7 +753,7 @@ void TraceCtl::ClearLine()
 void TraceCtl::Clear()
 {
 	AddTextInfo* pAddTextInfo = new AddTextInfo;
-	if( pAddTextInfo == null )
+	if( pAddTextInfo == nullptr )
 	{
 		return;
 	}
@@ -771,7 +771,7 @@ BOOL TraceCtl::OnAddText(WPARAM wParam, LPARAM)
 	int line = pAddTextInfo->line;
 	TextPiece tp = pAddTextInfo->tp;
 	delete pAddTextInfo;
-	pAddTextInfo = null;
+	pAddTextInfo = nullptr;
 
 	switch( operation )
 	{
@@ -854,7 +854,7 @@ void TraceCtl::DoAddText(const TextPiece& tp, int lineIndex)
 
 		// Add an empty piece, except if there is already one
 		TextPiece* pPiece = line.AddOrReusePiece();
-		if( pPiece == null )
+		if( pPiece == nullptr )
 		{
 			break;
 		}

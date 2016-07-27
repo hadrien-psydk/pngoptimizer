@@ -4,7 +4,7 @@ TEST(Buffer, Construction)
 {
 	Buffer buf;
 	ASSERT_TRUE(buf.GetSize() == 0);
-	ASSERT_TRUE(buf.GetReadPtr() == null);
+	ASSERT_TRUE(buf.GetReadPtr() == nullptr);
 }
 
 TEST(Buffer, SetSize)
@@ -12,7 +12,7 @@ TEST(Buffer, SetSize)
 	Buffer buf;
 	ASSERT_TRUE(buf.SetSize(3));
 	ASSERT_TRUE(buf.GetSize() == 3);
-	ASSERT_TRUE(buf.GetReadPtr() != null);
+	ASSERT_TRUE(buf.GetReadPtr() != nullptr);
 
 	uint8* pBytes = buf.GetWritePtr();
 	pBytes[0] = 'a';
@@ -33,7 +33,7 @@ TEST(Buffer, EnsureCapacity)
 	Buffer buf;
 	ASSERT_TRUE(buf.EnsureCapacity(3));
 	ASSERT_EQ(0, buf.GetSize());
-	ASSERT_TRUE(buf.GetReadPtr() != null);
+	ASSERT_TRUE(buf.GetReadPtr() != nullptr);
 }
 
 TEST(Buffer, CopyConstructor)
@@ -45,7 +45,7 @@ TEST(Buffer, CopyConstructor)
 	// With data
 	Buffer buf1;
 	ASSERT_TRUE(buf1.SetSize(2));
-	ASSERT_TRUE(buf1.GetReadPtr() != null);
+	ASSERT_TRUE(buf1.GetReadPtr() != nullptr);
 	uint8* p1 = buf1.GetWritePtr();
 	p1[0] = 'x';
 	p1[1] = 'y';

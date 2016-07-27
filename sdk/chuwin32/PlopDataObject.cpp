@@ -160,11 +160,11 @@ HGLOBAL PlopDataObject::DuplicateGlobalBuffer(HGLOBAL hSrc)
 
 STDMETHODIMP PlopDataObject::GetData(LPFORMATETC pFE, LPSTGMEDIUM pSM)
 {
-	if(pFE == NULL ||pSM == NULL)
+	if( pFE == nullptr ||pSM == nullptr )
 		return E_INVALIDARG;
 
 
-	Both* pde = null;
+	Both* pde = nullptr;
     HRESULT hres = FindFORMATETC(pFE, &pde, FALSE);
     if (SUCCEEDED(hres))
 	{

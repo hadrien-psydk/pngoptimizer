@@ -97,7 +97,7 @@ protected:
 	int ComputeLineWidth(const Line& line);
 	uint32 GetNewScrollPos32(int nSBType, HWND hScrollBar = 0);
 
-	TextPiece* GetLinkFromPoint(int x, int y, RECT* pLocalRect = null);
+	TextPiece* GetLinkFromPoint(int x, int y, RECT* pLocalRect = nullptr);
 
 	///////////////////////////////////////////////////////////////	
 	enum ScrollUpdateFlag

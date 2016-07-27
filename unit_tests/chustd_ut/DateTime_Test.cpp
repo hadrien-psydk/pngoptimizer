@@ -127,7 +127,7 @@ void OS_Date_Split(int64 chuts, int& year, int& month, int& day)
 #elif defined(__linux__)
 	time_t unixts = chuts/1000;
 	unixts += OS_GetEpochOffset();
-	struct tm tm = { 0 };
+	struct tm tm = {};
 	gmtime_r(&unixts, &tm);
 
 	year = tm.tm_year + 1900;

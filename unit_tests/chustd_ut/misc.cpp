@@ -345,3 +345,23 @@ TEST(StringArray, Sort)
 	ASSERT_TRUE( c[2] == "plop" );
 	ASSERT_TRUE( c[3] == "zergh" );
 }
+
+struct Car
+{
+	int color;
+	Car(int c) : color(c) {}
+	~Car() { color = -1; }
+};
+
+TEST(PtrArray, CopyConstructor)
+{
+	PtrArray<Car> cars;
+	cars.Add( new Car(1) );
+	cars.Add( new Car(2) );
+
+	PtrArray<Car> newCars(cars);
+	cars.SetSize(0);
+
+	ASSERT_EQ( 1, newCars[0]->color );
+	ASSERT_EQ( 2, newCars[1]->color );
+}

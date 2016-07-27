@@ -179,7 +179,7 @@ TEST(PaletteTranslator, BuildSortLuminance)
 	exp[5] = col5;
 
 	PaletteTranslator pt;
-	pt.BuildSortLuminance(pal, null);
+	pt.BuildSortLuminance(pal, nullptr);
 
 	ASSERT_TRUE( pal == exp );
 }

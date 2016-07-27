@@ -25,7 +25,7 @@ Color32 Color32::magenta(255, 0, 255);
 //////////////////////////////////////////////////////////////////////
 PixelFormat AnimFrame::GetPixelFormat() const
 {
-	if( m_pOwner != null )
+	if( m_pOwner != nullptr )
 	{ 
 		return m_pOwner->GetPixelFormat();
 	}
@@ -34,7 +34,7 @@ PixelFormat AnimFrame::GetPixelFormat() const
 
 bool AnimFrame::HasSimpleTransparency() const
 {
-	if( m_pOwner != null )
+	if( m_pOwner != nullptr )
 	{ 
 		return m_pOwner->HasSimpleTransparency();
 	}
@@ -43,7 +43,7 @@ bool AnimFrame::HasSimpleTransparency() const
 
 uint16 AnimFrame::GetGreyTransIndex() const
 {
-	if( m_pOwner != null )
+	if( m_pOwner != nullptr )
 	{
 		return m_pOwner->GetGreyTransIndex();
 	}
@@ -52,7 +52,7 @@ uint16 AnimFrame::GetGreyTransIndex() const
 
 void AnimFrame::GetTransIndexes(uint16& red, uint16& green, uint16& blue) const
 {
-	if( m_pOwner != null )
+	if( m_pOwner != nullptr )
 	{
 		return m_pOwner->GetTransIndexes(red, green, blue);
 	}
@@ -61,7 +61,7 @@ void AnimFrame::GetTransIndexes(uint16& red, uint16& green, uint16& blue) const
 
 const Palette& AnimFrame::GetPalette() const
 {
-	if( m_pOwner != null )
+	if( m_pOwner != nullptr )
 	{
 		return m_pOwner->GetPalette();
 	}
@@ -342,7 +342,7 @@ int32 ImageFormat::GetFrameCount() const
 
 const AnimFrame* ImageFormat::GetAnimFrame(int /*index*/) const
 {
-	return null;
+	return nullptr;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

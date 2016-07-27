@@ -18,7 +18,8 @@ INCDIRS += ../../sdk
 CONFIG ?= debug
 OUTDIR := linux-$(CONFIG)
 
-CFLAGS := -Wall -Wmissing-braces -fdata-sections -ffunction-sections -Wunused-parameter
+CFLAGS := -Wall
+CFLAGS += -fdata-sections -ffunction-sections
 LDFLAGS := --gc-sections
 
 # In Debug, store debug symbols (-g)
@@ -32,7 +33,8 @@ endif
 
 GCC := gcc
 GPP := g++
-CPPFLAGS := $(CFLAGS) -std=c++0x $(addprefix -I,$(INCDIRS))
+CPPFLAGS := $(CFLAGS) -Wextra
+CPPFLAGS += -std=c++0x $(addprefix -I,$(INCDIRS))
 EXTLIBS := -pthread -lrt
 
 # Most includes for GTK+ are in /usr/include but some of them are

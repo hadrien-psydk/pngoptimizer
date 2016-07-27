@@ -96,13 +96,13 @@ STDMETHODIMP PlopEnumFormatEtc::Reset(void)
 
 STDMETHODIMP PlopEnumFormatEtc::Clone(IEnumFORMATETC FAR * FAR * ppCloneEnumFormatEtc)
 {
-	PlopEnumFormatEtc* pNewEnum = null;
+	PlopEnumFormatEtc* pNewEnum = nullptr;
 
-	if(ppCloneEnumFormatEtc == NULL)
+	if( ppCloneEnumFormatEtc == nullptr )
 		return ResultFromScode(S_FALSE);
 	
 	pNewEnum = new PlopEnumFormatEtc(m_aFormats);
-	if( pNewEnum == NULL )
+	if( pNewEnum == nullptr )
 		return (ResultFromScode(E_OUTOFMEMORY));	
 
 	pNewEnum->m_iCur = m_iCur;

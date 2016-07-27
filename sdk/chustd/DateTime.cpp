@@ -443,7 +443,7 @@ int32 DateTime::Scan(const String& strDate)
 	}
 	/////////////////////////////////////////////////////////////////
 
-	uint8* const apn[] = {null, &m_month, &m_day, &m_hour, &m_minute, &m_second };
+	uint8* const apn[] = { nullptr, &m_month, &m_day, &m_hour, &m_minute, &m_second };
 	int32 iClear = count;
 
 	for(; iClear < 3; ++iClear)

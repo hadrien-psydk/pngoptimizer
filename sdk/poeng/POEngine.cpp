@@ -435,7 +435,7 @@ bool POEngine::DumpBestResultToFile(OptiTarget& target)
 	else
 	{
 		// Target is memory buffer
-		if( target.buf == null )
+		if( target.buf == nullptr )
 		{
 			AddError(k_szInvalidArgument);
 			return false;
@@ -1591,7 +1591,7 @@ bool POEngine::OptimizeSingleFileMem(const uint8* imgBuf, int imgSize, uint8* ds
 	m_resultmgr.Reset();
 	m_originalFileWriteTime = DateTime();
 
-	if( imgBuf == null || imgSize <= 0 || dst == null || dstCapacity <= 0 || pDstSize == null )
+	if( imgBuf == nullptr || imgSize <= 0 || dst == nullptr || dstCapacity <= 0 || pDstSize == nullptr )
 	{
 		AddError(k_szInvalidArgument);
 		return false;
@@ -2236,7 +2236,7 @@ void PrepareAnimatedDumpSettings(const ImageFormat& img, PngDumpData& dd)
 	{
 		const AnimFrame* pSrc = img.GetAnimFrame(i);
 
-		ApngFrame* pFrame = new ApngFrame(null);
+		ApngFrame* pFrame = new ApngFrame(nullptr);
 
 		pFrame->m_fctl.width = pSrc->GetWidth();
 		pFrame->m_fctl.height = pSrc->GetHeight();

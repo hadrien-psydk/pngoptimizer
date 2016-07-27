@@ -14,7 +14,7 @@ namespace chuwin32 {
 class Dialog : public Window
 {
 public:
-	Dialog() : Window(null) {}
+	Dialog() : Window(nullptr) {}
 	Dialog(HWND hWnd) : Window(hWnd) {}
 	void operator = (HWND hWnd) { m_hWnd = hWnd; }
 
