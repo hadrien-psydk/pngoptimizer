@@ -35,7 +35,7 @@ String System::GetFontsDirectory()
 {
 #if defined(_WIN32)
 	wchar szPath[MAX_PATH];
-	if( SHGetSpecialFolderPathW(NULL, szPath, CSIDL_FONTS, FALSE) )
+	if( SHGetSpecialFolderPathW(nullptr, szPath, CSIDL_FONTS, FALSE) )
 	{
 		return String(szPath);
 	}
@@ -51,7 +51,7 @@ String System::GetApplicationDataDirectory()
 {
 #if defined(_WIN32)
 	wchar szPath[MAX_PATH];
-	if( SHGetSpecialFolderPathW(NULL, szPath,CSIDL_APPDATA, TRUE) )
+	if( SHGetSpecialFolderPathW(nullptr, szPath,CSIDL_APPDATA, TRUE) )
 	{
 		return String(szPath);
 	}

@@ -131,7 +131,7 @@ void ChustdAssertMessage(const char* pszFileName, int32 line, const char* pszMsg
 	if( hMod )
 	{
 		PFN_MESSAGEBOXA pfnMessageBoxA = (PFN_MESSAGEBOXA) GetProcAddress(hMod, "MessageBoxA");
-		pfnMessageBoxA(NULL, szBuffer, szTitle, MB_TASKMODAL | MB_OK | MB_TOPMOST);
+		pfnMessageBoxA(nullptr, szBuffer, szTitle, MB_TASKMODAL | MB_OK | MB_TOPMOST);
 		FreeLibrary(hMod);
 	}
 #elif CHUOS

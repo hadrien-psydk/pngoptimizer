@@ -86,7 +86,7 @@ bool File::Open(const String& filePath, uint32 mode/*=modeRead*/)
 	}
 
 	HANDLE handle = CreateFileW(filePath.GetBuffer(), 
-		access, shareMode, NULL, disposition, FILE_ATTRIBUTE_NORMAL, NULL);
+		access, shareMode, nullptr, disposition, FILE_ATTRIBUTE_NORMAL, nullptr);
 	if( handle == INVALID_HANDLE_VALUE )
 	{
 		return false;
@@ -227,7 +227,7 @@ int File::Read(void* pBuffer, int size)
 
 #if defined(_WIN32)
 	DWORD read = 0;
-	BOOL bRet = ReadFile(m_impl.handle, pBuffer, size, &read, NULL);
+	BOOL bRet = ReadFile(m_impl.handle, pBuffer, size, &read, nullptr);
 	if( !bRet )
 	{
 		return -3;
@@ -253,7 +253,7 @@ int File::Write(const void* pBuffer, int size)
 
 #if defined(_WIN32)
 	DWORD written = 0;
-	BOOL bRet = WriteFile(m_impl.handle, pBuffer, size, &written, NULL);
+	BOOL bRet = WriteFile(m_impl.handle, pBuffer, size, &written, nullptr);
 	if( !bRet )
 	{
 		return -3;
@@ -615,7 +615,7 @@ DateTime File::GetLastWriteTime()
 #if defined(_WIN32)
 	uint64 lastWriteTime = 0;
 	FILETIME timeLastWrite = {0};
-	if( ::GetFileTime(m_impl.handle, NULL, NULL, &timeLastWrite) )
+	if( ::GetFileTime(m_impl.handle, nullptr, nullptr, &timeLastWrite) )
 	{
 		lastWriteTime = *((uint64*)&timeLastWrite);
 	}
@@ -641,7 +641,7 @@ bool File::SetLastWriteTime(const DateTime& dt)
 #if defined(_WIN32)
 	uint64 ts = dt.GetChuTimeStamp() * 10000;
 	FILETIME timeLastWrite = *((FILETIME*)&ts);
-	return ::SetFileTime(m_impl.handle, NULL, NULL, &timeLastWrite) != FALSE;
+	return ::SetFileTime(m_impl.handle, nullptr, nullptr, &timeLastWrite) != FALSE;
 
 #elif defined(__linux__)
 	int nsec = 0;
@@ -716,7 +716,7 @@ String File::GetAbsolutePath(const String& strCurrentDir, const String& strRelat
 String File::GetAbsolutePath(const String& filePath)
 {
 #if defined(_WIN32)
-	const int length = ::GetFullPathName(filePath.GetBuffer(), 0, NULL, NULL);
+	const int length = ::GetFullPathName(filePath.GetBuffer(), 0, nullptr, nullptr);
 
 	wchar* pBuffer = new wchar[length];
 	wchar* pFilePart;

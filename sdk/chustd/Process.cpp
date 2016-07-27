@@ -17,7 +17,7 @@ String Process::GetCurrentDirectory()
 {
 #if defined(_WIN32)
 	// Includes ending 0
-	const int sizeofBuffer = ::GetCurrentDirectory(0, NULL);
+	const int sizeofBuffer = ::GetCurrentDirectory(0, nullptr);
 
 	wchar* pBuffer = new wchar[sizeofBuffer];
 	::GetCurrentDirectory(sizeofBuffer, pBuffer);
@@ -145,7 +145,7 @@ chustd::StringArray Process::CommandLineToArgv(const String& cmdLine)
 String Process::GetExecutablePath()
 {
 #if defined(_WIN32)
-	HINSTANCE hInstance = GetModuleHandle(NULL);
+	HINSTANCE hInstance = GetModuleHandle(nullptr);
 
 	wchar szBuffer[MAX_PATH];
 	::GetModuleFileName(hInstance, szBuffer, MAX_PATH);

@@ -55,12 +55,12 @@ bool Thread::Start(int (*pfn)(void*), void* userArg)
 
 #if defined(_WIN32)
 	DWORD threadId = 0;
-	m_handle = ::CreateThread(NULL, 0, ThreadProc, pStartArg, 0, &threadId);
-	return m_handle != NULL;
+	m_handle = ::CreateThread(nullptr, 0, ThreadProc, pStartArg, 0, &threadId);
+	return m_handle != nullptr;
 
 #elif defined(__linux__)
 	pthread_t th;
-	int ret = pthread_create(&th, NULL, &ThreadProc, pStartArg);
+	int ret = pthread_create(&th, nullptr, &ThreadProc, pStartArg);
 	if( ret != 0 )
 	{
 		return false;
@@ -115,7 +115,7 @@ void Thread::Sleep(int delayMs)
 	struct timespec ts;
 	ts.tv_sec = delayMs / 1000;
 	ts.tv_nsec = (delayMs % 1000) * 1000000;
-	nanosleep(&ts, NULL);
+	nanosleep(&ts, nullptr);
 #endif
 }
 

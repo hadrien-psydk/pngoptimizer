@@ -220,7 +220,7 @@ StringArray Directory::GetFileNames(const String& dirPath, const String& joker,
 bool Directory::Create(const String& dirPath)
 {
 #if defined(_WIN32)
-	return CreateDirectoryW(dirPath.GetBuffer(), NULL) != FALSE;
+	return CreateDirectoryW(dirPath.GetBuffer(), nullptr) != FALSE;
 
 #elif defined(__linux__)
 	char dirPath8[260];
