@@ -1,8 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////
-// This file is part of the PngOptimizerCL application
+// This file is part of the pngoptimizercl application
 // Copyright (C) 2002/2013 Hadrien Nilsson - psydk.org
 //
-// PngOptimizerCL is free software; you can redistribute it and/or modify
+// pngoptimizercl is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
@@ -65,7 +65,7 @@ int main(int argc, char** argv)
 		Console::WriteLine("Converts GIF, BMP and TGA files to optimized PNG files.");
 		Console::WriteLine("Optimizes and cleans PNG files.");
 		Console::WriteLine("");
-		Console::WriteLine("Usage:  PngOptimizerCL -file:\"yourfile.png\" [-recurs]");
+		Console::WriteLine("Usage:  pngoptimizercl -file:\"yourfile.png\" [-recurs]");
 		POEngineSettings::WriteArgvUsage("  ");
 		Console::WriteLine("");
 		Console::WriteLine("Values enclosed with [] are optional.");
@@ -73,15 +73,15 @@ int main(int argc, char** argv)
 		Console::WriteLine("");
 		Console::WriteLine("Input examples:");
 		Console::WriteLine("Handle a specific file:");
-		Console::WriteLine("  PngOptimizerCL -file:\"icon.png\"");
+		Console::WriteLine("  pngoptimizercl -file:\"icon.png\"");
 		Console::WriteLine("Handle specific file types in the current directory:");
-		Console::WriteLine("  PngOptimizerCL -file:\"*.png|*.bmp\"");
+		Console::WriteLine("  pngoptimizercl -file:\"*.png|*.bmp\"");
 		Console::WriteLine("Handle any supported file in the current directory:");
-		Console::WriteLine("  PngOptimizerCL -file:\"*\"");
+		Console::WriteLine("  pngoptimizercl -file:\"*\"");
 		Console::WriteLine("Handle specific file types in the current directory (recursive):");
-		Console::WriteLine("  PngOptimizerCL -file:\".png|*.bmp\" -recurs");
+		Console::WriteLine("  pngoptimizercl -file:\".png|*.bmp\" -recurs");
 		Console::WriteLine("Handle a specific directory (recursive):");
-		Console::WriteLine("  PngOptimizerCL -file:\"gfx/\"");
+		Console::WriteLine("  pngoptimizercl -file:\"gfx/\"");
 		Console::WriteLine("");
 	
 		if( Console::IsOwned() )
@@ -122,7 +122,7 @@ int main(int argc, char** argv)
 		filePaths = Directory::GetFileNames(dir, fileName, true);
 		if( filePaths.IsEmpty() )
 		{
-			// For PngOptimizerCL, it is an error if we have nothing to optimize
+			// For pngoptimizercl, it is an error if we have nothing to optimize
 			Color col = POEngine::ColorFromTextType(POEngine::TT_ErrorMsg);
 			Console::SetTextColor(col);
 			Console::WriteLine("File not found: " + filePath);

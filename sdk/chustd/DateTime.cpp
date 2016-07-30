@@ -255,7 +255,7 @@ DateTime DateTime::GetNow()
 
 #elif defined(__linux__)
 	struct timeval tv;
-	gettimeofday(&tv, NULL);
+	gettimeofday(&tv, nullptr);
 	return FromUnixTimeStamp(tv.tv_sec, tv.tv_usec*1000);
 
 #endif

@@ -177,7 +177,7 @@ void Console::Write(const String& str)
 	{
 		// Write to the window
 		DWORD length = str.GetLength();
-		BOOL bOk = WriteConsoleW(hStdOut, str.GetBuffer(), length, &written, NULL);
+		BOOL bOk = WriteConsoleW(hStdOut, str.GetBuffer(), length, &written, nullptr);
 		bOk;
 	}
 	else
@@ -190,7 +190,7 @@ void Console::Write(const String& str)
 		// Write as UTF-8
 		SetConsoleOutputCP(CP_UTF8); // Default in Windows 7, not sure for previous versions
 		ByteArray bytes = unified.ToBytes(TextEncoding::Utf8());
-		WriteFile(hStdOut, bytes.GetPtr(), bytes.GetSize(), &written, NULL);
+		WriteFile(hStdOut, bytes.GetPtr(), bytes.GetSize(), &written, nullptr);
 	}
 #elif defined(__linux__)
 	String unified = str.UnifyNewlines(String::NT_Dos);
@@ -227,7 +227,7 @@ bool Console::WaitForInput(const String& prompt, String& input)
 	DWORD numberOfCharsToRead = (sizeof(szBuffer) / 2) - 1;
 	DWORD numberOfCharsRead = 0;
 
-	BOOL bWinOk = ReadConsoleW(hStdIn, szBuffer, numberOfCharsToRead, &numberOfCharsRead, NULL);
+	BOOL bWinOk = ReadConsoleW(hStdIn, szBuffer, numberOfCharsToRead, &numberOfCharsRead, nullptr);
 
 	if( !bWinOk )
 		return false;

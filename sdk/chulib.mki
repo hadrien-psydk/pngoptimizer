@@ -138,5 +138,5 @@ $(OUTDIR)/%.glade.o: %.glade
 
 rebuild: clean all
 
-run:
+run: all
 	$(OUTPATH)

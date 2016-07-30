@@ -44,8 +44,8 @@ Semaphore::~Semaphore()
 bool Semaphore::Create(int initialCount)
 {
 #if defined(_WIN32)
-	HANDLE handle = CreateSemaphore(NULL, initialCount, MAX_INT32, NULL);
-	if( handle == NULL )
+	HANDLE handle = CreateSemaphore(nullptr, initialCount, MAX_INT32, nullptr);
+	if( handle == nullptr)
 	{
 		return false;
 	}

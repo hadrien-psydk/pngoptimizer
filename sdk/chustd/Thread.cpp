@@ -52,12 +52,12 @@ bool Thread::Start(int (*pfn)(void*), void* userArg)
 	pStartArg->userArg = userArg;
 
 	DWORD threadId = 0;
-	m_handle = ::CreateThread(NULL, 0, &ThreadProc, pStartArg, 0, &threadId);
-	return m_handle != NULL;
+	m_handle = ::CreateThread(nullptr, 0, &ThreadProc, pStartArg, 0, &threadId);
+	return m_handle != nullptr;
 
 #elif defined(__linux__)
 	pthread_t th;
-	int ret = pthread_create(&th, NULL, (pthread_pfn)pfn, userArg);
+	int ret = pthread_create(&th, nullptr, (pthread_pfn)pfn, userArg);
 	if( ret != 0 )
 	{
 		return false;
@@ -70,7 +70,7 @@ bool Thread::Start(int (*pfn)(void*), void* userArg)
 ///////////////////////////////////////////////////////////////////////////////
 bool Thread::IsStarted() const
 {
-	return m_handle != 0;
+	return m_handle != nullptr;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

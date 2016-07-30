@@ -6,6 +6,7 @@
 #ifndef POENGINE_UT_STDAFX_H
 #define POENGINE_UT_STDAFX_H
 
+#define _HAS_EXCEPTIONS 0
 #include <gtest/gtest.h>
 #include <chustd/chustd.h>
 #include <poeng/poeng.h>
