@@ -9,6 +9,9 @@
 #include "String.h"
 #include "Array.h"
 #include "File.h"
+#include "FilePath.h"
+#include "System.h"
+#include "Directory.h"
 
 namespace chustd {\
 
@@ -169,6 +172,81 @@ String Process::GetExecutableDirectory()
 	String strDir, strFileName;
 	FilePath::Split(strPath, strDir, strFileName);
 	return strDir;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Gets the full path of the INI configuration file, depending on what exists
+// already along the executable. This version is private to avoid confusion
+// with the forWrite argument.
+//
+// [in] appName   Name of the application used for creating sub-directory and INI file.
+// [in] forWrite  true to create the directory structure if it does not exist.
+//
+// Returns the full path or empty string if not found
+///////////////////////////////////////////////////////////////////////////////
+static String GetConfigPath(const String& appName, bool forWrite)
+{
+	String configFileName = appName + ".ini";
+
+	// A settings file in the executable directory ?
+	String exeDir = Process::GetExecutableDirectory();
+	String filePath = FilePath::Combine(exeDir, configFileName);
+	if( !File::Exists(filePath) )
+	{
+		// Nop, use a user profile location
+		String configDir = System::GetUserConfigDirectory();
+		if( !Directory::Exists(configDir) )
+		{
+			if( forWrite )
+			{
+				// A fresh OS install, the directory does not exist yet
+				if( !Directory::Create(configDir) )
+				{
+					return "";
+				}
+			}
+		}
+
+		String appConfigDir = FilePath::Combine(configDir, appName);
+		if( !Directory::Exists(appConfigDir) )
+		{
+			if( forWrite )
+			{
+				// First time PngOptimizer is run, create profile directory
+				if( !Directory::Create(appConfigDir) )
+				{
+					return "";
+				}
+			}
+		}
+		filePath = FilePath::Combine(appConfigDir, configFileName);
+		if( !forWrite )
+		{
+			if( !File::Exists(filePath) )
+			{
+				// First run
+				return "";
+			}
+		}
+	}
+	return filePath;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Gets the path of the configuration file or empty string if it does not exist
+///////////////////////////////////////////////////////////////////////////////
+String Process::GetConfigPathForRead(const String& appName)
+{
+	return GetConfigPath(appName, false);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Gets the path of the configuration file, creating the directory structure
+// if it does not exist yet. Returns an empty string if creation fails.
+///////////////////////////////////////////////////////////////////////////////
+String Process::GetConfigPathForWrite(const String& appName)
+{
+	return GetConfigPath(appName, true);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

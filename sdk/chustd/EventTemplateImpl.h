@@ -26,22 +26,22 @@ namespace chustd {
 EVENT_TEMPLATE_ARGS
 void EVENT_TYPE::Fire(ARGS_TYPENAME) const
 {
-	int observerCount = m_apObservers.GetSize();
+	int observerCount = m_observers.GetSize();
 	
 	for( int i = 0; i < observerCount; ++i )
 	{
-		m_apObservers[i]->Fire(ARGS_NAME);
+		m_observers[i]->Fire(ARGS_NAME);
 	}
 }
 
 EVENT_TEMPLATE_ARGS
 EVENT_TYPE::~EVENT_NAME()
 {
-	int observerCount = m_apObservers.GetSize();
+	int observerCount = m_observers.GetSize();
 
 	for( int i = 0; i < observerCount; ++i )
 	{
-		OBSERVER_TYPE* pObserver = m_apObservers[i];
+		OBSERVER_TYPE* pObserver = m_observers[i];
 		delete pObserver;
 	}
 }

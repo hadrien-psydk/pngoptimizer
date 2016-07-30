@@ -388,8 +388,7 @@ bool File::Rename(const String& oldName, const String& newName)
 	{
 		return false;
 	}
-	return rename(oldName8, newName8);
-	
+	return rename(oldName8, newName8) == 0;
 #endif
 }
 
@@ -520,7 +519,6 @@ ByteArray File::GetContent()
 	Read(content.GetPtr(), int(fileLength));
 	
 	SetPosition(currentPosition);
-	
 	return content;
 }
 
@@ -730,7 +728,6 @@ String File::GetAbsolutePath(const String& filePath)
 
 #else
 	return filePath;
-	
 #endif
 }
 
@@ -738,26 +735,40 @@ String File::GetAbsolutePath(const String& filePath)
 bool File::Copy(const String& srcFilePath, const String& dstFilePath)
 {
 #if defined(_WIN32)
-	BOOL bRet = ::CopyFileW(srcFilePath.GetBuffer(), dstFilePath.GetBuffer(), FALSE);
-	return bRet != 0;
+	return ::CopyFileW(srcFilePath.GetBuffer(),
+	                   dstFilePath.GetBuffer(), FALSE) != 0;
 
 #else
 	char tmp1[400];
-	srcFilePath.ToUtf8Z(tmp1);
+	if( !srcFilePath.ToUtf8Z(tmp1) )
+	{
+		return false;
+	}
 
 	char tmp2[400];
-	dstFilePath.ToUtf8Z(tmp2);
+	if( !dstFilePath.ToUtf8Z(tmp2) )
+	{
+		return false;
+	}
 
-    int source = open(tmp1, O_RDONLY, 0);
-    int dest = open(tmp2, O_WRONLY | O_CREAT, 0644);
+	int source = open(tmp1, O_RDONLY, 0);
+	if( source < 0 )
+	{
+		return false;
+	}
+	int dest = open(tmp2, O_WRONLY | O_CREAT, 0644);
+	if( dest < 0 )
+	{
+		return false;
+	}
 
-    struct stat stat;
-    fstat(source, &stat);
+	struct stat stat;
+	fstat(source, &stat);
 
-    sendfile(dest, source, 0, stat.st_size);
+	sendfile(dest, source, 0, stat.st_size);
 
-    close(source);
-    close(dest);
+	close(source);
+	close(dest);
 	return true;	
 #endif
 }
@@ -800,7 +811,10 @@ bool File::Delete(const String& filePath)
 
 #elif defined(__linux__)
 	char path8[400];
-	filePath.ToUtf8Z(path8);
+	if( !filePath.ToUtf8Z(path8) )
+	{
+		return false;
+	}
 	return unlink(path8) == 0;
 #endif
 }

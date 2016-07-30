@@ -107,15 +107,15 @@ public:
 public:
 	///////////////////////////////////////////////////
 	template <typename TARGET>
-	Handler Handle(TARGET* pTarget, void (TARGET::*pMethod)(ARGS_TYPE)) const
+	Handler Connect(TARGET* pTarget, void (TARGET::*pMethod)(ARGS_TYPE)) const
 	{
 		OBSERVER_TYPE* pObserver = new OBSERVERTEMPLATE_TYPE(pTarget, pMethod);
-		m_apObservers.Add(pObserver);
-		return Handler(m_apObservers, *pObserver);
+		m_observers.Add(pObserver);
+		return Handler(m_observers, *pObserver);
 	}
 
 	///////////////////////////////////////////////////
-	bool IsHandled() const { return ( m_apObservers.GetSize() != 0 ); }
+	bool IsConnected() const { return ( m_observers.GetSize() != 0 ); }
 	
 	///////////////////////////////////////////////////
 	void Fire(ARGS_TYPENAME) const;
@@ -127,7 +127,7 @@ public:
 private:
 	
 private:
-	mutable ObserverPtrArray m_apObservers;
+	mutable ObserverPtrArray m_observers;
 };
 
 } // namespace chustd

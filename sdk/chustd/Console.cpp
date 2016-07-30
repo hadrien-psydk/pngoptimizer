@@ -26,7 +26,7 @@ public:
 	};
 #endif
 
-	void SetColor(Color32 col)
+	void SetColor(Color col)
 	{
 		int th1 = 64; // First threshold
 		int th2 = 192; // Second threshold
@@ -99,9 +99,9 @@ public:
 #endif
 	}
 
-	Color32 GetColor()
+	Color GetColor()
 	{
-		Color32 ret;
+		Color ret;
 #if defined(_WIN32)
 		HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
 		CONSOLE_SCREEN_BUFFER_INFO ci;
@@ -289,7 +289,7 @@ uint32 Console::WaitForKey()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void Console::SetTextColor(Color32 col)
+void Console::SetTextColor(Color col)
 {
 	g_consoleColorSetter.SetColor(col);
 }

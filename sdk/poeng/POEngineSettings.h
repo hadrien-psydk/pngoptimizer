@@ -26,16 +26,20 @@ struct POEngineSettings
 	bool ignoreAnimatedGifs;
 	bool keepFileDate;
 
-	POChunkOption bkgdOption;
-	chustd::Color32       bkgdColor; // Forced color
+	POChunkOption  bkgdOption;
+	chustd::Color  bkgdColor; // Forced color
 
-	POChunkOption textOption;
-	chustd::String        textKeyword; // Forced text keyword
-	chustd::String        textData;    // Forced text data
+	POChunkOption  textOption;
+	chustd::String textKeyword; // Forced text keyword
+	chustd::String textData;    // Forced text data
 
-	POChunkOption physOption;
-	int           physPpmX;
-	int           physPpmY;
+	POChunkOption  physOption;
+	int            physPpmX;
+	int            physPpmY;
+
+	POChunkOption  fctlOption; // fcTL for APNG
+	int            fctlDelayNum;
+	int            fctlDelayDen; // Seconds. If 0 then equals to 100
 
 	POEngineSettings();
 	void LoadFromIni(const chustd::MemIniFile& ini);

@@ -14,11 +14,13 @@ class System
 {
 public:
 	static uint32 GetTime();
+	static uint64 GetTime64();
 	static String GetFontsDirectory(); // Replace with FontFilePathFromFamilyName() ?
 	
 	// Get the user specific directory where to store applications settings
 	// On Windows, typically : C:\Documents and Settings\Gwendoline\Application Data
-	static String GetApplicationDataDirectory();
+	// On Linux: ~/.config
+	static String GetUserConfigDirectory();
 };
 
 } // namespace chustd

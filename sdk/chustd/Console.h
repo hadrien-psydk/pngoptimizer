@@ -33,7 +33,7 @@ public:
 	// Returns the unicode code point of the corresponding pressed key
 	static uint32 WaitForKey();
 
-	static void SetTextColor(Color32 col);
+	static void SetTextColor(Color col);
 	static void ResetTextColor();
 
 	static bool IsOwned();

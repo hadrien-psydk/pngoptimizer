@@ -35,9 +35,9 @@ public:
 	const TYPE& GetValue() const { return m_value; }
 	
 	template <typename TARGET>
-	Handler Handle(TARGET* pTarget, void(TARGET::*method)(const TYPE&, const TYPE&)) const
+	Handler Connect(TARGET* pTarget, void(TARGET::*method)(const TYPE&, const TYPE&)) const
 	{
-		return m_event.Handle(pTarget, method);
+		return m_event.Connect(pTarget, method);
 	}
 
 public:

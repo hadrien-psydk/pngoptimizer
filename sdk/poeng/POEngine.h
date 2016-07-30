@@ -39,8 +39,8 @@ public:
 
 	struct ProgressingArg
 	{
-		chustd::String     text;
-		TextType   textType;
+		chustd::String  text;
+		TextType        textType;
 		ProgressingArg() : textType(TT_Last) {}
 	};
 
@@ -77,11 +77,13 @@ public:
 	// Optimizes or convert one single file loaded in memory.
 	bool OptimizeSingleFileMem(const uint8* imgBuf, int imgSize, uint8* dst, int dstCapacity, int* pDstSize);
 
-	static chustd::Color32 ColorFromTextType(TextType tt);
+	static chustd::Color ColorFromTextType(TextType tt);
 
 	// Initializes some structure. To be called before any optimization function to avoid making the first call
 	// slower than other calls (first call will do the warmup if it is not done).
 	bool WarmUp();
+
+	void EnableUnicodeArrow();
 
 	POEngine();
 	virtual ~POEngine();
@@ -109,6 +111,8 @@ private:
 	DateTime m_originalFileWriteTime;
 
 	POWorkerThread m_workerThreads[4];
+
+	bool m_unicodeArrowEnabled; // To have a nice arrow for ->
 
 	// Hold either a target file path or a target buffer
 	struct OptiTarget

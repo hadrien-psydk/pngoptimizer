@@ -54,25 +54,24 @@ int ArgvParser::GetFlagIndex(const String& flagName) const
 {
 	String strWanted = flagName.ToLowerCase();
 
-	const int32 argCount = m_args.GetSize();
-	for(int32 i = 0; i < argCount; ++i)
+	const int argCount = m_args.GetSize();
+	for(int i = 0; i < argCount; ++i)
 	{
-		if( m_args[i].m_flag)
+		if( m_args[i].m_flag )
 		{
 			String strName = m_args[i].m_name.ToLowerCase();
 
-			if( strName == strWanted)
+			if( strName == strWanted )
 				return i;
 		}
 	}
-
 	return -1;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 bool ArgvParser::HasFlag(const String& flagName) const
 {
-	if( GetFlagIndex(flagName) < 0)
+	if( GetFlagIndex(flagName) < 0 )
 	{
 		return false;
 	}
@@ -82,13 +81,25 @@ bool ArgvParser::HasFlag(const String& flagName) const
 ///////////////////////////////////////////////////////////////////////////////
 String ArgvParser::GetFlagString(const String& flagName) const
 {
-	const int32 index = GetFlagIndex(flagName);
-	if( index < 0)
+	const int index = GetFlagIndex(flagName);
+	if( index < 0 )
 	{
 		return String();
 	}
-
 	return m_args[index].m_flagString;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+int ArgvParser::GetFlagInt(const String& flagName) const
+{
+	const int index = GetFlagIndex(flagName);
+	if( index < 0 )
+	{
+		return 0;
+	}
+	int value = 0;
+	m_args[index].m_flagString.ToInt(value);
+	return value;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -100,13 +111,13 @@ void ArgvParser::ConvertToArgs(const StringArray& astrArgs)
 		const String& strArg = astrArgs[iArg];
 		const int argLength = strArg.GetLength();
 
-		if( argLength > 0)
+		if( argLength > 0 )
 		{
 			int index = m_args.Add();
 			Arg& arg = m_args[index];
 
 			wchar cFirst = strArg.GetAt(0);
-			if( cFirst == '/' || cFirst == '-')
+			if( cFirst == '/' || cFirst == '-' )
 			{
 				StringBuilder sbName;
 				StringBuilder sbFlagString;
@@ -122,13 +133,13 @@ void ArgvParser::ConvertToArgs(const StringArray& astrArgs)
 				{
 					wchar c = strArg.GetAt(i);
 
-					if( searchMode == searchFlagName)
+					if( searchMode == searchFlagName )
 					{
-						if( c == ':')
+						if( c == ':' )
 						{
 							searchMode = searchPreFlagString;
 						}
-						else if( c == '"')
+						else if( c == '"' )
 						{
 							searchMode = searchFlagStringDQ;
 						}
@@ -139,13 +150,13 @@ void ArgvParser::ConvertToArgs(const StringArray& astrArgs)
 					}
 					else
 					{
-						if( searchMode == searchFlagStringNoDQ)
+						if( searchMode == searchFlagStringNoDQ )
 						{
 							sbFlagString += c;
 						}
-						else if( searchMode == searchFlagStringDQ)
+						else if( searchMode == searchFlagStringDQ )
 						{
-							if( c == '"')
+							if( c == '"' )
 							{
 								// We reached the end of this argument
 								break;
@@ -155,9 +166,9 @@ void ArgvParser::ConvertToArgs(const StringArray& astrArgs)
 								sbFlagString += c;
 							}
 						}
-						else if( searchMode == searchPreFlagString)
+						else if( searchMode == searchPreFlagString )
 						{
-							if( c == '"')
+							if( c == '"' )
 							{
 								searchMode = searchFlagStringDQ;
 							}

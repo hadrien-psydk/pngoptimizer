@@ -552,7 +552,7 @@ bool Tga::ReadPalette(IFile& file, int16 colorMapOrigin, int16 colorMapLength, u
 			uint8 r = aCols[iSrcColByte + 2];
 			uint8 a = aCols[iSrcColByte + 3];
 
-			m_pal.m_colors[i] = Color32(r, g, b, a);
+			m_pal.m_colors[i] = Color(r, g, b, a);
 		}
 		else if( colorMapDepth == 24 )
 		{
@@ -560,14 +560,14 @@ bool Tga::ReadPalette(IFile& file, int16 colorMapOrigin, int16 colorMapLength, u
 			uint8 g = aCols[iSrcColByte + 1];
 			uint8 r = aCols[iSrcColByte + 2];
 			
-			m_pal.m_colors[i] = Color32(r, g, b, 255);
+			m_pal.m_colors[i] = Color(r, g, b, 255);
 		}
 		else if( colorMapDepth == 16 || colorMapDepth == 15 )
 		{
 			uint8 low = aCols[iSrcColByte];
 			uint8 nHi = aCols[iSrcColByte + 1];
 			uint16 color = (nHi << 8) | low;
-			m_pal.m_colors[i] = Color32::From16bppRgb555(color);
+			m_pal.m_colors[i] = Color::From16bppRgb555(color);
 		}
 		
 		iSrcColByte += bytesPerColor;

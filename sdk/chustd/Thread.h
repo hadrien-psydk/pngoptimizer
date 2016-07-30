@@ -9,6 +9,9 @@
 
 namespace chustd {
 
+class ThreadFunction;
+
+///////////////////////////////////////
 class Thread
 {
 public:
@@ -28,6 +31,7 @@ private:
 	void* m_handle;
 };
 
+///////////////////////////////////////////////////////////////////////////////
 } // namespace chustd
 
 #endif

@@ -1565,14 +1565,16 @@ String String::UnifyNewlines(NewlineType nt) const
 // Converts this string to UTF-8 bytes and a zero byte. No memory allocation
 // is done.
 //
-// [out] buf    Buffer where the UTF-8 bytes are written to
-// [in]  size   Size in bytes of the buffer pointer by buf
+// [out] buf       Buffer where the UTF-8 bytes are written to
+// [in]  size      Size in bytes of the buffer pointer by buf
+// [out] pUtf8Len  (optional) number of bytes written to buf
 //
 // Returns true upon success
 ///////////////////////////////////////////////////////////////////////////////
-bool String::ToUtf8Z(char* buf, int size) const
+bool String::ToUtf8Z(char* buf, int size, int* pUtf8Len) const
 {
-	uint8* dstBytes = reinterpret_cast<uint8*>(buf);
+	uint8* const buf8 = reinterpret_cast<uint8*>(buf);
+	uint8* dstBytes = buf8;
 	int index = 0;
 	for(;;)
 	{
@@ -1596,6 +1598,10 @@ bool String::ToUtf8Z(char* buf, int size) const
 		return false;
 	}
 	dstBytes[0] = 0;
+	if( pUtf8Len )
+	{
+		*pUtf8Len = int(dstBytes - buf8);
+	}
 	return true;
 }
 

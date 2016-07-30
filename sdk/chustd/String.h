@@ -145,10 +145,11 @@ public:
 	enum NewlineType { NT_Unix, NT_Dos };
 	String UnifyNewlines(NewlineType nt) const;
 
-	bool ToUtf8Z(char* buf, int size) const;
+	bool ToUtf8Z(char* buf, int size, int* pUtf8Len = nullptr) const;
 
 	template<int TSIZE>
-	bool ToUtf8Z(char (&buf)[TSIZE]) const { return ToUtf8Z(buf, TSIZE); }
+	bool ToUtf8Z(char (&buf)[TSIZE], int* pUtf8Len = nullptr) const
+	{ return ToUtf8Z(buf, TSIZE, pUtf8Len); }
 
 	static String FromUtf8(const char* buf, int len);
 	static String FromUtf8Z(const char* buf);

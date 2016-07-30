@@ -1,9 +1,9 @@
-/////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 // This file is part of the poeng library, part of the PngOptimizer application
 // Copyright (C) Hadrien Nilsson - psydk.org
 // This library is distributed under the terms of the GNU LESSER GENERAL PUBLIC LICENSE
 // See License.txt for the full license.
-/////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
 #include "POEngine.h"
@@ -37,11 +37,12 @@ const char k_szPathIsNotAFile[] = "Not a file";
 const char k_szUnsupportedFileType[] = "Unsupported file type";
 const char k_szInvalidArgument[] = "Invalid argument";
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-// Gets a buffer to use for next optimization. We always keep the best result (smallest file weight)
-// and return the largest to be overwritten by a new optimization case.
+///////////////////////////////////////////////////////////////////////////////
+// Gets a buffer to use for next optimization. We always keep the best result
+// (smallest file weight) and return the largest to be overwritten by a new
+// optimization case.
 DynamicMemoryFile& POEngine::ResultManager::GetCandidate()
 {
 	// Get the largest, except if 0
@@ -69,7 +70,7 @@ DynamicMemoryFile& POEngine::ResultManager::GetCandidate()
 	return dmf;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 // Gets the best result, i.e. the smallest result.
 DynamicMemoryFile& POEngine::ResultManager::GetSmallest()
 {
@@ -96,16 +97,37 @@ void POEngine::ResultManager::Reset()
 	m_dmf1.SetPosition(0);
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-POEngine::POEngine()
+///////////////////////////////////////////////////////////////////////////////
+// Sets a value to 0 if negative, max_u16 if greater than max_u16
+static uint16 ClampUInt16(int value)
 {
+	if( value < 0 )
+		return 0;
+	if( value > 65535 )
+		return 65535;
+	return value;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+POEngine::POEngine()
+{
+	// Default to false because of older versions of Windows
+	// that cannot display some unicode symbols
+	m_unicodeArrowEnabled = false;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 POEngine::~POEngine()
 {
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+void POEngine::EnableUnicodeArrow()
+{
+	m_unicodeArrowEnabled = true;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // Checks if a palette is black&white
 // [in]   pal         Palette to check
 // [out]  shouldSwap  true if the palette colors 0 and 1 should be swapped
@@ -115,26 +137,26 @@ bool POEngine::IsBlackAndWhite(const Palette& pal, bool& shouldSwap)
 	{
 		return false;
 	}
-	Color32 col0 = pal.m_colors[0];
-	Color32 col1 = pal.m_colors[1];
+	Color col0 = pal.m_colors[0];
+	Color col1 = pal.m_colors[1];
 	
 	shouldSwap = false;
 
-	if( col0.IsEqualRgb(Color32::black) && col1.IsEqualRgb(Color32::white) )
+	if( col0.IsEqualRgb(Color::Black) && col1.IsEqualRgb(Color::White) )
 	{
 		return true;
 	}
-	if( col0.IsEqualRgb(Color32::white) && col1.IsEqualRgb(Color32::black) )
+	if( col0.IsEqualRgb(Color::White) && col1.IsEqualRgb(Color::Black) )
 	{
 		shouldSwap = true;
 		return true;
 	}
 
-	if( col0.GetAlpha() == 0 && col1.IsEqualRgb(Color32::white) )
+	if( col0.GetAlpha() == 0 && col1.IsEqualRgb(Color::White) )
 	{
 		return true;
 	}
-	if( col0.GetAlpha() == 0 && col1.IsEqualRgb(Color32::black) )
+	if( col0.GetAlpha() == 0 && col1.IsEqualRgb(Color::Black) )
 	{
 		shouldSwap = true;
 		return true;
@@ -192,6 +214,22 @@ bool POEngine::PerformDumpTries(PngDumpData& dd)
 		if( m_settings.bkgdOption == POChunk_Keep || m_settings.bkgdOption == POChunk_Force )
 		{
 			dd.useBackgroundColor = true;
+		}
+	}
+
+	// Force frame control delay values if necessary
+	if( m_settings.fctlOption == POChunk_Force )
+	{
+		// Clamp to be safe
+		uint16 num = ClampUInt16(m_settings.fctlDelayNum);
+		uint16 den = ClampUInt16(m_settings.fctlDelayDen);
+
+		const int frameCount = dd.frames.GetSize();
+		for(int iFrame = 0; iFrame < frameCount; ++iFrame)
+		{
+			ApngFrame* pFrame = dd.frames[iFrame];
+			pFrame->m_fctl.delayFracNumerator = num;
+			pFrame->m_fctl.delayFracDenominator = den;
 		}
 	}
 
@@ -279,7 +317,7 @@ bool POEngine::TryToConvertIndexedToBlackAndWhite(PngDumpData& dd)
 
 	if( shouldSwap )
 	{
-		Color32 colTmp = dd.palette.m_colors[0];
+		Color colTmp = dd.palette.m_colors[0];
 		dd.palette.m_colors[0] = dd.palette.m_colors[1];
 		dd.palette.m_colors[1] = colTmp;
 
@@ -653,7 +691,7 @@ bool POEngine::FindUnusedColorHardcoreMethod(const uint8* pRgba, int32 pixelCoun
 bool POEngine::FindUnusedColor(const Buffer& aRgb, uint8& nRed, uint8& nGreen, uint8& nBlue)
 {
 	// Check with some candidates
-	FixArray<Color32, 7> aCandidates;
+	FixArray<Color, 7> aCandidates;
 	aCandidates[0].SetRgb(1, 0, 0);
 	aCandidates[1].SetRgb(1, 1, 0);
 	aCandidates[2].SetRgb(1, 1, 1);
@@ -922,7 +960,7 @@ bool POEngine::Optimize24BitsMode(PngDumpData& dd)
 		int32 iCol = 0;
 		for(; iCol < palTest.m_count; ++iCol)
 		{
-			const Color32& col = palTest.m_colors[iCol];
+			const Color& col = palTest.m_colors[iCol];
 			uint8 rp, gp, bp;
 			col.ToRgb(rp, gp, bp);
 
@@ -987,7 +1025,7 @@ bool POEngine::Optimize24BitsMode(PngDumpData& dd)
 		int32 iCol = 0;
 		for(; iCol < palTest.m_count; ++iCol)
 		{
-			const Color32& col = palTest.m_colors[iCol];
+			const Color& col = palTest.m_colors[iCol];
 			uint8 rp, gp, bp;
 			col.ToRgb(rp, gp, bp);
 
@@ -1809,9 +1847,19 @@ void POEngine::PrintSizeChange(int64 sizeBefore, int64 sizeAfter)
 	ratio *= 100;
 	ratio /= sizeBefore;
 			
+	String arrow;
+	if( m_unicodeArrowEnabled )
+	{
+		static const wchar arrow2 = 0x2192; // utf-8: { 0xE2, 0x86, 0x92 }
+		arrow = String(&arrow2, 1);
+	}
+	else
+	{
+		arrow = "->";
+	}
 	StringBuilder sb;
 	PrintText(String::FromInt64(sizeBefore), TT_SizeInfoNum);
-	PrintText(" bytes -> ", TT_SizeInfo); // \x2192
+	PrintText(" bytes "+arrow+" ", TT_SizeInfo); 
 	PrintText(String::FromInt64(sizeAfter), TT_SizeInfoNum);
 	PrintText(" bytes", TT_SizeInfo);
 
@@ -2346,7 +2394,7 @@ void MergePalettes(const ImageFormat& img, PngDumpData& dd)
 			PaletteTranslator superTranslator;
 			if( !superTranslator.MergePalette(superPalette, fnp.palette) )
 			{
-				// Too many colors, have to switch to Color32 mode
+				// Too many colors, have to switch to Color mode
 				// Continue however to compute no holes palettes
 				switchToTrueColors = true;
 			}
@@ -2356,7 +2404,7 @@ void MergePalettes(const ImageFormat& img, PngDumpData& dd)
 	}
 		
 	////////////////////////////////////////////////////////////////////
-	// Choose between Color32 and RGBA when switching to true colors
+	// Choose between Color and RGBA when switching to true colors
 	if( switchToTrueColors && hasTransparency )
 	{
 		// Alpha is needed
@@ -2450,7 +2498,7 @@ void MergePalettes(const ImageFormat& img, PngDumpData& dd)
 			}
 			else
 			{
-				// Palette to Color32
+				// Palette to Color
 				dd.pixelFormat = PF_24bppRgb;
 				for(int iPix = 0; iPix < nPixCount; ++iPix)
 				{
@@ -2544,7 +2592,7 @@ bool POEngine::OptimizeAnimated(const ImageFormat& img, PngDumpData& dd, OptiTar
 	UnpackPixelFrames(dd);
 	
 	// Merge palettes if frame local palettes are found (GIF)
-	// The pixel format can switch to Color32 or RGBA
+	// The pixel format can switch to Color or RGBA
 	MergePalettes(img, dd);
 	
 	dd.interlaced = false; // Always to false with animation
@@ -2624,64 +2672,64 @@ bool POEngine::IsFileExtensionSupported(const String& ext, const String& joker)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Gets a color related to a text type.
-Color32 POEngine::ColorFromTextType(TextType tt)
+Color POEngine::ColorFromTextType(TextType tt)
 {
-	Color32 col;
+	Color col;
 	if( tt == POEngine::TT_FilePath )
 	{
 		// Color for file paths
-		col = Color32(0, 0, 0);
+		col = Color(0, 0, 0);
 	}
 	else if( tt == POEngine::TT_RegularInfo )
 	{
-		col = Color32(100, 100, 100);
+		col = Color(100, 100, 100);
 	}
 	else if( tt == POEngine::TT_ActionVerb )
 	{
 		// Creating, Converting, Optimizing...
-		col = Color32(100, 100, 100);
+		col = Color(100, 100, 100);
 	}
 	else if( tt == POEngine::TT_SizeInfo || tt == POEngine::TT_SizeInfoNum )
 	{
 		// xxx bytes -> yyy bytes
-		col = Color32(100, 100, 100);
+		col = Color(100, 100, 100);
 	}
 	else if( tt == POEngine::TT_FileEnlarged )
 	{
 		// (103% of the original size)
-		col = Color32(200, 100, 0);
+		col = Color(200, 100, 0);
 	}
 	else if( tt == POEngine::TT_FileSizeSame )
 	{
 		// (100% of the original size)
-		col = Color32(100, 100, 100);
+		col = Color(100, 100, 100);
 	}
 	else if( tt == POEngine::TT_FileReduced )
 	{
 		// (80% of the original size)
-		col = Color32(0, 120, 0);
+		col = Color(0, 120, 0);
 	}
 	else if( tt == POEngine::TT_ActionOk || tt == POEngine::TT_BatchDoneOk )
 	{
 		// (OK) :-)
-		col = Color32(0, 100, 0);
+		col = Color(0, 100, 0);
 	}
 	else if( tt == POEngine::TT_ActionFail || tt == POEngine::TT_BatchDoneFail )
 	{
 		// (KO) :-(
-		col = Color32(200, 0, 0);
+		col = Color(200, 0, 0);
 	}
 	else if( tt == POEngine::TT_ErrorMsg )
 	{
 		// could not load bla
-		col = Color32(255, 0, 0);
+		col = Color(255, 0, 0);
 	}
 	else if( tt == POEngine::TT_Animated )
 	{
 		// [Animated GIF : converting to APNG]
 		// [Animated GIF : ignoring]
 		// [APNG]
-		col = Color32(0, 50, 200);
+		col = Color(0, 50, 200);
 	}
 	return col;
 }

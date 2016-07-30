@@ -18,6 +18,11 @@ INCDIRS += ../../sdk
 CONFIG ?= debug
 OUTDIR := linux-$(CONFIG)
 
+GCC := gcc
+GPP := g++
+LD  := ld
+OBJCOPY := objcopy
+
 CFLAGS := -Wall
 CFLAGS += -fdata-sections -ffunction-sections
 LDFLAGS := --gc-sections
@@ -31,8 +36,6 @@ else
 	LDFLAGS := $(LDFLAGS),-s
 endif
 
-GCC := gcc
-GPP := g++
 CPPFLAGS := $(CFLAGS) -Wextra
 CPPFLAGS += -std=c++0x $(addprefix -I,$(INCDIRS))
 EXTLIBS := -pthread -lrt
@@ -60,6 +63,8 @@ PCHPATH := $(OUTDIR)/stdafx.h.gch
 PROJECT_FILES := $(foreach filename,$(PROJECT_FILES),$(wildcard $(filename)))
 OBJS := $(subst .cpp,.o, $(PROJECT_FILES))
 OBJS := $(subst .c,.o, $(OBJS))
+OBJS := $(subst .png,.png.o, $(OBJS))
+OBJS := $(subst .glade,.glade.o, $(OBJS))
 SUBDIRS := $(dir $(OBJS))
 SUBDIRS := $(sort $(SUBDIRS))
 SUBDIRS := $(subst ./,, $(SUBDIRS))
@@ -120,6 +125,16 @@ $(OUTDIR)/%.o: %.cpp $(PCHPATH)
 $(OUTDIR)/%.o: %.c
 	$(info $<)
 	@$(GCC) $(CFLAGS) -c -MMD $< -o $@
+
+$(OUTDIR)/%.png.o: %.png
+	$(info $< (resource))
+	@$(LD) -r -o $@ -z noexecstack --format=binary $<
+	@$(OBJCOPY) --rename-section .data=.rodata,alloc,load,readonly,data,contents $@
+
+$(OUTDIR)/%.glade.o: %.glade
+	$(info $< (resource))
+	@$(LD) -r -o $@ -z noexecstack --format=binary $<
+	@$(OBJCOPY) --rename-section .data=.rodata,alloc,load,readonly,data,contents $@
 
 rebuild: clean all
 

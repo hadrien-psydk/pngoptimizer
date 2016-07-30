@@ -122,6 +122,7 @@ typedef SOCKET SOCKET_ID; // HANDLE on Windows/VC++, int on Linux/G++
 #include <sys/sendfile.h>
 #include <dirent.h> 
 #include <sys/time.h>
+#include <pwd.h> // getpwuid
 
 const int INVALID_SOCKET = -1;
 typedef int SOCKET_ID;

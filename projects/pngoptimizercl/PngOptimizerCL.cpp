@@ -27,7 +27,7 @@ class POApplicationConsole
 public:
 	void OnEngineProgressing(const POEngine::ProgressingArg& arg)
 	{
-		Color32 col = POEngine::ColorFromTextType(arg.textType);
+		Color col = POEngine::ColorFromTextType(arg.textType);
 		if( col.r == 0 && col.g == 0 && col.b == 0 )
 		{
 			Console::ResetTextColor();
@@ -102,7 +102,7 @@ int main(int argc, char** argv)
 		Console::WriteLine("Warm-up failed");
 		return 1;
 	}
-	engine.Progressing.Handle(&app, &POApplicationConsole::OnEngineProgressing);
+	engine.Progressing.Connect(&app, &POApplicationConsole::OnEngineProgressing);
 
 	engine.m_settings.LoadFromArgv(ap);
 
@@ -123,7 +123,7 @@ int main(int argc, char** argv)
 		if( filePaths.IsEmpty() )
 		{
 			// For PngOptimizerCL, it is an error if we have nothing to optimize
-			Color32 col = POEngine::ColorFromTextType(POEngine::TT_ErrorMsg);
+			Color col = POEngine::ColorFromTextType(POEngine::TT_ErrorMsg);
 			Console::SetTextColor(col);
 			Console::WriteLine("File not found: " + filePath);
 			Console::ResetTextColor();

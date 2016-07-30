@@ -67,8 +67,8 @@ void PropertySynchronizer<TYPE>::Connect(Property<TYPE>& property1, Property<TYP
 
 	m_pProperty1 = &property1;
 	m_pProperty2 = &property2;
-	m_handler1 = property1.Handle(this, &PropertySynchronizer<TYPE>::OnProperty1Change);
-	m_handler2 = property2.Handle(this, &PropertySynchronizer<TYPE>::OnProperty2Change);
+	m_handler1 = property1.Connect(this, &PropertySynchronizer<TYPE>::OnProperty1Change);
+	m_handler2 = property2.Connect(this, &PropertySynchronizer<TYPE>::OnProperty2Change);
 }
 
 //////////////////////////////////////////////////////////////////////

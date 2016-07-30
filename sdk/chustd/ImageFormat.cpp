@@ -12,14 +12,14 @@
 using namespace chustd;
 
 //////////////////////////////////////////////////////////////////////
-Color32 Color32::black(0, 0, 0);
-Color32 Color32::white(255, 255, 255);
-Color32 Color32::red(255, 0, 0);
-Color32 Color32::green(0, 255, 0);
-Color32 Color32::blue(0, 0, 255);
-Color32 Color32::yellow(255, 255, 0);
-Color32 Color32::cyan(0, 255, 255);
-Color32 Color32::magenta(255, 0, 255);
+Color Color::Black(0, 0, 0);
+Color Color::White(255, 255, 255);
+Color Color::Red(255, 0, 0);
+Color Color::Green(0, 255, 0);
+Color Color::Blue(0, 0, 255);
+Color Color::Yellow(255, 255, 0);
+Color Color::Cyan(0, 255, 255);
+Color Color::Magenta(255, 0, 255);
 //////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////
@@ -104,7 +104,7 @@ void Palette::SetAlphaFullOpaque()
 }
 
 // Returns -1 if not found
-int Palette::FindColor(Color32 col) const
+int Palette::FindColor(Color col) const
 {
 	for(int i = 0; i < m_count; ++i) 
 	{

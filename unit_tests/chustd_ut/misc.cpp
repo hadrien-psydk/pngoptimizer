@@ -171,7 +171,7 @@ TEST(Color32Test, Misc)
 {
 	// 0 11111 11110 11100 => 0111_1111 1101_1100 => 7FDC
 	uint16 nValue = 0x7FDC;
-	Color32 col = Color32::From16bppRgb555(nValue);
+	Color col = Color::From16bppRgb555(nValue);
 
 	uint8 r, g, b, a;
 	col.ToRgba(r, g, b, a);
@@ -189,7 +189,7 @@ TEST(Color32Test, Misc)
 
 	// 0 10011 10111 01011 => 0100 1110 1110 1011 => 0x4EEB
 	nValue = 0x4EEB;
-	col = Color32::From16bppRgb555(nValue);
+	col = Color::From16bppRgb555(nValue);
 
 	col.ToRgba(r, g, b, a);
 

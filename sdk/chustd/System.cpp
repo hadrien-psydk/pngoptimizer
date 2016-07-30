@@ -31,6 +31,24 @@ uint32 System::GetTime()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// Gets a system timer time in microseconds
+uint64 System::GetTime64()
+{
+#if defined(_WIN32)
+	return GetTickCount()*1000;
+
+#elif defined(__linux__)
+	timespec ts = {};
+	clock_gettime(CLOCK_MONOTONIC, &ts);
+	int64 ret = ts.tv_sec;
+	ret *= 1000000000;
+	ret += ts.tv_nsec;
+	ret /= 1000;
+	return static_cast<uint32>(ret);
+#endif
+}
+
+///////////////////////////////////////////////////////////////////////////////
 String System::GetFontsDirectory()
 {
 #if defined(_WIN32)
@@ -47,18 +65,20 @@ String System::GetFontsDirectory()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-String System::GetApplicationDataDirectory()
+String System::GetUserConfigDirectory()
 {
 #if defined(_WIN32)
 	wchar szPath[MAX_PATH];
-	if( SHGetSpecialFolderPathW(NULL, szPath,CSIDL_APPDATA, TRUE) )
+	if( SHGetSpecialFolderPathW(NULL, szPath, CSIDL_APPDATA, TRUE) )
 	{
 		return String(szPath);
 	}
 	return String();
 
 #elif defined(__linux__)
-	return String();
+	struct passwd* pw = getpwuid(getuid());
+	const char* homedir = pw->pw_dir;
+	return FilePath::Combine(String(homedir), ".config");
 #endif
 }
 

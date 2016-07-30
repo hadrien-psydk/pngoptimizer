@@ -8,10 +8,10 @@ TEST(PaletteTranslator, BuildSortPopulation)
 	colCounts[2] = 102; // --> 1
 	colCounts[3] = 103; // --> 0
 
-	Color32 col100(1, 0, 1);
-	Color32 col101(0, 1, 0);
-	Color32 col102(0, 0, 1);
-	Color32 col103(0, 1, 1);
+	Color col100(1, 0, 1);
+	Color col101(0, 1, 0);
+	Color col102(0, 0, 1);
+	Color col103(0, 1, 1);
 
 	Palette pal;
 	pal.m_count = 4;
@@ -153,12 +153,12 @@ TEST(PaletteTranslator, BuildSortLuminance)
 {
 	//uint32 y = r * 299 + g * 587 + b * 114;
 
-	Color32 col0(0, 0, 10);
-	Color32 col1(0, 0, 11);
-	Color32 col2(10, 0, 0);
-	Color32 col3(11, 0, 0);
-	Color32 col4(0, 10, 0);
-	Color32 col5(0, 11, 0);
+	Color col0(0, 0, 10);
+	Color col1(0, 0, 11);
+	Color col2(10, 0, 0);
+	Color col3(11, 0, 0);
+	Color col4(0, 10, 0);
+	Color col5(0, 11, 0);
 
 	Palette pal;
 	pal.m_count = 6;
@@ -198,10 +198,10 @@ TEST(PaletteTranslator, BuildUnusedColors)
 	expColCounts[2] = 1000;
 	expColCounts[3] = 0;
 
-	Color32 col00(0, 0, 10);
-	Color32 col11(0, 0, 11);
-	Color32 col21(10, 0, 0);
-	Color32 col32(11, 0, 0);
+	Color col00(0, 0, 10);
+	Color col11(0, 0, 11);
+	Color col21(10, 0, 0);
+	Color col32(11, 0, 0);
 
 	Palette pal;
 	pal.m_count = 4;
@@ -225,11 +225,11 @@ TEST(PaletteTranslator, BuildUnusedColors)
 
 TEST(PaletteTranslator, BuildDuplicatedColors)
 {
-	Color32 col0(11, 12, 13);
-	Color32 col1(14, 15, 16);
-	Color32 col2(20, 21, 22, 0);
-	Color32 col3(11, 12, 13);
-	Color32 col4(30, 31, 32, 0);
+	Color col0(11, 12, 13);
+	Color col1(14, 15, 16);
+	Color col2(20, 21, 22, 0);
+	Color col3(11, 12, 13);
+	Color col4(30, 31, 32, 0);
 
 	Palette pal;
 	pal.m_count = 5;

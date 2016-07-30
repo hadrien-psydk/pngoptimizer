@@ -13,7 +13,6 @@
 
 namespace chustd {
 
-	
 enum PixelFormat
 {
 	PF_Unknown,
@@ -48,20 +47,20 @@ enum PixelFormat
 	PF_64bppRgba
 };
 
-// Color32 stores bytes in a compatible way with Surface32
+// Color stores bytes in a compatible way with Surface32
 // Native color format is plateform dependant. For instance PF_32bppBgra is the
 // best suitable in Windows because it is compatible with DIBs.
-struct Color32
+struct Color
 {
 public:
-	static Color32 black;
-	static Color32 white;
-	static Color32 red;
-	static Color32 blue;
-	static Color32 green;
-	static Color32 yellow;
-	static Color32 cyan;
-	static Color32 magenta;
+	static Color Black;
+	static Color White;
+	static Color Red;
+	static Color Blue;
+	static Color Green;
+	static Color Yellow;
+	static Color Cyan;
+	static Color Magenta;
 
 public:
 	inline void ToRgb(uint8& rx, uint8& gx, uint8& bx) const
@@ -102,18 +101,12 @@ public:
 		ax = ((color >> 24) & 0x00ff);
 	}
 
-	Color32()
+	Color()
 	{
 		value32 = 0xff000000;
 	}
 
-	// Sets 0xAARRGGBB
-	Color32(uint32 argb)
-	{
-		value32 = argb;
-	}
-
-	Color32(uint32 r, uint32 g, uint32 b, uint32 a = 255)
+	Color(uint32 r, uint32 g, uint32 b, uint32 a = 255)
 	{
 		value32 = (a << 24) | (r << 16) | (g << 8) | b;
 	}
@@ -138,18 +131,18 @@ public:
 		return uint8(value32 >> 24);
 	}
 
-	bool IsEqualRgb(Color32 other)
+	bool IsEqualRgb(Color other)
 	{
 		return (value32 & 0x00ffffff) == (other.value32 & 0x00ffffff);
 	}
 
-	Color32& operator = (const Color32& color)
+	Color& operator = (const Color& color)
 	{
 		value32 = color.value32;
 		return *this;
 	}
 
-	bool operator == (const Color32& color) const
+	bool operator == (const Color& color) const
 	{
 		return (value32 == color.value32);
 	}
@@ -164,7 +157,7 @@ public:
 		return PF_32bppRgba;
 	}
 
-	static Color32 From16bppRgb555(uint16 pixel)
+	static Color From16bppRgb555(uint16 pixel)
 	{
 		uint8 r = uint8( (pixel & 0x7c00) >> 10 );
 		uint8 g = uint8( (pixel & 0x03e0) >> 5 );
@@ -174,7 +167,7 @@ public:
 		g = uint8( (g << 3) + ((g >> 2) & 0x07));
 		b = uint8( (b << 3) + ((b >> 2) & 0x07));
 
-		return Color32(r, g, b, 255);
+		return Color(r, g, b, 255);
 	}
 public:
 	union
@@ -191,13 +184,13 @@ public:
 class Palette
 {
 public:
-	Color32& operator[](int index) { return m_colors[index]; }
-	Color32 operator[](int index) const { return m_colors[index]; }
+	Color& operator[](int index) { return m_colors[index]; }
+	Color operator[](int index) const { return m_colors[index]; }
 
 	bool  HasNonOpaqueColor() const;
 	bool  AllAlphasAreOpaque() const;
 	void  SetAlphaFullOpaque();
-	int   FindColor(Color32 col) const;
+	int   FindColor(Color col) const;
 	int   GetFirstFullyTransparentColor() const;
 
 	Palette() : m_count(0) {}
@@ -206,11 +199,48 @@ public:
 
 public:
 	int32   m_count;       // Number of color in the palette
-	Color32 m_colors[256]; // Colors
+	Color m_colors[256]; // Colors
 
 public:
 	static const Palette Null;
 };
+
+
+/////////////////////////////
+struct Point
+{
+	int x, y;
+
+	Point() : x(0), y(0) {}
+	Point(int xa, int ya) : x(xa), y(ya) {}
+};
+
+/////////////////////////////
+struct Rect
+{
+	int x1, y1;
+	int x2, y2;
+
+	Rect() : x1(0), y1(0), x2(0), y2(0) {}
+	Rect(int x1a, int y1a, int x2a, int y2a)
+		: x1(x1a), y1(y1a), x2(x2a), y2(y2a) {
+	}
+	bool IsNull() const {
+		return (x1 == 0 && y1 == 0 && x2 == 0 && y2 == 0);
+	}
+	bool IsEmpty() const {
+		return ( Width() <= 0 || Height() <= 0 );
+	}
+	bool IsInside(Point pt) const {
+		return (x1 <= pt.x && pt.x < x2) && (y1 <= pt.y && pt.y < y2);
+	}
+	int  Width() const { return x2 - x1; }
+	int  Height() const { return y2 - y1; }
+};
+
+inline Point operator-(Point pt1, Point pt2) {
+	return Point(pt1.x - pt2.x, pt1.y - pt2.y);
+}
 
 /////////////////////////////
 class IImage

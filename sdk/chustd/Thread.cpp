@@ -7,60 +7,57 @@
 #include "stdafx.h"
 #include "Thread.h"
 
-using namespace chustd;
+namespace chustd {
 
-////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 Thread::Thread()
 {
 	m_handle = nullptr;
 }
 
-////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 Thread::~Thread()
 {
-	WaitForExit();
+#if defined(_WIN32)
+	::CloseHandle(m_handle);
+#endif
 }
 
 ////////////////////////////////////////////////
+#if defined(_WIN32)
 struct StartArg
 {
 	int (*pfn)(void*);
 	void* userArg;
 };
 
-////////////////////////////////////////////////
-#if defined(_WIN32)
 static DWORD WINAPI ThreadProc(LPVOID arg)
-#elif defined(__linux__)
-static void* ThreadProc(void* arg)
-#endif
 {
 	StartArg* pStartArg = reinterpret_cast<StartArg*>(arg);
 	StartArg startArg = *pStartArg;
 	delete pStartArg;
 	int ret = startArg.pfn(startArg.userArg);
-#if defined(_WIN32)
 	return static_cast<DWORD>(ret);
-#elif defined(__linux__)
-	return reinterpret_cast<void*>(ret);
-#endif
 }
+#endif
 
-////////////////////////////////////////////////
+typedef void* (*pthread_pfn)(void*);
+
+///////////////////////////////////////////////////////////////////////////////
 bool Thread::Start(int (*pfn)(void*), void* userArg)
 {
+#if defined(_WIN32)
 	StartArg* pStartArg = new StartArg;
 	pStartArg->pfn = pfn;
 	pStartArg->userArg = userArg;
 
-#if defined(_WIN32)
 	DWORD threadId = 0;
-	m_handle = ::CreateThread(NULL, 0, ThreadProc, pStartArg, 0, &threadId);
+	m_handle = ::CreateThread(NULL, 0, &ThreadProc, pStartArg, 0, &threadId);
 	return m_handle != NULL;
 
 #elif defined(__linux__)
 	pthread_t th;
-	int ret = pthread_create(&th, NULL, &ThreadProc, pStartArg);
+	int ret = pthread_create(&th, NULL, (pthread_pfn)pfn, userArg);
 	if( ret != 0 )
 	{
 		return false;
@@ -70,13 +67,13 @@ bool Thread::Start(int (*pfn)(void*), void* userArg)
 #endif
 }
 
-////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 bool Thread::IsStarted() const
 {
 	return m_handle != 0;
 }
 
-////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 void Thread::Suspend()
 {
 #if defined(_WIN32)
@@ -84,7 +81,7 @@ void Thread::Suspend()
 #endif
 }
 
-////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 void Thread::WaitForExit()
 {
 	if( m_handle == nullptr )
@@ -105,7 +102,7 @@ void Thread::WaitForExit()
 	m_handle = nullptr;
 }
 
-////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 void Thread::Sleep(int delayMs)
 {
 #if defined(_WIN32)
@@ -119,3 +116,5 @@ void Thread::Sleep(int delayMs)
 #endif
 }
 
+///////////////////////////////////////////////////////////////////////////////
+}

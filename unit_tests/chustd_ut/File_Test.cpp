@@ -126,3 +126,8 @@ TEST(File, LastWriteTime)
 	//ASSERT_TRUE( File::Delete("test-file2.txt") );
 }
 
+TEST(File, Rename)
+{
+	ASSERT_TRUE( File::WriteTextUtf8("test-file.txt", "rename") );
+	ASSERT_TRUE( File::Rename("test-file.txt", "test-file-renamed.txt") );
+}

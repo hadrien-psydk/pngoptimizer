@@ -83,7 +83,7 @@ namespace chustd {
 #endif
 
 #if defined(_MSC_VER)
-// Used by the Color32 class, recode Color32 if portability problems
+// Used by the Color class, recode Color if portability problems
 #pragma warning (disable: 4201) // nonstandard extension used : nameless struct/union
 // Use enum underlying type C++0x feature
 #pragma warning (disable: 4480) // nonstandard extension used: specifying underlying type for enum
@@ -112,6 +112,9 @@ void ChustdTraceLine(const class chustd::String& str);
 
 template<typename T>
 inline T MIN(T a, T b) { return (a < b) ? a : b; }
+
+template<typename T>
+inline T MAX(T a, T b) { return (a > b) ? a : b; }
 
 template<typename T, int TSIZE>
 uint8 (*ArraySizeHelper(T (&)[TSIZE]))[TSIZE];

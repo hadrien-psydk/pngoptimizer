@@ -86,6 +86,7 @@ bool Semaphore::Increment()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// Returns 0 upon signal
 int Semaphore::Wait(int timeout)
 {
 #if defined(_WIN32)

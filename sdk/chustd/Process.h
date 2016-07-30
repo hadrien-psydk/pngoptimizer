@@ -39,6 +39,9 @@ public:
 
 	// Returns the directory of the executable that originated the process
 	static String GetExecutableDirectory();
+
+	static String GetConfigPathForRead(const String& appName);
+	static String GetConfigPathForWrite(const String& appName);
 };
 
 } // namespace chustd

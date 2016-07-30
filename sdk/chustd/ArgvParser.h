@@ -27,6 +27,10 @@ public:
 	// Example: run -value:"100" // GetFlagString("value") returns "100"
 	String GetFlagString(const String& flagName) const;
 
+	// Returns the integer value assigned to a flag, 0 upon error
+	// Example: run -value:"100" // GetFlagInt("value") returns 100
+	int GetFlagInt(const String& flagName) const;
+
 protected:
 	StringArray m_argv;
 

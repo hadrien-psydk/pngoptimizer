@@ -28,6 +28,10 @@ static const char k_szForcedPixelsPerMeter[]     = "ForcedPixelsPerMeter";
 static const char k_szForcedPixelsPerInch[]      = "ForcedPixelsPerInch";
 static const int  k_PpuSeparator = 'x'; // Pixels per unit separator
 
+static const char k_szKeepFrameControl[]       = "KeepFrameControl";
+static const char k_szForcedDelayNumerator[]   = "ForcedDelayNumerator";
+static const char k_szForcedDelayDenominator[] = "ForcedDelayDenominator";
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 POEngineSettings::POEngineSettings()
 {
@@ -43,6 +47,10 @@ POEngineSettings::POEngineSettings()
 	physOption = POChunk_Remove;
 	physPpmX = 2834; // 72 dpi: 2834.645669291339 dpm
 	physPpmY = 2834;
+
+	fctlOption = POChunk_Keep;
+	fctlDelayNum = 1;
+	fctlDelayDen = 10;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -91,7 +99,7 @@ void POEngineSettings::LoadFromIni(const MemIniFile& ini)
 	}
 	else
 	{
-		bkgdColor = Color32::black;
+		bkgdColor = Color::Black;
 	}
 
 	///////////////////////////////////////////
@@ -111,6 +119,14 @@ void POEngineSettings::LoadFromIni(const MemIniFile& ini)
 	// Note: only PPM in the INI file
 	ini.GetString(k_szForcedPixelsPerMeter, ppmStr);
 	GetDoubleInt(ppmStr, k_PpuSeparator, physPpmX, physPpmY);
+
+	///////////////////////////////////////////
+	optionInt = int(fctlOption);
+	ini.GetInt(k_szKeepFrameControl, optionInt);
+	fctlOption = POChunkOption(optionInt);
+
+	ini.GetInt(k_szForcedDelayNumerator, fctlDelayNum);
+	ini.GetInt(k_szForcedDelayDenominator, fctlDelayDen);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -129,14 +145,21 @@ void POEngineSettings::SaveToIni(MemIniFile& ini) const
 	String strColBk = String::FromInt(nColBk, 'x', 6, '0').Right(6);
 	ini.SetString(k_szForcedBackgroundColor, strColBk);
 
+	///////////////////////////////////////////
 	ini.SetInt(k_szKeepTextualData, textOption);
 	ini.SetString(k_szForcedTextKeyword, textKeyword);
 	ini.SetString(k_szForcedTextData, textData);
 
+	///////////////////////////////////////////
 	ini.SetInt(k_szKeepPhysicalPixelDimensions, physOption);
 	// Note: only PPM in the INI file
 	String ppmStr = String::FromInt(physPpmX) + "x" + String::FromInt(physPpmY);
 	ini.SetString(k_szForcedPixelsPerMeter, ppmStr);
+
+	///////////////////////////////////////////
+	ini.SetInt(k_szKeepFrameControl, fctlOption);
+	ini.SetInt(k_szForcedDelayNumerator, fctlDelayNum);
+	ini.SetInt(k_szForcedDelayDenominator, fctlDelayDen);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -173,7 +196,7 @@ void POEngineSettings::LoadFromArgv(const ArgvParser& ap)
 
 	bkgdOption = GetChunkOption(ap, k_szKeepBackgroundColor);
 
-	Color32 bkColor;
+	Color bkColor;
 	if( ap.HasFlag(k_szForcedBackgroundColor) )
 	{
 		String strBkColor = ap.GetFlagString(k_szForcedBackgroundColor);
@@ -189,10 +212,12 @@ void POEngineSettings::LoadFromArgv(const ArgvParser& ap)
 		}
 	}
 	
+	///////////////////////////////////////////
 	textOption = GetChunkOption(ap, k_szKeepTextualData);
 	textKeyword = ap.GetFlagString(k_szForcedTextKeyword);
 	textData = ap.GetFlagString(k_szForcedTextData);
 
+	///////////////////////////////////////////
 	physOption = GetChunkOption(ap, k_szKeepPhysicalPixelDimensions);
 	String ppmStr = ap.GetFlagString(k_szForcedPixelsPerMeter);
 	String ppiStr = ap.GetFlagString(k_szForcedPixelsPerInch);
@@ -208,6 +233,11 @@ void POEngineSettings::LoadFromArgv(const ArgvParser& ap)
 		physPpmX = PpmFromPpi(ppiX);
 		physPpmY = PpmFromPpi(ppiY);
 	}
+
+	///////////////////////////////////////////
+	fctlOption = GetChunkOption(ap, k_szKeepTextualData);
+	fctlDelayNum = ap.GetFlagInt(k_szForcedDelayNumerator);
+	fctlDelayDen = ap.GetFlagInt(k_szForcedDelayDenominator);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -226,6 +256,9 @@ void POEngineSettings::WriteArgvUsage(const String& indent)
 	Console::WriteLine(indent + "[-" + String(k_szKeepPhysicalPixelDimensions) + "][:R|K|F] [-" 
 		+ String(k_szForcedPixelsPerMeter) + ":3000x2500] ");
 	Console::WriteLine(indent + "                                       [-" + String(k_szForcedPixelsPerInch) + ":72x72]");
+
+	Console::WriteLine(indent + "[-" + String(k_szKeepFrameControl) + "][:K|F]     [-" + String(k_szForcedDelayNumerator) + ":1] [-" 
+	                                                                                   + String(k_szForcedDelayDenominator) + ":30]");
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

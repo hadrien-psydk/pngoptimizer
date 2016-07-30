@@ -365,14 +365,14 @@ void POApplication::OnMainWndActivated()
 
 void POApplication::DoConnections()
 {
-	m_mainwnd.FilesDropped.Handle(this, &POApplication::OnMainWndFilesDropped);
-	m_mainwnd.ListCleared.Handle(this, &POApplication::OnMainWndListCleared);
-	m_mainwnd.Destroying.Handle(this, &POApplication::OnMainWndDestroying);
-	m_mainwnd.Activated.Handle(this, &POApplication::OnMainWndActivated);
+	m_mainwnd.FilesDropped.Connect(this, &POApplication::OnMainWndFilesDropped);
+	m_mainwnd.ListCleared.Connect(this, &POApplication::OnMainWndListCleared);
+	m_mainwnd.Destroying.Connect(this, &POApplication::OnMainWndDestroying);
+	m_mainwnd.Activated.Connect(this, &POApplication::OnMainWndActivated);
 
-	m_engine.Progressing.Handle(this, &POApplication::OnEngineProgressing);
+	m_engine.Progressing.Connect(this, &POApplication::OnEngineProgressing);
 
-	m_bmpcd.DumpStateChanged.Handle(this, &POApplication::OnBmpcdStateChanged);
+	m_bmpcd.DumpStateChanged.Connect(this, &POApplication::OnBmpcdStateChanged);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
