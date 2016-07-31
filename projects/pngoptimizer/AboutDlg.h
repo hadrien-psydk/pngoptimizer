@@ -3,20 +3,24 @@
 // Copyright (C) Hadrien Nilsson - psydk.org
 // For conditions of distribution and use, see copyright notice in PngOptimizer.h
 /////////////////////////////////////////////////////////////////////////////////////
-#ifndef PO_DLGABOUT_H
-#define PO_DLGABOUT_H
 
-/////////////////////////////////////////////////////////////////////////////////////
-class DlgAbout : public Dialog
+#ifndef PO_ABOUTDLG_H
+#define PO_ABOUTDLG_H
+
+class AboutDlg : public Dialog
 {
 public:
-	int DoModal(HWND hParent);
-	virtual LRESULT DlgProc(UINT nMsg, WPARAM wParam, LPARAM lParam);
+	AboutDlg();
 
-	DlgAbout();
 protected:
 	SysLink m_syslinkUrl;
-	HFONT m_hFont;
+	FONT_HANDLE m_hFont;
+
+protected:
+	virtual bool SetupUI();
+	virtual void SetupConnections();
+	virtual void LoadValues();
+	virtual bool StoreValues();
 };
 
 #endif

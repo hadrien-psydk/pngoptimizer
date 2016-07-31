@@ -3,6 +3,11 @@
 Note: for engine optimization, see PngOptimizer Changelog instead.
 
 -----------------
+2016-07-24 (2.5-beta)
+
+- new: option to change frame rate of animated pngs
+
+-----------------
 2016-07-24 (2.4.3)
 
 - change: executable name is now in lower case: pngoptimizercl

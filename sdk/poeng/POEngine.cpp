@@ -105,7 +105,7 @@ static uint16 ClampUInt16(int value)
 		return 0;
 	if( value > 65535 )
 		return 65535;
-	return value;
+	return static_cast<uint16>(value);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

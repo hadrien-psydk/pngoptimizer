@@ -18,8 +18,8 @@
 // 
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef PO_PNGOPTIMIZER_H
-#define PO_PNGOPTIMIZER_H
+#ifndef PO_POAPPLICATION_H
+#define PO_POAPPLICATION_H
 
 #include "BmpClipboardDumper.h"
 #include "MainWnd.h"
@@ -36,7 +36,7 @@ public:
 
 public:
 	bool Initialize(HINSTANCE hInstance);
-	int32 Run();
+	int Run();
 
 	bool IsJobRunning();         // Used by the user interface to know what menus have to be disabled
 	void OnJobDone();            // Received by the main window when the working thread finished its work
@@ -47,11 +47,8 @@ public:
 	POApplication();
 	virtual ~POApplication();
 
-	// Allows an access to the single application instance
-	static POApplication& GetInstance();
-
 	// Color conversion from one world (the engine) to another (the Windows UI)
-	static COLORREF CrFromTc(POEngine::TextType textType);
+	static Color CrFromTc(POEngine::TextType textType);
 
 private:
 	// Related to the working thread

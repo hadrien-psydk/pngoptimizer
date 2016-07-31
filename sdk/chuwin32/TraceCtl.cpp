@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////////////////
+ï»¿///////////////////////////////////////////////////////////////////////////////
 // This file is part of the chuwin32 library
 // Copyright (C) ChuTeam
 // For conditions of distribution and use, see copyright notice in chuwin32.h
@@ -6,10 +6,30 @@
 
 #include "stdafx.h"
 #include "TraceCtl.h"
+
 #include "gui.h"
+#include "gdi.h"
+#include "DibBitmap.h"
+
+namespace chuwin32 {
 
 //////////////////////////////////////////////////////////////////////
-using namespace chuwin32;
+
+struct SpecificImpl
+{
+	HFONT   m_hFont;     // Current font
+	LOGFONT m_iconLogFont;
+	HFONT   m_hIconFont; // Font used by desktop icons
+	DibBitmap m_dib;
+
+	SpecificImpl()
+	{
+		m_hFont = NULL;
+		m_hIconFont = NULL;
+		memset(&m_iconLogFont, 0, sizeof(m_iconLogFont));
+	}
+};
+
 //////////////////////////////////////////////////////////////////////
 #ifndef IDC_HAND
 #define IDC_HAND            MAKEINTRESOURCE(32649)
@@ -52,24 +72,21 @@ TraceCtl::TextPiece* TraceCtl::Line::AddOrReusePiece()
 //////////////////////////////////////////////////////////////////////
 TraceCtl::TraceCtl()
 {
-	m_hWnd = NULL;
-	m_hFont = NULL;
-	m_hIconFont = NULL;
-	m_nMarginLeft = 0;
+	m_impl = new SpecificImpl;
+	m_marginLeft = 0;
 	m_bDragStart = false;
-	m_nLargestLineWidth = 0;
+	m_largestLineWidth = 0;
 	m_lineHeight = 0;
 	m_exWidth = 0;
-	memset(&m_iconLogFont, 0, sizeof(m_iconLogFont));
 }
 
 TraceCtl::~TraceCtl()
 {
-	if( m_hIconFont != NULL )
+	if( m_impl->m_hIconFont != NULL )
 	{
-		DeleteObject(m_hIconFont);
-		m_hIconFont = NULL;
+		DeleteObject(m_impl->m_hIconFont);
 	}
+	delete m_impl;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -158,42 +175,42 @@ void TraceCtl::CheckFont()
 	LOGFONTW lf = { 0 };
 	SystemParametersInfo(SPI_GETICONTITLELOGFONT, sizeof(LOGFONT), &lf, 0);
 
-	if( m_hFont != NULL )
+	if( m_impl->m_hFont != NULL )
 	{
-		if( LogFontEquals(m_iconLogFont, lf) )
+		if( LogFontEquals(m_impl->m_iconLogFont, lf) )
 		{
 			// No change
 			return;
 		}
-		if( m_hIconFont != NULL )
+		if( m_impl->m_hIconFont != NULL )
 		{
-			DeleteObject(m_hIconFont);
-			m_hIconFont = NULL;
+			DeleteObject(m_impl->m_hIconFont);
+			m_impl->m_hIconFont = NULL;
 		}
 	}
-	m_iconLogFont = lf;
-	m_hIconFont = CreateFontIndirect(&lf);
-	if( m_hIconFont == NULL )
+	m_impl->m_iconLogFont = lf;
+	m_impl->m_hIconFont = CreateFontIndirect(&lf);
+	if( m_impl->m_hIconFont == NULL )
 	{
 		SetFont( (HFONT) GetStockObject(DEFAULT_GUI_FONT));
 	}
 	else
 	{
-		SetFont(m_hIconFont);
+		SetFont(m_impl->m_hIconFont);
 	}
 	if( m_lines.IsEmpty() )
 	{
 		return;
 	}
-	// Update m_nLargestLineWidth for horizontal scrollbar 
-	m_nLargestLineWidth = 0;
+	// Update m_largestLineWidth for horizontal scrollbar 
+	m_largestLineWidth = 0;
 	foreach(m_lines, i)
 	{
 		Line& line = m_lines[i];
 		const int width = ComputeLineWidth(line);
-		if( width > m_nLargestLineWidth )
+		if( width > m_largestLineWidth )
 		{
-			m_nLargestLineWidth = width;
+			m_largestLineWidth = width;
 		}
 	}
 
@@ -253,55 +270,55 @@ LRESULT TraceCtl::WndProc(UINT nMsg, WPARAM wParam, LPARAM lParam)
 	default:
 		break;
 	}
-	return DefWindowProc(m_hWnd, nMsg, wParam, lParam);
+	return DefWindowProc(m_handle, nMsg, wParam, lParam);
 }
 
 int TraceCtl::OnKeyDown(WPARAM wParam, LPARAM)
 {
 	if( wParam == VK_DOWN )
 	{
-		OnVScroll(SB_LINEDOWN, LPARAM(m_hWnd));
+		OnVScroll(SB_LINEDOWN, LPARAM(m_handle));
 	}
 	else if( wParam == VK_UP )
 	{
-		OnVScroll(SB_LINEUP, LPARAM(m_hWnd));
+		OnVScroll(SB_LINEUP, LPARAM(m_handle));
 	}
 	else if( wParam == VK_LEFT )
 	{
-		OnHScroll(SB_LINEUP, LPARAM(m_hWnd));
+		OnHScroll(SB_LINEUP, LPARAM(m_handle));
 	}
 	else if( wParam == VK_RIGHT )
 	{
-		OnHScroll(SB_LINEDOWN, LPARAM(m_hWnd));
+		OnHScroll(SB_LINEDOWN, LPARAM(m_handle));
 	}
 	else if( wParam == VK_NEXT )
 	{
-		OnVScroll(SB_PAGEDOWN, LPARAM(m_hWnd));
+		OnVScroll(SB_PAGEDOWN, LPARAM(m_handle));
 	}
 	else if( wParam == VK_PRIOR )
 	{
-		OnVScroll(SB_PAGEUP, LPARAM(m_hWnd));
+		OnVScroll(SB_PAGEUP, LPARAM(m_handle));
 	}
 	else if( wParam == VK_HOME )
 	{
 		if( GetAsyncKeyState(VK_CONTROL) != 0 )
 		{
-			OnVScroll(SB_TOP, LPARAM(m_hWnd));
+			OnVScroll(SB_TOP, LPARAM(m_handle));
 		}
 		else
 		{
-			OnHScroll(SB_TOP, LPARAM(m_hWnd));
+			OnHScroll(SB_TOP, LPARAM(m_handle));
 		}
 	}
 	else if( wParam == VK_END )
 	{
 		if( GetAsyncKeyState(VK_CONTROL) != 0 )
 		{
-			OnVScroll(SB_BOTTOM, LPARAM(m_hWnd));
+			OnVScroll(SB_BOTTOM, LPARAM(m_handle));
 		}
 		else
 		{
-			OnHScroll(SB_BOTTOM, LPARAM(m_hWnd));
+			OnHScroll(SB_BOTTOM, LPARAM(m_handle));
 		}
 	}
 
@@ -315,7 +332,7 @@ int TraceCtl::OnMouseWheel(WPARAM wParam, LPARAM)
 	int32 nPos = GetNewScrollPos32(SB_VERT);
 	nPos -= (zDelta * m_lineHeight) / 120;
 	SetScrollPos(SB_VERT, nPos, TRUE); // TRUE bRedraw
-	OnVScroll(SB_THUMBTRACK, LPARAM(m_hWnd));
+	OnVScroll(SB_THUMBTRACK, LPARAM(m_handle));
 
 	return 0;
 }
@@ -333,12 +350,12 @@ TraceCtl::TextPiece* TraceCtl::GetLinkFromPoint(int x, int y, RECT* /*pLocalRect
 	Line& line = m_lines[nLine];
 
 	// Parcours des morceaux de texte
-	HDC hResDC = GetDC();
-	SelectObject(hResDC, m_hFont);
+	HDC hResDC = ::GetDC(GetHandle());
+	SelectObject(hResDC, m_impl->m_hFont);
 
 	TextPiece* pResult = nullptr;
 
-	int32 nX1 = m_nMarginLeft;
+	int32 nX1 = m_marginLeft;
 	int32 nX2 = 0;
 	foreach(line.m_pieces, iPiece)
 	{
@@ -359,7 +376,7 @@ TraceCtl::TextPiece* TraceCtl::GetLinkFromPoint(int x, int y, RECT* /*pLocalRect
 		nX1 = nX2;
 	}
 	
-	ReleaseDC(hResDC);
+	::ReleaseDC(GetHandle(), hResDC);
 
 	return pResult;
 }
@@ -378,7 +395,7 @@ int TraceCtl::OnLButtonDown(WPARAM, LPARAM lParam)
 {
 	// On va chercher si on clique sur un lien
 	int x = GET_X_LPARAM(lParam); // Inclure <windowsx.h> dans stdafx.h
-	int y = GET_Y_LPARAM(lParam); 
+	int y = GET_Y_LPARAM(lParam);
 
 	TextPiece* pTP = GetLinkFromPoint(x, y);
 	if( pTP != nullptr )
@@ -437,7 +454,7 @@ int TraceCtl::OnMouseMove(WPARAM wParam, LPARAM lParam)
 {
 	// On va chercher si on clique sur un lien
 	int x = GET_X_LPARAM(lParam); // Inclure <windowsx.h> dans stdafx.h
-	int y = GET_Y_LPARAM(lParam); 
+	int y = GET_Y_LPARAM(lParam);
 
 	if( (wParam & MK_LBUTTON) && m_bDragStart )
 	{
@@ -446,12 +463,11 @@ int TraceCtl::OnMouseMove(WPARAM wParam, LPARAM lParam)
 
 		if( nDeltaX > 4 || nDeltaY > 4 )
 		{
-			COLORREF crPrevious = m_pDragText->color;
-			m_pDragText->color = RGB(127, 127, 255);
+			Color crPrevious = m_pDragText->color;
+			m_pDragText->color = Color(127, 127, 255);
 			
-			HDC hDC = GetDC();
+			HDC hDC = ::GetDC(GetHandle());
 			Draw(hDC);
-			ReleaseDC(hDC);
 
 			int nDragResult = OnLinkDragBegin(m_pDragText->url);
 			
@@ -461,7 +477,7 @@ int TraceCtl::OnMouseMove(WPARAM wParam, LPARAM lParam)
 			if( nDragResult == dragMove )
 			{
 				// Le lien n'est plus valide
-				m_pDragText->color = RGB(20, 20, 30);
+				m_pDragText->color = Color(20, 20, 30);
 				m_pDragText->url.Empty();
 			}
 			else
@@ -469,9 +485,8 @@ int TraceCtl::OnMouseMove(WPARAM wParam, LPARAM lParam)
 				m_pDragText->color = crPrevious;
 			}
 
-			hDC = GetDC();
 			Draw(hDC);
-			ReleaseDC(hDC);
+			::ReleaseDC(GetHandle(), hDC);
 		}
 	}
 	else
@@ -494,7 +509,7 @@ int TraceCtl::OnRButtonDown(WPARAM, LPARAM)
 	int nControlID = 1000;
 	NMHDR nm;
 	nm.code = NM_RCLICK; // Inclure <commctrl.h> dans stdafx.h
-	nm.hwndFrom = m_hWnd;
+	nm.hwndFrom = m_handle;
 	nm.idFrom = nControlID;
 
 	SendMessage( GetParent(), WM_NOTIFY, nControlID, (LPARAM) &nm);
@@ -506,23 +521,23 @@ void TraceCtl::Draw(HDC hdcWindow)
 	// One thread at a time can draw
 	chustd::TmpLock tmplock(m_cs);
 
-	RECT rectClient = GetClientRect();
-	const int nClientHeight = rectClient.bottom - rectClient.top;
+	Rect rectClient = GetClientRect();
+	const int nClientHeight = rectClient.Height();
 	//const int nClientWidth = rectClient.right - rectClient.left;
 	
 	///////////////////////////////////////////////
 
-	DeviceContext dcDib(m_dib.m_hDC);
+	DeviceContext dcDib(m_impl->m_dib.m_hDC);
 
 	COLORREF colBk = GetSysColor(COLOR_WINDOW);
-	dcDib.SelectObject(m_hFont);
+	dcDib.SelectObject(m_impl->m_hFont);
 	
 	// For correct anti-aliasing, do not render any background when drawing the font,
 	// we will draw the whole background ourselves
 	dcDib.SetBkMode(TRANSPARENT);
 
 	const int nStartX = -GetScrollPos(SB_HORZ);
-	
+
 	int y = 0;
 
 	int32 nPos = GetScrollPos(SB_VERT);
@@ -541,7 +556,7 @@ void TraceCtl::Draw(HDC hdcWindow)
 
 	const int lineCount = m_lines.GetSize();
 
-	// m_lineHeight peut être à 0 à l'initialisation du contrôle
+	// m_lineHeight can be 0 upon control initialization
 	if( m_lineHeight > 0 )
 	{
 		const int visibleIndexCount = (nClientHeight / m_lineHeight) + 1;
@@ -555,16 +570,16 @@ void TraceCtl::Draw(HDC hdcWindow)
 		{
 			const Line& line = m_lines[iLine];
 			
-			RECT rectClearLine;
-			rectClearLine.top = 0;
-			rectClearLine.bottom = m_dib.GetHeight();
-			rectClearLine.left = 0;
-			rectClearLine.right = rectClient.right - rectClient.left;
+			Rect rectClearLine;
+			rectClearLine.y1 = 0;
+			rectClearLine.y2 = m_impl->m_dib.GetHeight();
+			rectClearLine.x1 = 0;
+			rectClearLine.x2 = rectClient.Width();
 			dcDib.FillSolidRect(rectClearLine, colBk);
 
-			int textStartX = nStartX + m_nMarginLeft;
+			int textStartX = nStartX + m_marginLeft;
 			int nDibX = textStartX;
-			int nLineWidth = m_nMarginLeft;
+			int nLineWidth = m_marginLeft;
 
 			const int pieceCount = line.m_pieces.GetSize();
 			for(int iPiece = 0; iPiece < pieceCount; ++iPiece)
@@ -587,7 +602,7 @@ void TraceCtl::Draw(HDC hdcWindow)
 			}
 
 			// Blit the line to the window
-			m_dib.Blit(hdcWindow, 0, y);
+			m_impl->m_dib.Blit(hdcWindow, 0, y);
 
 			y += m_lineHeight;
 		}
@@ -595,15 +610,17 @@ void TraceCtl::Draw(HDC hdcWindow)
 
 	// Clear the remaining client area
 	DeviceContext dcWindow(hdcWindow);
-	RECT rectRemaining = rectClient;
-	rectRemaining.top = y;
+	Rect rectRemaining = rectClient;
+	rectRemaining.y1 = y;
 	dcWindow.FillSolidRect(rectRemaining, colBk);
 
 	if( lineCount == 0 || (lineCount == 1 && m_lines[0].m_pieces.GetSize() == 0) )
 	{
 		// Draw empty text
 		SetTextColor(hdcWindow, RGB(0,0,200));
-		DrawTextW(hdcWindow, m_emptyText.GetBuffer(), m_emptyText.GetLength(), &rectClient, 
+		Rect rect = rectClient;
+		RECT rc = { rect.x1, rect.y1, rect.x2, rect.y2 };
+		DrawTextW(hdcWindow, m_emptyText.GetBuffer(), m_emptyText.GetLength(), &rc, 
 		          DT_CENTER|DT_SINGLELINE|DT_VCENTER);
 	}
 }
@@ -628,7 +645,7 @@ int TraceCtl::GetTextPieceWidth(HDC hDC, const TextPiece& tp)
 int TraceCtl::DrawTextPiece(HDC hDC, int x, int y, const TextPiece& tp)
 {
 	int tabHints[1] = { m_exWidth * 2 };
-	SetTextColor(hDC, tp.color);
+	SetTextColor(hDC, RGB(tp.color.r,tp.color.g,tp.color.b));
 	int minWidthPix = tp.minWidthEx * m_exWidth;
 	int justifyBorder = 0;
 	if( tp.justify != 0 )
@@ -650,14 +667,14 @@ int TraceCtl::DrawTextPiece(HDC hDC, int x, int y, const TextPiece& tp)
 	return wret;
 }
 
-int TraceCtl::OnPaint(WPARAM, LPARAM) 
+int TraceCtl::OnPaint(WPARAM, LPARAM)
 {
 	CheckFont();
 
 	PAINTSTRUCT ps;
-	HDC hPaintDC = BeginPaint(m_hWnd, &ps);
+	HDC hPaintDC = BeginPaint(m_handle, &ps);
 	Draw(hPaintDC);
-	EndPaint(m_hWnd, &ps);
+	EndPaint(m_handle, &ps);
 	return 0;
 }
 
@@ -666,13 +683,13 @@ void TraceCtl::Refresh()
 	UpdateScrollSizeVert();
 	UpdateScrollSizeHorz();
 
-	HDC hDC = GetDC();
+	HDC hDC = ::GetDC(GetHandle());
 	Draw(hDC);
-	ReleaseDC(hDC);
+	::ReleaseDC(GetHandle(), hDC);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void TraceCtl::AddText(const chustd::String& text, COLORREF cr)
+void TraceCtl::AddText(const chustd::String& text, Color cr)
 {
 	AddTextInfo* pAddTextInfo = new AddTextInfo;
 	if( pAddTextInfo == nullptr )
@@ -682,7 +699,7 @@ void TraceCtl::AddText(const chustd::String& text, COLORREF cr)
 	pAddTextInfo->operation = opAddText;
 	pAddTextInfo->tp.text = text;
 	pAddTextInfo->tp.color = cr;
-	::SendMessage(m_hWnd, ms_nWmAddText, (WPARAM) pAddTextInfo, 0);
+	::SendMessage(m_handle, ms_nWmAddText, (WPARAM) pAddTextInfo, 0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -695,17 +712,17 @@ void TraceCtl::AddText(const TextPiece& tp)
 	}
 	pAddTextInfo->operation = opAddText;
 	pAddTextInfo->tp = tp;
-	::SendMessage(m_hWnd, ms_nWmAddText, (WPARAM) pAddTextInfo, 0);
+	::SendMessage(m_handle, ms_nWmAddText, (WPARAM) pAddTextInfo, 0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void TraceCtl::AddLine(const chustd::String& text, COLORREF cr)
+void TraceCtl::AddLine(const chustd::String& text, Color cr)
 {
 	chustd::String strLine = text + L"\n";
 	AddText(strLine, cr);
 }
 
-void TraceCtl::AddTextAtLine(int32 line, const chustd::String& text, COLORREF cr)
+void TraceCtl::AddTextAtLine(int32 line, const chustd::String& text, Color cr)
 {
 	AddTextInfo* pAddTextInfo = new AddTextInfo;
 	if( pAddTextInfo == nullptr )
@@ -716,7 +733,7 @@ void TraceCtl::AddTextAtLine(int32 line, const chustd::String& text, COLORREF cr
 	pAddTextInfo->tp.text = text;
 	pAddTextInfo->tp.color = cr;
 	pAddTextInfo->line = line;
-	::SendMessage(m_hWnd, ms_nWmAddText, (WPARAM) pAddTextInfo, 0);
+	::SendMessage(m_handle, ms_nWmAddText, (WPARAM) pAddTextInfo, 0);
 }
 
 void TraceCtl::AddLink(const chustd::String& text, const chustd::String& strUrl)
@@ -729,8 +746,8 @@ void TraceCtl::AddLink(const chustd::String& text, const chustd::String& strUrl)
 	pAddTextInfo->operation = opAddLink;
 	pAddTextInfo->tp.text = text;
 	pAddTextInfo->tp.url = strUrl;
-	pAddTextInfo->tp.color = RGB(0, 0, 255);
-	::SendMessage(m_hWnd, ms_nWmAddText, (WPARAM) pAddTextInfo, 0);
+	pAddTextInfo->tp.color = Color(0, 0, 255);
+	::SendMessage(m_handle, ms_nWmAddText, (WPARAM) pAddTextInfo, 0);
 }
 
 void TraceCtl::ClearLineAt(int32 line)
@@ -742,7 +759,7 @@ void TraceCtl::ClearLineAt(int32 line)
 	}
 	pAddTextInfo->operation = opClearLineAt;
 	pAddTextInfo->line = line;
-	::SendMessage(m_hWnd, ms_nWmAddText, (WPARAM) pAddTextInfo, 0);
+	::SendMessage(m_handle, ms_nWmAddText, (WPARAM) pAddTextInfo, 0);
 }
 
 void TraceCtl::ClearLine()
@@ -758,14 +775,14 @@ void TraceCtl::Clear()
 		return;
 	}
 	pAddTextInfo->operation = opClearAll;
-	::SendMessage(m_hWnd, ms_nWmAddText, (WPARAM) pAddTextInfo, 0);
+	::SendMessage(m_handle, ms_nWmAddText, (WPARAM) pAddTextInfo, 0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL TraceCtl::OnAddText(WPARAM wParam, LPARAM)
 {
-	AddTextInfo* pAddTextInfo = (AddTextInfo*) wParam;
-	
+	AddTextInfo* pAddTextInfo = (AddTextInfo*)wParam;
+
 	// Transfert params
 	Operation operation = pAddTextInfo->operation;
 	int line = pAddTextInfo->line;
@@ -806,9 +823,9 @@ void TraceCtl::DoAddText(const TextPiece& tp, int lineIndex)
 		line.m_pieces[pieceIndex] = tp;
 
 		const int width = ComputeLineWidth(line);
-		if( width > m_nLargestLineWidth )
+		if( width > m_largestLineWidth )
 		{
-			m_nLargestLineWidth = width;
+			m_largestLineWidth = width;
 		}
 
 		Refresh();
@@ -843,7 +860,7 @@ void TraceCtl::DoAddText(const TextPiece& tp, int lineIndex)
 	int32 nScrollStart = GetNewScrollPos32(SB_VERT);
 
 	RECT rectToUpdate;
-	::GetClientRect(m_hWnd, &rectToUpdate);
+	::GetClientRect(m_handle, &rectToUpdate);
 	
 	rectToUpdate.top = nStartLine * m_lineHeight - nScrollStart;
 	rectToUpdate.bottom = rectToUpdate.top + nCount * m_lineHeight;
@@ -870,16 +887,16 @@ void TraceCtl::DoAddText(const TextPiece& tp, int lineIndex)
 		}
 
 		const int width = ComputeLineWidth(line);
-		if( width > m_nLargestLineWidth )
+		if( width > m_largestLineWidth )
 		{
-			m_nLargestLineWidth = width;
+			m_largestLineWidth = width;
 		}
 	}
 
 	UpdateScrollSizeVert();
 	UpdateScrollSizeHorz();
 	
-	InvalidateRect(m_hWnd, NULL, FALSE);
+	InvalidateRect(m_handle, NULL, FALSE);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -909,7 +926,7 @@ void TraceCtl::DoClear()
 	m_cs.Enter();
 
 	m_lines.Clear();
-	m_nLargestLineWidth = 0;
+	m_largestLineWidth = 0;
 
 	Refresh();
 
@@ -919,7 +936,7 @@ void TraceCtl::DoClear()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 int TraceCtl::OnDestroy(WPARAM, LPARAM)
 {
-	m_dib.Destroy();
+	m_impl->m_dib.Destroy();
 	return 0;
 }
 
@@ -935,7 +952,7 @@ uint32 TraceCtl::GetNewScrollPos32(int nSBType, HWND hScrollBar)
     // on the window or scrolled the window itself
 	HWND hWndScroll;
 	if( hScrollBar == NULL )
-		hWndScroll = m_hWnd;
+		hWndScroll = m_handle;
 	else
 		hWndScroll = hScrollBar;
 	
@@ -948,17 +965,17 @@ uint32 TraceCtl::GetNewScrollPos32(int nSBType, HWND hScrollBar)
 	return nPos;
 }
 
-int TraceCtl::OnVScroll(WPARAM wParam, LPARAM lParam) 
+int TraceCtl::OnVScroll(WPARAM wParam, LPARAM lParam)
 {
 	UINT nSBCode = LOWORD(wParam);
-	HWND hScrollBar = (HWND) lParam;
+	HWND hScrollBar = (HWND)lParam;
 
 	int nGetPos = GetScrollPos(SB_VERT);
 	//const int nBefore = nGetPos;
 
 	int nMinPos = 0;
 	int nMaxPos = 0;
-	GetScrollRange(m_hWnd, SB_VERT, &nMinPos, &nMaxPos);
+	GetScrollRange(m_handle, SB_VERT, &nMinPos, &nMaxPos);
 
 	switch(nSBCode)
 	{
@@ -995,7 +1012,7 @@ int TraceCtl::OnVScroll(WPARAM wParam, LPARAM lParam)
 	//const int nAfter = GetScrollPos(SB_VERT);
 	//const int nDelta = nBefore - nAfter;
 	
-	InvalidateRect(m_hWnd, NULL, FALSE);
+	InvalidateRect(m_handle, NULL, FALSE);
 	return 0;
 }
 
@@ -1006,8 +1023,8 @@ void TraceCtl::UpdateScrollSizeVert(int flags)
 
 	//int nGetPos = GetScrollPos(SB_VERT);
 
-	RECT rect = GetClientRect();
-	const int nClientHeight = rect.bottom - rect.top;
+	Rect rect = GetClientRect();
+	const int nClientHeight = rect.Height();
 
 	const int lineCount = m_lines.GetSize();
 
@@ -1025,26 +1042,26 @@ void TraceCtl::UpdateScrollSizeVert(int flags)
 	si.nPos = si.nMax;
 	si.nTrackPos = 0;
 
-	SetScrollInfo(m_hWnd, SB_VERT, &si, redraw);
+	SetScrollInfo(m_handle, SB_VERT, &si, redraw);
 }
 
 void TraceCtl::InitScrollSizeVert()
 {
-	RECT rect = GetClientRect();
-	const int nClientHeight = rect.bottom - rect.top;
+	Rect rect = GetClientRect();
+	const int nClientHeight = rect.Height();
 
 	const int lineCount = m_lines.GetSize();
 
 	SCROLLINFO si;
-    si.cbSize = sizeof(si);
-    si.fMask = SIF_ALL | SIF_DISABLENOSCROLL;
-    si.nMin = 0;
-    si.nMax = lineCount * m_lineHeight;
-    si.nPage = nClientHeight;
-    si.nPos = 0;
-    si.nTrackPos = 0;
+	si.cbSize = sizeof(si);
+	si.fMask = SIF_ALL | SIF_DISABLENOSCROLL;
+	si.nMin = 0;
+	si.nMax = lineCount * m_lineHeight;
+	si.nPage = nClientHeight;
+	si.nPos = 0;
+	si.nTrackPos = 0;
 
-	SetScrollInfo(m_hWnd, SB_VERT, &si, TRUE);
+	SetScrollInfo(m_handle, SB_VERT, &si, TRUE);
 }
 
 
@@ -1058,7 +1075,7 @@ int TraceCtl::OnHScroll(WPARAM wParam, LPARAM lParam)
 
 	int nMinPos = 0;
 	int nMaxPos = 0;
-	GetScrollRange(m_hWnd, SB_VERT, &nMinPos, &nMaxPos);
+	GetScrollRange(m_handle, SB_VERT, &nMinPos, &nMaxPos);
 
 	switch(nSBCode)
 	{
@@ -1095,7 +1112,7 @@ int TraceCtl::OnHScroll(WPARAM wParam, LPARAM lParam)
 	//const int nAfter = GetScrollPos(SB_HORZ);
 	//const int nDelta = nBefore - nAfter;
 	
-	InvalidateRect(m_hWnd, NULL, FALSE);
+	InvalidateRect(m_handle, NULL, FALSE);
 	return 0;
 }
 
@@ -1106,44 +1123,44 @@ void TraceCtl::UpdateScrollSizeHorz(int flags)
 
 	//int nGetPos = GetScrollPos(SB_HORZ);
 
-	RECT rect = GetClientRect();
-	const int nClientWidth = rect.right - rect.left;
-	
+	Rect rect = GetClientRect();
+	const int nClientWidth = rect.Width();
+
 	SCROLLINFO si;
 	si.cbSize = sizeof(si);
-	si.fMask = SIF_PAGE | SIF_RANGE | SIF_DISABLENOSCROLL; // On ne met pas à jour la position
+	si.fMask = SIF_PAGE | SIF_RANGE | SIF_DISABLENOSCROLL; // On ne met pas \E0 jour la position
 	si.nMin = 0;
-	si.nMax = m_nLargestLineWidth;
+	si.nMax = m_largestLineWidth;
 	si.nPage = nClientWidth;
 	si.nPos = si.nMax;
 	si.nTrackPos = 0;
 
-	SetScrollInfo(m_hWnd, SB_HORZ, &si, redraw);
+	SetScrollInfo(m_handle, SB_HORZ, &si, redraw);
 }
 
 void TraceCtl::InitScrollSizeHorz()
 {
-	RECT rect = GetClientRect();
-	const int nClientWidth = rect.right - rect.left;
+	Rect rect = GetClientRect();
+	const int nClientWidth = rect.Width();
 
 	SCROLLINFO si;
-    si.cbSize = sizeof(si);
-    si.fMask = SIF_ALL | SIF_DISABLENOSCROLL;
-    si.nMin = 0;
-    si.nMax = m_nLargestLineWidth;
-    si.nPage = nClientWidth;
-    si.nPos = 0;
-    si.nTrackPos = 0;
+	si.cbSize = sizeof(si);
+	si.fMask = SIF_ALL | SIF_DISABLENOSCROLL;
+	si.nMin = 0;
+	si.nMax = m_largestLineWidth;
+	si.nPage = nClientWidth;
+	si.nPos = 0;
+	si.nTrackPos = 0;
 
-	SetScrollInfo(m_hWnd, SB_HORZ, &si, TRUE);
+	SetScrollInfo(m_handle, SB_HORZ, &si, TRUE);
 }
 
 int TraceCtl::ComputeLineWidth(const Line& line)
 {
-	HDC hResDC = GetDC();
-	SelectObject(hResDC, m_hFont);
+	HDC hResDC = ::GetDC(GetHandle());
+	SelectObject(hResDC, m_impl->m_hFont);
 
-	int x = m_nMarginLeft;
+	int x = m_marginLeft;
 
 	const int pieceCount = line.m_pieces.GetSize();
 	for(int iPiece = 0; iPiece < pieceCount; ++iPiece)
@@ -1152,7 +1169,7 @@ int TraceCtl::ComputeLineWidth(const Line& line)
 		x += GetTextPieceWidth(hResDC, tp);
 	}
 
-	ReleaseDC(hResDC);
+	::ReleaseDC(GetHandle(), hResDC);
 	return x;
 }
 
@@ -1161,55 +1178,55 @@ int TraceCtl::OnSize(WPARAM, LPARAM)
 	//int nType = int(wParam);
 	//int cx = LOWORD(lParam);
 	//int cy = HIWORD(lParam);
-	
+
 	chustd::TmpLock tmplock(m_cs);
 
-	UpdateScrollSizeVert(SUF_Redraw); // Pas de mise à jour de position sinon on se retrouve tout en bas au resize
+	UpdateScrollSizeVert(SUF_Redraw); // No position update to avoid bottom scroll
 	UpdateScrollSizeHorz(SUF_Redraw);
 	
-	HDC hDC = GetDC();
+	HDC hDC = ::GetDC(GetHandle());
 	Draw(hDC);
-	ReleaseDC(hDC);
+	::ReleaseDC(GetHandle(), hDC);
 
 	return 0;
 }
 
 void TraceCtl::Resize(int cx, int cy)
 {
-	MoveWindow(m_hWnd, 0, 0, cx, cy, TRUE);
+	MoveWindow(m_handle, 0, 0, cx, cy, TRUE);
 }
 
-void TraceCtl::SetFont(const HFONT& hFont)
+void TraceCtl::SetFont(HFONT hFont)
 {
 	m_cs.Enter();
 
-	m_hFont = hFont;
+	m_impl->m_hFont = hFont;
 
-	HDC hDC = GetDC();
+	HDC hDC = GetDC(GetHandle());
 
-	SelectObject(hDC, m_hFont);
+	SelectObject(hDC, m_impl->m_hFont);
 	
 	TEXTMETRIC tm;
 	GetTextMetrics(hDC, &tm);
 
 	m_lineHeight = tm.tmHeight;
-	m_nMarginLeft = tm.tmAveCharWidth / 2;
+	m_marginLeft = tm.tmAveCharWidth / 2;
 	m_exWidth = tm.tmAveCharWidth;
 
 	// Recreate the dib for off line text rendering
 	int nMaxWidth = ::GetSystemMetrics(SM_CXFULLSCREEN);
 
-	m_dib.Destroy();
-	m_dib.Create(hDC, nMaxWidth, m_lineHeight);
+	m_impl->m_dib.Destroy();
+	m_impl->m_dib.Create(hDC, nMaxWidth, m_lineHeight);
 
-	ReleaseDC(hDC);
+	ReleaseDC(GetHandle(), hDC);
 
 	m_cs.Leave();
 }
 
-const HFONT& TraceCtl::GetFont() const 
+HFONT TraceCtl::GetFont() const 
 {
-	return m_hFont;
+	return m_impl->m_hFont;
 }
 
 void TraceCtl::ResetHrzPos()
@@ -1224,3 +1241,5 @@ void TraceCtl::ResetHrzPos()
 	m_cs.Leave();
 }
 
+///////////////////////////////////////////////////////////////////////////////
+}

@@ -5,7 +5,6 @@
 /////////////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#include "PngOptimizer.h"
 #include "BmpClipboardDumper.h"
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -38,17 +37,17 @@ BmpClipboardDumper::~BmpClipboardDumper()
 }
 
 // Gets the bitmap data from the clipboard and put it into the dib argument
-bool BmpClipboardDumper::PrepareDib(chuwin32::DibBitmap& dib)
+static bool PrepareDib(chuwin32::DibBitmap& dib, String& strErr)
 {
 	if( !IsClipboardFormatAvailable(CF_BITMAP) )
 	{
-		m_strErr = k_szNoBitmapInClipboard;
+		strErr = k_szNoBitmapInClipboard;
 		return false;
 	}
 
 	if( !OpenClipboard(NULL) )
 	{
-		m_strErr = k_szOpenClipboardFailed;
+		strErr = k_szOpenClipboardFailed;
 		return false;
 	}
 
@@ -87,12 +86,12 @@ bool BmpClipboardDumper::PrepareDib(chuwin32::DibBitmap& dib)
 					}
 					else
 					{
-						m_strErr = k_szCannotCreate32BitsDib;
+						strErr = k_szCannotCreate32BitsDib;
 					}
 				}
 				else
 				{
-					m_strErr = k_szGetObjectFailed;
+					strErr = k_szGetObjectFailed;
 				}
 
 				// </SelectObject>
@@ -100,7 +99,7 @@ bool BmpClipboardDumper::PrepareDib(chuwin32::DibBitmap& dib)
 			}
 			else
 			{
-				m_strErr = k_szSelectObjectFailed;
+				strErr = k_szSelectObjectFailed;
 			}
 			
 			// </CreateCompatibleDC>
@@ -108,12 +107,12 @@ bool BmpClipboardDumper::PrepareDib(chuwin32::DibBitmap& dib)
 		}
 		else
 		{
-			m_strErr = k_szCreateCompatibleDCFailed;
+			strErr = k_szCreateCompatibleDCFailed;
 		}
 	}
 	else
 	{
-		m_strErr = k_szGetClipboardDataFailed;
+		strErr = k_szGetClipboardDataFailed;
 	}
 
 	CloseClipboard();
@@ -127,7 +126,7 @@ bool BmpClipboardDumper::Dump(POEngine* pEngine)
 	m_bAbort = false;
 
 	chuwin32::DibBitmap dib;
-	if( !PrepareDib(dib) )
+	if( !PrepareDib(dib, m_strErr) )
 	{
 		return false;
 	}

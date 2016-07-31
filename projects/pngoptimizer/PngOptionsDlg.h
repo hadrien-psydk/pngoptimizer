@@ -3,34 +3,32 @@
 // Copyright (C) Hadrien Nilsson - psydk.org
 // For conditions of distribution and use, see copyright notice in PngOptimizer.h
 /////////////////////////////////////////////////////////////////////////////////////
-#ifndef PO_DLGPNGOPTIONS_H
-#define PO_DLGPNGOPTIONS_H
 
-class DlgPngOptions : public Dialog
+#ifndef PO_PNGOPTIONSDLG_H
+#define PO_PNGOPTIONSDLG_H
+
+class PngOptionsDlg : public Dialog
 {
 public:
 	// Public settings [in,out]
 	POEngineSettings m_settings;
 
 public:
-	int DoModal(HWND hParent);
-
-	DlgPngOptions();
+	PngOptionsDlg();
 
 protected:
-	// Controls
 	CheckButton m_chkBackupOldPngFiles;
 	CheckButton m_chkKeepInterlacing;
-	CheckButton m_chkAvoidGreyWithSimpleTransparency;
+	CheckButton m_chkAvoidGreyWith;
 	CheckButton m_chkIgnoreAnimatedGifs;
 	CheckButton m_chkKeepFileDate;
 
 	RadioButton m_radBkColorRemove;
 	RadioButton m_radBkColorKeep;
 	RadioButton m_radBkColorForce;
-	ColorButton m_stBkColor;
-	Window      m_stBkColorTxtDec;
-	Window      m_stBkColorTxtHex;
+	ColorButton m_cbtBkColor;
+	Label       m_lblBkColorTxtDec;
+	Label       m_lblBkColorTxtHex;
 
 	RadioButton m_radTextRemove;
 	RadioButton m_radTextKeep;
@@ -47,13 +45,15 @@ protected:
 	EditBox     m_editPpiY;
 
 protected:
-	virtual LRESULT DlgProc(UINT nMsg, WPARAM wParam, LPARAM lParam);
-	virtual BOOL OnInitDialog(HWND hCtl, LPARAM lParam);
+	virtual bool SetupUI();
+	virtual void SetupConnections();
+	virtual void LoadValues();
+	virtual bool StoreValues();
 
 	void OnCheckBkColor();
 	void OnSelectBkColor();
 	void SetColorControlStates();
-	void SetColorControls(COLORREF cr);
+	void SetColorControls(Color col);
 
 	void OnCheckText();
 	void SetTextControlStates();

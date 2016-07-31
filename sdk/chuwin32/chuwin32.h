@@ -43,9 +43,10 @@
 #include "PlopDataObject.h"
 #include "PlopDropSource.h"
 
-#include "Registry.h"
-
 #include "ResourceVersion.h"
 #include "DibBitmap.h"
+
+#include "MsgDialog.h"
+#include "ColorButton.h"
 
 #endif // ndef CHUWIN32_CHUWIN32_H

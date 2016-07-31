@@ -5,91 +5,22 @@
 /////////////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
+#include "PngOptionsDlg.h"
 #include "resource.h"
-#include "DlgPngOptions.h"
 
 ///////////////////////////////////////////////////////////////////////////////
-
-DlgPngOptions::DlgPngOptions()
+PngOptionsDlg::PngOptionsDlg() : Dialog(IDD_PNGOPTIONS)
 {
 	m_ppSyncInProgress = false;
 }
 
-LRESULT DlgPngOptions::DlgProc(UINT nMsg, WPARAM wParam, LPARAM lParam)
-{
-	switch(nMsg)
-	{
-	case WM_INITDIALOG:
-		return OnInitDialog(HWND(wParam), lParam);
 
-	case WM_COMMAND: 
-		switch( LOWORD(wParam)) 
-		{ 
-		case IDCANCEL:
-			EndDialog(IDCANCEL);
-			return TRUE;
-
-		case IDOK:
-			if( StoreControlValues() )
-			{
-				EndDialog(IDOK);
-			}
-			return TRUE;
-
-		case IDC_RADIO_BKCOLOR_REMOVE:
-		case IDC_RADIO_BKCOLOR_KEEP:
-		case IDC_RADIO_BKCOLOR_FORCE:
-			OnCheckBkColor();
-			return TRUE;
-		case IDC_STATIC_BKCOL:
-			OnSelectBkColor();
-			return TRUE;
-
-		case IDC_RADIO_TEXT_REMOVE:
-		case IDC_RADIO_TEXT_KEEP:
-		case IDC_RADIO_TEXT_FORCE:
-			OnCheckText();
-			return TRUE;
-
-		case IDC_RADIO_PHYS_REMOVE:
-		case IDC_RADIO_PHYS_KEEP:
-		case IDC_RADIO_PHYS_FORCE:
-			OnCheckPhys();
-			return TRUE;
-		
-		case IDC_EDIT_PPMX:
-		case IDC_EDIT_PPMY:
-			if( HIWORD(wParam) == EN_CHANGE )
-			{
-				SyncPpiFromPpm();
-				return TRUE;
-			}
-			return FALSE;
-		case IDC_EDIT_PPIX:
-		case IDC_EDIT_PPIY:
-			if( HIWORD(wParam) == EN_CHANGE )
-			{
-				SyncPpmFromPpi();
-				return TRUE;
-			}
-			return FALSE;
-		default:
-			break;
-		}
-		break;
-
-	default:
-		break;
-	}
-
-	return FALSE;
-}
-
-BOOL DlgPngOptions::OnInitDialog(HWND, LPARAM)
+///////////////////////////////////////////////////////////////////////////////
+bool PngOptionsDlg::SetupUI()
 {
 	m_chkBackupOldPngFiles = GetItem(IDC_CHECK_BACKUPOLDPNGFILES);
 	m_chkKeepInterlacing = GetItem(IDC_CHECK_KEEPINTERLACING);
-	m_chkAvoidGreyWithSimpleTransparency = GetItem(IDC_CHECK_AVOIDGREYWITHSIMPLETRANSPARENCY);
+	m_chkAvoidGreyWith = GetItem(IDC_CHECK_AVOIDGREYWITHSIMPLETRANSPARENCY);
 	m_chkIgnoreAnimatedGifs = GetItem(IDC_CHECK_IGNOREANIMATEDGIFS);
 	m_chkKeepFileDate = GetItem(IDC_CHECK_KEEPFILEDATE);
 
@@ -97,16 +28,25 @@ BOOL DlgPngOptions::OnInitDialog(HWND, LPARAM)
 	m_radBkColorKeep = GetItem(IDC_RADIO_BKCOLOR_KEEP);
 	m_radBkColorForce = GetItem(IDC_RADIO_BKCOLOR_FORCE);
 	Window wnd = GetItem(IDC_STATIC_BKCOL);
-	m_stBkColor.Create(wnd.GetRelativeRect(), m_hWnd, IDC_STATIC_BKCOL);
+	m_cbtBkColor.Create(wnd.GetRelativeRect(), this, IDC_COLBUTTON_BKCOL);
 	wnd.Hide();
-	m_stBkColorTxtDec = GetItem(IDC_STATIC_BKCOLDEC);
-	m_stBkColorTxtHex = GetItem(IDC_STATIC_BKCOLHEX);
+	m_lblBkColorTxtDec = GetItem(IDC_STATIC_BKCOLDEC);
+	m_lblBkColorTxtHex = GetItem(IDC_STATIC_BKCOLHEX);
 
 	m_radTextRemove = GetItem(IDC_RADIO_TEXT_REMOVE);
 	m_radTextKeep = GetItem(IDC_RADIO_TEXT_KEEP);
 	m_radTextForce = GetItem(IDC_RADIO_TEXT_FORCE);
 	m_comboTextKeyword = GetItem(IDC_COMBO_TEXT_KEYWORD);
 	m_editTextData = GetItem(IDC_EDIT_TEXT_DATA);
+
+	// pHYs chunk
+	m_radPhysRemove = GetItem(IDC_RADIO_PHYS_REMOVE);
+	m_radPhysKeep = GetItem(IDC_RADIO_PHYS_KEEP);
+	m_radPhysForce = GetItem(IDC_RADIO_PHYS_FORCE);
+	m_editPpmX = GetItem(IDC_EDIT_PPMX);
+	m_editPpmY = GetItem(IDC_EDIT_PPMY);
+	m_editPpiX = GetItem(IDC_EDIT_PPIX);
+	m_editPpiY = GetItem(IDC_EDIT_PPIY);
 
 	// Fill the combo
 	static const char* keywords[] = {
@@ -121,104 +61,51 @@ BOOL DlgPngOptions::OnInitDialog(HWND, LPARAM)
 		"Title",
 		"Warning"
 	};
-	const int count = sizeof(keywords) / sizeof(keywords[0]);
+	const int count = ARRAY_SIZE(keywords);
 	for(int i = 0; i < count; ++i)
 	{
 		m_comboTextKeyword.AddString(keywords[i]);
 	}
 	m_comboTextKeyword.LimitText(79);
-
-	// pHYs chunk
-	m_radPhysRemove = GetItem(IDC_RADIO_PHYS_REMOVE);
-	m_radPhysKeep = GetItem(IDC_RADIO_PHYS_KEEP);
-	m_radPhysForce = GetItem(IDC_RADIO_PHYS_FORCE);
-	m_editPpmX = GetItem(IDC_EDIT_PPMX);
-	m_editPpmY = GetItem(IDC_EDIT_PPMY);
-	m_editPpiX = GetItem(IDC_EDIT_PPIX);
-	m_editPpiY = GetItem(IDC_EDIT_PPIY);
-
-	LoadControlValues();
-	CenterWindow(true);
-
-	return TRUE;
+	return true;
 }
 
-///////////////////////////////////////////////////////
-void DlgPngOptions::OnCheckBkColor()
+///////////////////////////////////////////////////////////////////////////////
+void PngOptionsDlg::SetupConnections()
 {
-	SetColorControlStates();
+	m_radBkColorRemove.Toggled.Connect(this, &PngOptionsDlg::OnCheckBkColor);
+	m_radBkColorKeep.Toggled.Connect(this, &PngOptionsDlg::OnCheckBkColor);
+	m_radBkColorForce.Toggled.Connect(this, &PngOptionsDlg::OnCheckBkColor);
+	m_cbtBkColor.ColorSet.Connect(this, &PngOptionsDlg::OnSelectBkColor);
+
+	m_radTextRemove.Toggled.Connect(this, &PngOptionsDlg::OnCheckText);
+	m_radTextKeep.Toggled.Connect(this, &PngOptionsDlg::OnCheckText);
+	m_radTextForce.Toggled.Connect(this, &PngOptionsDlg::OnCheckText);
+
+	m_radPhysRemove.Toggled.Connect(this, &PngOptionsDlg::OnCheckPhys);
+	m_radPhysKeep.Toggled.Connect(this, &PngOptionsDlg::OnCheckPhys);
+	m_radPhysForce.Toggled.Connect(this, &PngOptionsDlg::OnCheckPhys);
+
+	m_editPpmX.Changed.Connect(this, &PngOptionsDlg::SyncPpiFromPpm);
+	m_editPpmY.Changed.Connect(this, &PngOptionsDlg::SyncPpiFromPpm);
+	m_editPpiX.Changed.Connect(this, &PngOptionsDlg::SyncPpmFromPpi);
+	m_editPpiY.Changed.Connect(this, &PngOptionsDlg::SyncPpmFromPpi);
 }
 
-// Enable/Disable color controls according to BackgroundColor chunk option
-void DlgPngOptions::SetColorControlStates()
-{
-	m_stBkColor.Enable( m_radBkColorForce.IsChecked() );
-	m_stBkColorTxtDec.Enable( m_radBkColorForce.IsChecked() );
-	m_stBkColorTxtHex.Enable( m_radBkColorForce.IsChecked() );
-}
-
-void DlgPngOptions::OnSelectBkColor()
-{
-	COLORREF acr[16] = { 0xff };
-
-	CHOOSECOLOR cc;
-	cc.lStructSize = sizeof(cc);
-	cc.hwndOwner = m_hWnd;
-	cc.hInstance = 0;
-	cc.rgbResult = m_stBkColor.GetColor();
-	cc.lpCustColors = acr;
-	cc.Flags = CC_RGBINIT | CC_FULLOPEN;
-	cc.lCustData = 0;
-	cc.lpfnHook = NULL;
-	cc.lpTemplateName = NULL;
-
-	if( !ChooseColor(&cc) )
-	{
-		return;
-	}
-	SetColorControls(cc.rgbResult);
-}
-
-///////////////////////////////////////////////////////
-void DlgPngOptions::OnCheckText()
-{
-	SetTextControlStates();
-}
-
-void DlgPngOptions::SetTextControlStates()
-{
-	m_comboTextKeyword.Enable( m_radTextForce.IsChecked() );
-	m_editTextData.Enable( m_radTextForce.IsChecked() );
-}
-
-///////////////////////////////////////////////////////
-void DlgPngOptions::OnCheckPhys()
-{
-	SetPhysControlStates();
-}
-
-void DlgPngOptions::SetPhysControlStates()
-{
-	m_editPpmX.Enable( m_radPhysForce.IsChecked() );
-	m_editPpmY.Enable( m_radPhysForce.IsChecked() );
-	m_editPpiX.Enable( m_radPhysForce.IsChecked() );
-	m_editPpiY.Enable( m_radPhysForce.IsChecked() );
-}
-
+///////////////////////////////////////////////////////////////////////////////
 // Sets the control values from attributes
-void DlgPngOptions::LoadControlValues()
+void PngOptionsDlg::LoadValues()
 {
 	m_chkBackupOldPngFiles.Check(m_settings.backupOldPngFiles);
 	m_chkKeepInterlacing.Check(m_settings.keepInterlacing);
-	m_chkAvoidGreyWithSimpleTransparency.Check(m_settings.avoidGreyWithSimpleTransparency);
+	m_chkAvoidGreyWith.Check(m_settings.avoidGreyWithSimpleTransparency);
 	m_chkIgnoreAnimatedGifs.Check(m_settings.ignoreAnimatedGifs);
 	m_chkKeepFileDate.Check(m_settings.keepFileDate);
 
 	m_radBkColorRemove.Check(m_settings.bkgdOption == POChunk_Remove);
 	m_radBkColorKeep.Check(m_settings.bkgdOption == POChunk_Keep);
 	m_radBkColorForce.Check(m_settings.bkgdOption == POChunk_Force);
-	COLORREF cr = RGB(m_settings.bkgdColor.r, m_settings.bkgdColor.g, m_settings.bkgdColor.b);
-	SetColorControls(cr);
+	SetColorControls(m_settings.bkgdColor);
 	SetColorControlStates();
 
 	m_radTextRemove.Check(m_settings.textOption == POChunk_Remove);
@@ -238,32 +125,13 @@ void DlgPngOptions::LoadControlValues()
 	SetPhysControlStates();
 }
 
-void DlgPngOptions::SetColorControls(COLORREF cr)
-{
-	m_stBkColor.SetColor(cr);
-
-	int r = GetRValue(cr);
-	int g = GetGValue(cr);
-	int b = GetBValue(cr);
-
-	m_stBkColorTxtDec.SetText("rgb(" 
-		+ String::FromInt(r)
-		+ ","
-		+ String::FromInt(g)
-		+ ","
-		+ String::FromInt(b)
-		+ ")");
-	
-	uint32 nVal = (r << 16) | (g << 8) | b;
-	m_stBkColorTxtHex.SetText( "#" + String::FromInt(nVal, 'x', 6, '0').Right(6) );
-}
-
+///////////////////////////////////////////////////////////////////////////////
 // Returns true upon success
-bool DlgPngOptions::StoreControlValues()
+bool PngOptionsDlg::StoreValues()
 {
 	m_settings.backupOldPngFiles = m_chkBackupOldPngFiles.IsChecked();
 	m_settings.keepInterlacing = m_chkKeepInterlacing.IsChecked();
-	m_settings.avoidGreyWithSimpleTransparency = m_chkAvoidGreyWithSimpleTransparency.IsChecked();
+	m_settings.avoidGreyWithSimpleTransparency = m_chkAvoidGreyWith.IsChecked();
 	m_settings.ignoreAnimatedGifs = m_chkIgnoreAnimatedGifs.IsChecked();
 	m_settings.keepFileDate = m_chkKeepFileDate.IsChecked();
 
@@ -279,11 +147,7 @@ bool DlgPngOptions::StoreControlValues()
 	{
 		m_settings.bkgdOption = POChunk_Force;
 	}
-	COLORREF cr = m_stBkColor.GetColor();
-	uint8 r = GetRValue(cr);
-	uint8 g = GetGValue(cr);
-	uint8 b = GetBValue(cr);
-	m_settings.bkgdColor.SetRgb(r, g, b);
+	m_settings.bkgdColor = m_cbtBkColor.GetColor();
 
 	if( m_radTextRemove.IsChecked() )
 	{
@@ -318,21 +182,77 @@ bool DlgPngOptions::StoreControlValues()
 	// Validity check
 	if( m_settings.textOption == POChunk_Force && m_settings.textKeyword.IsEmpty() )
 	{
-		::MessageBoxW(m_hWnd, L"Please set the forced text keyword.", GetText().GetBuffer(), MB_ICONEXCLAMATION | MB_OK);
+		MsgDialog md("Please set the forced text keyword.", GetText(), CMT_Warning, CBT_Ok);
+		md.DoModal(this);
 		m_comboTextKeyword.SetFocus();
 		return false;
 	}
 	return true;
 }
 
-int DlgPngOptions::DoModal(HWND hParent)
+///////////////////////////////////////////////////////////////////////////////
+void PngOptionsDlg::OnCheckBkColor()
 {
-	HINSTANCE hInstance = GetModuleHandle(NULL);
-	return DoModalHelper(hInstance, IDD_PNGOPTIONS, hParent);
+	SetColorControlStates();
+}
+
+// Enable/Disable color controls according to BackgroundColor chunk option
+void PngOptionsDlg::SetColorControlStates()
+{
+	m_cbtBkColor.Enable( m_radBkColorForce.IsChecked() );
+	m_lblBkColorTxtDec.Enable( m_radBkColorForce.IsChecked() );
+	m_lblBkColorTxtHex.Enable( m_radBkColorForce.IsChecked() );
+}
+
+void PngOptionsDlg::OnSelectBkColor()
+{
+	SetColorControls(m_cbtBkColor.GetColor());
+}
+
+///////////////////////////////////////////////////////
+void PngOptionsDlg::OnCheckText()
+{
+	SetTextControlStates();
+}
+
+void PngOptionsDlg::SetTextControlStates()
+{
+	m_comboTextKeyword.Enable( m_radTextForce.IsChecked() );
+	m_editTextData.Enable( m_radTextForce.IsChecked() );
+}
+
+///////////////////////////////////////////////////////
+void PngOptionsDlg::OnCheckPhys()
+{
+	SetPhysControlStates();
+}
+
+void PngOptionsDlg::SetPhysControlStates()
+{
+	m_editPpmX.Enable( m_radPhysForce.IsChecked() );
+	m_editPpmY.Enable( m_radPhysForce.IsChecked() );
+	m_editPpiX.Enable( m_radPhysForce.IsChecked() );
+	m_editPpiY.Enable( m_radPhysForce.IsChecked() );
+}
+
+void PngOptionsDlg::SetColorControls(Color col)
+{
+	m_cbtBkColor.SetColor(col);
+
+	m_lblBkColorTxtDec.SetText("rgb(" 
+		+ String::FromInt(col.r)
+		+ ","
+		+ String::FromInt(col.g)
+		+ ","
+		+ String::FromInt(col.b)
+		+ ")");
+	
+	uint32 val = (col.r << 16) | (col.g << 8) | col.b;
+	m_lblBkColorTxtHex.SetText( "#" + String::FromInt(val, 'x', 6, '0').Right(6) );
 }
 
 // Synchronize the PPI editboxes from the PPM editboxes
-void DlgPngOptions::SyncPpiFromPpm()
+void PngOptionsDlg::SyncPpiFromPpm()
 {
 	if( m_ppSyncInProgress )
 		return;
@@ -345,7 +265,7 @@ void DlgPngOptions::SyncPpiFromPpm()
 }
 
 // Synchronize the PPM editboxes from the PPI editboxes
-void DlgPngOptions::SyncPpmFromPpi()
+void PngOptionsDlg::SyncPpmFromPpi()
 {
 	if( m_ppSyncInProgress )
 		return;

@@ -7,182 +7,173 @@
 #include "stdafx.h"
 #include "gui.h"
 
-using namespace chuwin32;
+namespace chuwin32 {\
 
-bool EditBox::Create(const RECT& rc, HWND hParent, int nId)
+#ifndef _WIN32
+static void OnCheckButtonStatic(GtkWidget* widget, gpointer userData)
+{
+	CheckButton* that = (CheckButton*)userData;
+	that->Toggled.Fire();
+}
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+void CheckButton::operator=(WIDGET_HANDLE handle)
+{
+	SetHandle(handle);
+#ifndef _WIN32
+	g_signal_connect(handle, "toggled", G_CALLBACK(OnCheckButtonStatic), this);
+#endif
+}
+
+void CheckButton::Check(bool check)
+{
+	SendMessage(m_handle, BM_SETCHECK, check ? BST_CHECKED : BST_UNCHECKED, 0);
+}
+
+bool CheckButton::IsChecked() const
+{
+	return (SendMessage(m_handle, BM_GETCHECK, 0, 0) == BST_CHECKED);
+}
+
+void CheckButton::OnCommand(uintptr_t)
+{
+	Toggled.Fire();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+bool EditBox::Create(const Rect& rc, const Widget* parent, int id)
 {
 	HINSTANCE hInstance = GetModuleHandle(NULL);
 
 	int nExStyle = WS_EX_CLIENTEDGE;
 	int nStyle = WS_TABSTOP | WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL;
 	
-	m_hWnd = ::CreateWindowExW(
+	m_handle = ::CreateWindowExW(
 		nExStyle,			// extended window style
 		WC_EDITW,	// registered class name
 		L"",	// window name
 		nStyle,	// window style
-		rc.left,			// horizontal position of window
-		rc.top,			// vertical position of window
-		rc.right - rc.left,		// window width
-		rc.bottom - rc.top,		// window height
-		hParent,		// handle to parent or owner window
-		HMENU( LongToHandle(nId)),		// menu handle or child identifier
+		rc.x1,			// horizontal position of window
+		rc.y1,			// vertical position of window
+		rc.x2 - rc.x1,		// window width
+		rc.y2 - rc.y1,		// window height
+		parent->GetHandle(),		// handle to parent or owner window
+		HMENU( LongToHandle(id)),		// menu handle or child identifier
 		hInstance,		// handle to application instance (Windows NT/2000/XP: This value is ignored)
 		NULL		// window-creation data
 		);
 
-	return m_hWnd != NULL;
+	return m_handle != NULL;
 }
 
-bool SysLink::Create(const RECT& rc, HWND hParent, int nId)
+void EditBox::SetSel(int start, int stop)
+{
+	::SendMessage(m_handle, EM_SETSEL, start, stop);
+}
+
+void EditBox::SetSelAll()
+{
+	SetSel(0, -1);
+}
+
+void EditBox::OnCommand(uintptr_t param)
+{
+	if( HIWORD(param) == EN_CHANGE )
+	{
+		Changed.Fire();
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////
+void Button::OnCommand(uintptr_t)
+{
+	Clicked.Fire();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+int ComboBox::AddString(const chustd::String& str)
+{
+	return (int)::SendMessage(m_handle, CB_ADDSTRING, 0, (LPARAM) str.GetBuffer());
+}
+
+void ComboBox::SetItemData(int nIndex, uint32 nData)
+{
+	::SendMessage(m_handle, CB_SETITEMDATA, nIndex, nData);
+}
+
+int ComboBox::GetCurSel()
+{
+	return (int)::SendMessage(m_handle, CB_GETCURSEL, 0, 0);
+}
+
+uint32 ComboBox::GetItemData(int nIndex)
+{
+	return (uint32)::SendMessage(m_handle, CB_GETITEMDATA, nIndex, 0);
+}
+
+void ComboBox::LimitText(int limit)
+{
+	::SendMessage(m_handle, CB_LIMITTEXT, limit, 0);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+void Slider::SetRangeMin(int min, bool redraw)
+{
+	::SendMessage(m_handle, TBM_SETRANGEMIN, BOOL(redraw), min);
+}
+
+void Slider::SetRangeMax(int max, bool redraw)
+{
+	::SendMessage(m_handle, TBM_SETRANGEMAX, BOOL(redraw), max);
+}
+
+void Slider::SetRange(int min, int max, bool redraw)
+{
+	SetRangeMin(min, redraw);
+	SetRangeMax(max, redraw);
+}
+
+void Slider::SetPos(int pos)
+{
+	::SendMessage(m_handle, TBM_SETPOS, TRUE, pos);
+}
+
+int Slider::GetPos()
+{
+	return (int) ::SendMessage(m_handle, TBM_GETPOS, 0, 0L);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+bool SysLink::Create(const Rect& rc, const Widget* parent, int id)
 {
 	HINSTANCE hInstance = GetModuleHandle(NULL);
 
-	int nExStyle = 0;
 	int nStyle = WS_TABSTOP | WS_CHILD | WS_VISIBLE;
 
-	m_hWnd = CreateWindowExW(
-		nExStyle, 
-		WC_LINK, 
-		L"", 
-		nStyle, 
-		rc.left,			// horizontal position of window
-		rc.top,			// vertical position of window
-		rc.right - rc.left,		// window width
-		rc.bottom - rc.top,		// window height
-		hParent,		// handle to parent or owner window
-		HMENU( LongToHandle(nId)),		// menu handle or child identifier
-		hInstance,		// handle to application instance (Windows NT/2000/XP: This value is ignored)
-		NULL		// window-creation data
+	HWND handle = CreateWindowExW(0, WC_LINK, L"", nStyle,
+		rc.x1, rc.y1, rc.x2 - rc.x1, rc.y2 - rc.y1, // x,y,w,h
+		parent->GetHandle(),	
+		HMENU( LongToHandle(id)),
+		hInstance, // handle to application instance (Windows NT/2000/XP: This value is ignored)
+		NULL // window-creation data
 		);
-
-	return m_hWnd != NULL;
+	SetHandle(handle);
+	return handle != NULL;
 }
 
-ATOM ColorButton::RegisterClass(const wchar* pszClassName)
+///////////////////////////////////////////////////////////////////////////////
+void SysLink::OnCommand(uintptr_t param)
 {
-	WNDCLASSEXW wcex;
-	wcex.cbSize			= sizeof(WNDCLASSEX); 
-	wcex.style			= CS_HREDRAW | CS_VREDRAW;
-	wcex.lpfnWndProc	= (WNDPROC)WndProcStatic;
-	wcex.cbClsExtra		= 0;
-	wcex.cbWndExtra		= 0;
-	wcex.hInstance		= GetModuleHandle(NULL);;
-	wcex.hIcon			= NULL;
-	wcex.hCursor		= LoadCursor(NULL, IDC_ARROW);
-	wcex.hbrBackground	= (HBRUSH)(COLOR_WINDOW+1);
-	wcex.lpszMenuName	= NULL;
-	wcex.lpszClassName	= pszClassName;
-	wcex.hIconSm		= NULL;
-
-	return RegisterClassExW(&wcex);
+	// Open the link in default browser
+	PNMLINK pNMLink = (PNMLINK)param;
+	LITEM item = pNMLink->item;
+	if( item.iLink == 0 )
+	{
+		ShellExecute(NULL, L"open", item.szUrl, NULL, NULL, SW_SHOW);
+	}
 }
 
-bool ColorButton::Create(const RECT& rc, HWND hParent, int nId)
-{
-	m_cr = 0;
 
-	static const wchar szClassName[] = L"chuwin32::ColorButton";
-	static ATOM atom = 0;
-	if( atom == 0 )
-	{
-		atom = RegisterClass(szClassName);
-		if( atom == 0 )
-		{
-			return false;
-		}
-	}
-
-	return CreateEx(0, szClassName, L"", WS_BORDER | WS_TABSTOP | WS_CHILD | WS_VISIBLE, rc, hParent, nId);
-}
-
-//////////////////////
-LRESULT CALLBACK ColorButton::WndProcStatic(HWND hWnd, UINT nMsg, WPARAM wParam, LPARAM lParam)
-{
-	ColorButton* pWin = nullptr;
-
-	if( nMsg == WM_NCCREATE )
-	{
-		LPCREATESTRUCT pCreateStruct = (LPCREATESTRUCT) lParam;
-		pWin = (ColorButton*) pCreateStruct->lpCreateParams;
-
-		// The pointer must given with the CreateWindow
-		ASSERT(pWin != NULL);
-
-		::SetWindowLongPtr(hWnd, GWLP_USERDATA, LONG_PTR(pWin));
-		pWin->m_hWnd = hWnd;
-	}
-	else
-	{
-		LONG_PTR nLong = ::GetWindowLongPtr(hWnd, GWLP_USERDATA);
-		pWin = (ColorButton*) (nLong);
-	}
-	
-	if( pWin == nullptr )
-	{
-		// Can occur in very rare cases
-		return ::DefWindowProc(hWnd, nMsg, wParam, lParam);
-	}
-
-	return pWin->WndProc(nMsg, wParam, lParam);
-}
-
-LRESULT ColorButton::WndProc(UINT nMsg, WPARAM wParam, LPARAM lParam)
-{
-	if( nMsg == WM_ERASEBKGND )
-	{
-		return TRUE;
-	}
-	else if( nMsg == WM_PAINT )
-	{
-		PAINTSTRUCT ps;
-		DeviceContext dc = BeginPaint(m_hWnd, &ps);
-		RECT rect = GetClientRect();
-		dc.FillSolidRect(rect, m_cr);
-		if( !IsEnabled() )
-		{
-			// Shows that the control is disabled
-			
-			// Use the darkened control color for the hatch
-			int r = GetRValue(m_cr);
-			int g = GetGValue(m_cr);
-			int b = GetBValue(m_cr);
-			r = max(0, r - 40);
-			g = max(0, g - 40);
-			b = max(0, b - 40);
-
-			HBRUSH hbr = CreateHatchBrush(HS_BDIAGONAL, RGB(r, g, b));
-
-			HGDIOBJ hOld = dc.SelectObject(hbr);
-			dc.FillRect(rect, hbr);
-			dc.SelectObject(hOld);
-			DeleteObject(hbr);
-		}
-		EndPaint(m_hWnd, &ps);
-		return TRUE;
-	}
-	else if( nMsg == WM_LBUTTONUP )
-	{
-		PostMessage( GetParent(), WM_COMMAND, LOWORD( GetId() ), 0);
-		return TRUE;
-	}
-	else if( nMsg == WM_DESTROY )
-	{
-	}
-	else if( nMsg == WM_ENABLE )
-	{
-		InvalidateRect(m_hWnd, NULL, TRUE);
-	}
-	return DefWindowProc(m_hWnd, nMsg, wParam, lParam);
-}
-
-void ColorButton::SetColor(COLORREF cr)
-{
-	m_cr = cr;
-	InvalidateRect(m_hWnd, NULL, TRUE);
-}
-
-COLORREF ColorButton::GetColor() const
-{
-	return m_cr;
+///////////////////////////////////////////////////////////////////////////////
 }

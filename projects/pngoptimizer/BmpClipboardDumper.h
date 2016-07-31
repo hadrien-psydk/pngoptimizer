@@ -9,23 +9,7 @@
 
 class POEngine;
 
-// BmpClipboardDumper class settings
-struct BmpcdSettings
-{
-	bool   useDefaultDir;
-	String customDir;
-	bool   askForFileName; // Note: this only fires m_eventDumpStateChanged, no dialog involved
-	bool   maximizeCompression;
-
-	BmpcdSettings()
-	{
-		useDefaultDir = true;
-		askForFileName = false;
-		// Users feedback reveals that they expect this parameter to be true
-		// (maximize compression when creating a screenshot)
-		maximizeCompression = true;
-	}
-};
+#include "BmpcdSettings.h"
 
 // This class allows the creation of a PNG from a bitmap stored in the Windows clipboard
 class BmpClipboardDumper
@@ -69,7 +53,6 @@ private:
 	bool m_bAbort;
 
 private:
-	bool PrepareDib(chuwin32::DibBitmap& dib);
 	String GetTempDir() const;
 };
 

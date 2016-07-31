@@ -4,8 +4,8 @@
 // For conditions of distribution and use, see copyright notice in chuwin32.h
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef CHUWIN32_STDAFX_H
-#define CHUWIN32_STDAFX_H
+#ifndef CHUI_STDAFX_H
+#define CHUI_STDAFX_H
 
 #include "../chustd/chustd.h"
 
@@ -25,12 +25,11 @@
 
 #include <shlobj.h>
 #include <ole2.h>
-#pragma comment(lib, "ole32.lib")
-
 #include <shellapi.h>
-#pragma comment(lib, "comctl32.lib")
-
 #include <Commdlg.h>
+
+#pragma comment(lib, "ole32.lib")
+#pragma comment(lib, "comctl32.lib")
 
 #if !defined(WM_MOUSEWHEEL)
 #define WM_MOUSEWHEEL 0x020A
@@ -54,4 +53,6 @@
 #endif
 #endif
 
-#endif // ndef CHUWIN32_STDAFX_H
+#include "../chustd/chustd.h"
+
+#endif

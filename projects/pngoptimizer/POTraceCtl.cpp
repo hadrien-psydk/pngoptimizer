@@ -6,7 +6,19 @@
 
 #include "stdafx.h"
 #include "POTraceCtl.h"
-#include "PngOptimizer.h"
+#include "POApplication.h"
+
+///////////////////////////////////////////////////////////////////////////////
+POTraceCtl::POTraceCtl()
+{
+	m_pApp = nullptr;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+void POTraceCtl::SetApplication(POApplication* pApp)
+{
+	m_pApp = pApp;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 HGLOBAL POTraceCtl::CreateDropFilesW(const String& strUrl)
@@ -67,18 +79,17 @@ int POTraceCtl::OnLinkDragBegin(const String& strUrl)
 		IDropSource* pDropSource = new PlopDropSource; 
 		if( pDropSource )
 		{
-			// Forbid drag-adn-drop on ourself
-			::DragAcceptFiles( ::GetParent(m_hWnd), FALSE);
+			// Forbid drag-and-drop on ourself
+			::DragAcceptFiles( ::GetParent(m_handle), FALSE);
 
 			// DoDragDrop will manage the rest of the action and will return when a drag-and-drop action is done
 			DWORD nEffect = 0;
 			HRESULT hr = ::DoDragDrop(pDataObject, pDropSource, DROPEFFECT_MOVE | DROPEFFECT_COPY | DROPEFFECT_LINK, &nEffect);
 		
 			// Unless an optimization is in progress, enable again drag-and-drop on ourself
-			POApplication& app = POApplication::GetInstance();
-			if( !app.IsJobRunning() )
+			if( !m_pApp->IsJobRunning() )
 			{
-				::DragAcceptFiles( ::GetParent(m_hWnd), TRUE);
+				::DragAcceptFiles( ::GetParent(m_handle), TRUE);
 			}
 
 			if( hr == DRAGDROP_S_DROP )
@@ -112,6 +123,6 @@ int POTraceCtl::OnLinkDragBegin(const String& strUrl)
 // Open the favorite viewing application do display the screenshot
 void POTraceCtl::OnLinkDoubleClick(const String& strUrl)
 {
-	::ShellExecuteW(m_hWnd, L"open", strUrl.GetBuffer(), L"", L"", SW_SHOW);
+	::ShellExecuteW(m_handle, L"open", strUrl.GetBuffer(), L"", L"", SW_SHOW);
 }
 

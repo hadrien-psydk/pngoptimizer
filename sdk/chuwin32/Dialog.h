@@ -4,47 +4,49 @@
 // For conditions of distribution and use, see copyright notice in chuwin32.h
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef CHUWIN32_DIALOG_H
-#define CHUWIN32_DIALOG_H
+#ifndef CHUI_DIALOG_H
+#define CHUI_DIALOG_H
 
-#include "gui.h"
+#include "Window.h"
 
 namespace chuwin32 {
+
+enum class DialogResp
+{
+	None,
+	Ok,
+	Cancel,
+	Abort,
+	Retry,
+	Ignore,
+	Yes,
+	No
+};
 
 class Dialog : public Window
 {
 public:
-	Dialog() : Window(nullptr) {}
-	Dialog(HWND hWnd) : Window(hWnd) {}
-	void operator = (HWND hWnd) { m_hWnd = hWnd; }
+	Dialog(DIALOG_ID did) : Window(), m_id(did) {}
+	Dialog(WIDGET_HANDLE handle) : Window(handle), m_id(0) {}
+	void operator = (WIDGET_HANDLE handle) { m_handle = handle; }
 
-	HWND GetItem(int nID) { HWND hChild = GetDlgItem(m_hWnd, nID); ASSERT(hChild); return hChild; }
+	DialogResp DoModal(const Window* parent);
+	WIDGET_HANDLE GetItem(int id);
+	Rect GetItemRect(int id);
 
-	RECT GetItemRect(int nID)
-	{
-		HWND hChild = GetDlgItem(m_hWnd, nID);
-		
-		Window wndItem = hChild;
-		RECT rect = wndItem.GetWindowRect();
-		ScreenToClient(rect);
-
-		return rect;
-	}
-
-	void EndDialog(int nReturn)
-	{
-		::EndDialog(m_hWnd, nReturn);
-	}
-
-	int DoModalHelper(HINSTANCE hInstance, int nDialogId, HWND hParent);
-
-protected:
-	virtual LRESULT DlgProc(UINT nMsg, WPARAM wParam, LPARAM lParam);
-	
 private:
-	static LRESULT CALLBACK DlgProcStatic(HWND hDlg, UINT nMsg, WPARAM wParam, LPARAM lParam);
+	DIALOG_ID m_id;
+
+public:
+	bool DoCommand(WIDGET_HANDLE wh, uintptr_t param);
+	virtual uintptr_t DlgProc(uint32 msg, uintptr_t param1, uintptr_t param2);
+
+	virtual bool SetupUI() = 0; // true for automatic focus on child widget
+	virtual void SetupConnections() = 0;
+	virtual void LoadValues() = 0;
+	virtual bool StoreValues() = 0; // true to actually exit the dialog
 };
 
 } // namespace chuwin32
 
-#endif // ndef CHUWIN32_DIALOG_H
+#endif // ndef CHUI_DIALOG_H

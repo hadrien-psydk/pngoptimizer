@@ -37,6 +37,8 @@
 #define IDC_STATIC_BKCOLDEC                     2024
 #define IDC_STATIC_BKCOLHEX                     2025
 #define IDC_STATIC_BKCOL                        2026
+#define IDC_COLBUTTON_BKCOL                     2027
+#define IDC_STATIC_COPYRIGHT                    2028
 #define IDC_GROUP_TEXT                          3000
 #define IDC_RADIO_TEXT_KEEP                     3001
 #define IDC_RADIO_TEXT_FORCE                    3002

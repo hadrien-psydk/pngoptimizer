@@ -8,13 +8,12 @@
 #include "ContextMenu.h"
 
 ///////////////////////////////////////////////////////////////////////////////
-using namespace chuwin32;
-///////////////////////////////////////////////////////////////////////////////
+namespace chuwin32 {
 
 ContextMenu::ContextMenu()
 {
 	m_hMenu = NULL;
-	m_nPosition = TPM_LEFTALIGN;
+	m_position = TPM_LEFTALIGN;
 }
 
 ContextMenu::~ContextMenu()
@@ -45,15 +44,18 @@ bool ContextMenu::AddItem(const chustd::String& strText, int nId)
 	return bOk != FALSE;
 }
 
-void ContextMenu::Show(int x, int y, HWND hOwner)
+void ContextMenu::Show(int x, int y, const Widget* owner)
 {
-	UINT nFlags = m_nPosition;
+	UINT nFlags = m_position;
 	nFlags |= TPM_RIGHTBUTTON;
-	BOOL bOk = TrackPopupMenu(m_hMenu, nFlags, x, y, 0, hOwner, NULL);
+	BOOL bOk = TrackPopupMenu(m_hMenu, nFlags, x, y, 0, owner->GetHandle(), NULL);
 	bOk;
 }
 
-void ContextMenu::SetPosition(UINT nPosition)
+void ContextMenu::SetPosition(int position)
 {
-	m_nPosition = nPosition;
+	m_position = position;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 }

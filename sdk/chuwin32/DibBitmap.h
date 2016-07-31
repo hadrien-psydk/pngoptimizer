@@ -7,7 +7,7 @@
 #ifndef CHUWIN32_DIBBITMAP_H
 #define CHUWIN32_DIBBITMAP_H
 
-// Note : a copy of this class is present in the chui library aswell (but in the chui namespace)
+// Note : a copy of this class is present in the chuwin32 library aswell (but in the chuwin32 namespace)
 
 namespace chuwin32 {
 

@@ -1,6 +1,11 @@
 == PngOptimizer Changelog ==
 
 -----------------
+2016-07-31 (2.5-beta)
+
+- misc: update code for GTK+ version
+
+-----------------
 2016-07-24 (2.4.3)
 
 - misc: updated file structure for git first commit

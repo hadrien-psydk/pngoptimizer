@@ -55,7 +55,7 @@ int main(int argc, char** argv)
 	if( !ap.HasFlag("file") )
 	{
 		// Display usage
-		String version = "PngOptimizerCL 2.4.3";
+		String version = "PngOptimizerCL 2.5-beta";
 #if defined(_M_X64)
 		version = version + String(" (x64)");
 #elif defined(_M_IX86)  

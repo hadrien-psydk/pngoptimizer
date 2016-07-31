@@ -4,223 +4,93 @@
 // For conditions of distribution and use, see copyright notice in chuwin32.h
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef CHUWIN32_GUI_H
-#define CHUWIN32_GUI_H
+#ifndef CHUI_GUI_H
+#define CHUI_GUI_H
 
-#include "Window.h"
+#include "Widget.h"
 
 namespace chuwin32 {
 
-class CheckButton : public Window
+///////////////////////////////////////////////////////////////////////////////
+class CheckButton : public Widget
 {
-
 public:
-	void operator = (HWND hWnd) { m_hWnd = hWnd; }
+	chustd::Event0 Toggled;
+public:
+	void operator=(WIDGET_HANDLE handle);
+	void Check(bool check = true);
+	bool IsChecked() const;
 
-	void Check(bool bCheck = true) { SendMessage(m_hWnd, BM_SETCHECK, bCheck ? BST_CHECKED : BST_UNCHECKED, 0); }
-	bool IsChecked() const
-	{
-		if( SendMessage(m_hWnd, BM_GETCHECK, 0, 0) == BST_CHECKED )
-		{
-			return true;
-		}
-		return false;
-	}
+private:
+	virtual void OnCommand(uintptr_t);
 };
+
 typedef CheckButton RadioButton;
+typedef Widget Label;
 
-///////////////////////////////
-class EditBox : public Window
+///////////////////////////////////////////////////////////////////////////////
+class EditBox : public Widget
 {
 public:
-	void operator = (HWND hWnd) { m_hWnd = hWnd; }
+	chustd::Event0 Changed; // Fires after the content was changed
+public:
+	void operator=(WIDGET_HANDLE handle) { SetHandle(handle); }
+	bool Create(const Rect& rc, const Widget* parent, int id);
+	void SetSel(int start, int stop);
+	void SetSelAll();
 
-	bool Create(const RECT& rc, HWND hParent, int nId);
-	void SetSel(int nStart, int nStop)
-	{
-		::SendMessage(m_hWnd, EM_SETSEL, nStart, nStop);
-	}
-	void SetSelAll()
-	{
-		SetSel(0, -1);
-	}
+private:
+	virtual void OnCommand(uintptr_t);
 };
 
-///////////////////////////////
-class Button : public Window
+///////////////////////////////////////////////////////////////////////////////
+class Button : public Widget
 {
 public:
-	void operator = (HWND hWnd) { m_hWnd = hWnd; }
+	chustd::Event0 Clicked;
+public:
+	void operator=(WIDGET_HANDLE handle) { SetHandle(handle); }
+
+private:
+	virtual void OnCommand(uintptr_t);
 };
 
-///////////////////////////////
-class ComboBox : public Window
+///////////////////////////////////////////////////////////////////////////////
+class ComboBox : public Widget
 {
 public:
-	void operator = (HWND hWnd) { m_hWnd = hWnd; }
-
-	int AddString(const chustd::String& str)
-	{
-		return (int)::SendMessage(m_hWnd, CB_ADDSTRING, 0, (LPARAM) str.GetBuffer());
-	}
-
-	void SetItemData(int nIndex, uint32 nData)
-	{
-		::SendMessage(m_hWnd, CB_SETITEMDATA, nIndex, nData);
-	}
-
-	int GetCurSel()
-	{
-		return (int)::SendMessage(m_hWnd, CB_GETCURSEL, 0, 0);
-	}
-
-	uint32 GetItemData(int nIndex)
-	{
-		return (uint32)::SendMessage(m_hWnd, CB_GETITEMDATA, nIndex, 0);
-	}
-
-	void LimitText(int limit)
-	{
-		::SendMessage(m_hWnd, CB_LIMITTEXT, limit, 0);
-	}
+	void operator=(WIDGET_HANDLE handle) { SetHandle(handle); }
+	int AddString(const chustd::String& str);
+	void SetItemData(int nIndex, uint32 nData);
+	int GetCurSel();
+	uint32 GetItemData(int nIndex);
+	void LimitText(int limit);
 };
 
-///////////////////////////////
-class Slider : public Window
+///////////////////////////////////////////////////////////////////////////////
+class Slider : public Widget
 {
 public:
-	void operator = (HWND hWnd) { m_hWnd = hWnd; }
-
-	void SetRangeMin(int32 nMin, bool bRedraw = false)
-	{
-		::SendMessage(m_hWnd, TBM_SETRANGEMIN, BOOL(bRedraw), nMin);
-	}
-
-	void SetRangeMax(int32 nMax, bool bRedraw = false)
-	{
-		::SendMessage(m_hWnd, TBM_SETRANGEMAX, BOOL(bRedraw), nMax);
-	}
-
-	void SetRange(int32 nMin, int32 nMax, bool bRedraw = false)
-	{
-		SetRangeMin(nMin, bRedraw);
-		SetRangeMax(nMax, bRedraw);
-	}
-
-	void SetPos(int32 nPos)
-	{
-		::SendMessage(m_hWnd, TBM_SETPOS, TRUE, nPos);
-	}
-
-	int32 GetPos()
-	{
-		return (int32) ::SendMessage(m_hWnd, TBM_GETPOS, 0, 0l);
-	}
+	void operator=(WIDGET_HANDLE handle) { SetHandle(handle); }
+	void SetRangeMin(int min, bool redraw = false);
+	void SetRangeMax(int max, bool redraw = false);
+	void SetRange(int min, int max, bool redraw = false);
+	void SetPos(int pos);
+	int  GetPos();
 };
 
-///////////////////////////////
-class SysLink : public Window
+///////////////////////////////////////////////////////////////////////////////
+class SysLink : public Widget
 {
 public:
-	void operator = (HWND hWnd) { m_hWnd = hWnd; }
+	void operator=(WIDGET_HANDLE handle) { SetHandle(handle); }
+	bool Create(const Rect& rc, const Widget* parent, int id);
 
-	bool Create(const RECT& rc, HWND hParent, int nId);
+private:
+	virtual void OnCommand(uintptr_t);
 };
 
-///////////////////////////////
-class ColorButton : public Window
-{
-public:
-	void operator = (HWND hWnd) { m_hWnd = hWnd; }
-
-	bool Create(const RECT& rc, HWND hParent, int nId);
-	void SetColor(COLORREF cr);
-	COLORREF GetColor() const;
-protected:
-	COLORREF m_cr;
-protected:
-	static LRESULT CALLBACK WndProcStatic(HWND hWnd, UINT nMsg, WPARAM wParam, LPARAM lParam);
-	LRESULT WndProc(UINT nMsg, WPARAM wParam, LPARAM lParam);
-	ATOM RegisterClass(const wchar* pszClassName);
-};
-
-////////////////////////////////////////
-class DeviceContext
-{
-public:
-	HDC m_hDC;
-
-public:
-	DeviceContext(HDC hDC) : m_hDC(hDC) {}
-
-	void FillSolidRect(RECT& rect, COLORREF cr)
-	{
-		::SetBkColor(m_hDC, cr);
-		::ExtTextOut(m_hDC, 0, 0, ETO_OPAQUE, &rect, NULL, 0, NULL);
-	}
-
-	void FillRect(RECT& rect, HBRUSH hbr)
-	{
-		::FillRect(m_hDC, &rect, hbr);
-	}
-
-	HGDIOBJ SelectObject(HGDIOBJ hObj)
-	{
-		return ::SelectObject(m_hDC, hObj);
-	}
-
-	COLORREF SetBkColor(COLORREF colBk)
-	{
-		return ::SetBkColor(m_hDC, colBk);
-	}
-
-	int SetBkMode(int mode)
-	{
-		return ::SetBkMode(m_hDC, mode);
-	}
-
-	void MoveTo(int x, int y)
-	{
-		POINT ptprev;
-		::MoveToEx(m_hDC, x, y, &ptprev);
-	}
-
-	void LineTo(int x, int y)
-	{
-		::LineTo(m_hDC, x, y);
-	}
-
-	void MoveTo(POINT pt)
-	{
-		MoveTo(pt.x, pt.y);
-	}
-
-	void LineTo(POINT pt)
-	{
-		LineTo(pt.x, pt.y);
-	}
-
-};
-
-class Pen
-{
-public:
-	HPEN m_hPen;
-
-public:
-	operator HPEN() { return m_hPen; }
-
-	Pen(int nWidth, COLORREF cr)
-	{
-		m_hPen = ::CreatePen(PS_SOLID, nWidth, cr);
-	}
-
-	~Pen()
-	{
-		::DeleteObject(m_hPen);
-	}
-};
-
+///////////////////////////////////////////////////////////////////////////////
 } // namespace chuwin32
 
-#endif // ndef CHUWIN32_GUI_H
+#endif // ndef CHUI_GUI_H

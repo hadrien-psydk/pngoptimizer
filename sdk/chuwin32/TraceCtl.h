@@ -4,15 +4,14 @@
 // For conditions of distribution and use, see copyright notice in chuwin32.h
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef CHUWIN32_TRACECTL_H
-#define CHUWIN32_TRACECTL_H
+#ifndef CHUI_TRACECTL_H
+#define CHUI_TRACECTL_H
 
 #if !defined(CHUSTD_VERSION)
 #error "TraceCtl : you need the chustd library to build this class"
 #endif
 
-#include "Window.h" 
-#include "DibBitmap.h"
+#include "Widget.h" 
 
 // Class Version : 1.4
 // 1.4
@@ -31,7 +30,7 @@
 namespace chuwin32 {\
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class TraceCtl : public Window
+class TraceCtl : public Widget
 {
 public:
 	bool Create(int x, int y, int w, int h, HWND hParentWnd, int id,
@@ -41,7 +40,7 @@ public:
 	{
 		chustd::String text;
 		chustd::String url;
-		COLORREF color;
+		chustd::Color  color;
 		int16 minWidthEx; // In ex
 		int16 justify;
 
@@ -51,24 +50,24 @@ public:
 			JustifyRight
 		};
 
-		TextPiece() : color(0), minWidthEx(0), justify(0) {}
+		TextPiece() : minWidthEx(0), justify(0) {}
 	};
 
-	void AddText(const chustd::String& text, COLORREF cr = 0);
-	void AddLine(const chustd::String& text, COLORREF cr = 0);
-	void AddTextAtLine(int32 nLine, const chustd::String& text, COLORREF cr = 0);
+	void AddText(const chustd::String& text, Color cr = Color::Black);
+	void AddLine(const chustd::String& text, Color cr = Color::Black);
+	void AddTextAtLine(int32 nLine, const chustd::String& text, Color cr = Color::Black);
 	void AddLink(const chustd::String& text, const chustd::String& strUrl);
 	void AddText(const TextPiece& tct);
 
-	void ClearLineAt(int32 nLine);
+	void ClearLineAt(int line);
 	void ClearLine();
 	void Clear();
 
 	void Resize(int cx, int cy);
 	void ResetHrzPos();
 
-	void SetFont(const HFONT& hFont);
-	const HFONT& GetFont() const;
+	void SetFont(FONT_HANDLE hFont);
+	FONT_HANDLE GetFont() const;
 
 	TraceCtl();
 	virtual ~TraceCtl();
@@ -135,20 +134,17 @@ protected:
 
 private:
 	chustd::String m_emptyText; // Text displayed when the content is empty
-	HFONT   m_hFont;     // Current font
-	LOGFONT m_iconLogFont;
-	HFONT   m_hIconFont; // Font used by desktop icons
 
 	chustd::Array<Line> m_lines;
 
 	int m_lineHeight;
-	int m_nLargestLineWidth; // Max width in pixels
-	int m_nMarginLeft;
+	int m_largestLineWidth; // Max width in pixels
+	int m_marginLeft;
 	int m_exWidth;;
 
 	bool m_bDragStart;
 	TextPiece* m_pDragText;
-	POINT m_ptDrag;
+	Point m_ptDrag;
 
 	chustd::CriticalSection m_cs;
 
@@ -165,7 +161,7 @@ private:
 		AddTextInfo() : line(-1) {}
 	};
 
-	DibBitmap m_dib;
+	struct SpecificImpl* m_impl;
 
 private:
 	void DoAddText(const TextPiece& tp, int line = -1);
@@ -179,4 +175,4 @@ private:
 
 } // namespace chuwin32
 
-#endif // ndef CHUWIN32_TRACECTL_H
+#endif // ndef CHUI_TRACECTL_H

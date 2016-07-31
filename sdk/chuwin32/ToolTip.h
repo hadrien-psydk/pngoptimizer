@@ -7,11 +7,9 @@
 #ifndef CHUWIN32_TOOLTIP_H
 #define CHUWIN32_TOOLTIP_H
 
-#include "Window.h"
-
 namespace chuwin32 {
 
-class ToolTip : public Window
+class ToolTip
 {
 public:
 	bool Create(HWND hwndParent);
@@ -28,6 +26,7 @@ private:
 	chustd::String m_strText;
 	TOOLINFO m_ti;
 	bool m_bVisible;
+	HWND m_handle;
 };
 
 } // namespace chuwin32

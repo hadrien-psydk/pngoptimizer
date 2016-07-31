@@ -7,6 +7,7 @@
 #ifndef PO_STDAFX_H
 #define PO_STDAFX_H
 
+#include <chustd/chustd.h>
 #include <chuwin32/chuwin32.h>
 #include <poeng/poeng.h>
 

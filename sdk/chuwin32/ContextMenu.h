@@ -4,8 +4,8 @@
 // For conditions of distribution and use, see copyright notice in chuwin32.h
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef CHUWIN32_CONTEXTMENU_H
-#define CHUWIN32_CONTEXTMENU_H
+#ifndef CHUI_CONTEXTMENU_H
+#define CHUI_CONTEXTMENU_H
 
 #include "gui.h"
 
@@ -15,18 +15,18 @@ class ContextMenu
 {
 public:
 	bool Create();
-	bool AddItem(const chustd::String& strText, int nId);
-	void Show(int x, int y, HWND hOwner);
-	void SetPosition(UINT nPosition);
+	bool AddItem(const chustd::String& text, int id);
+	void Show(int x, int y, const Widget* owner);
+	void SetPosition(int position);
 
 	ContextMenu();
 	~ContextMenu();
 
 private:
 	HMENU m_hMenu;
-	UINT m_nPosition;
+	int m_position;
 };
 
 } // namespace chuwin32
 
-#endif // ndef CHUWIN32_CONTEXTMENU_H
+#endif

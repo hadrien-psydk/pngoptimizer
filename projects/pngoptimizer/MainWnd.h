@@ -8,9 +8,9 @@
 #define PO_MAINWND_H
 
 #include "POTraceCtl.h"
+class POApplication;
 
 // PngOptimizer Main window class
-
 class MainWnd : public chuwin32::Window
 {
 public:
@@ -21,9 +21,9 @@ public:
 	Event1<const StringArray&> FilesDropped; // [filePaths]
 
 public:
-	bool Create(const String& title, RECT rcWnd, bool alwaysOnTop, const String& welcomeMsg);
+	bool Create(const String& title, RECT rcWnd, bool alwaysOnTop,
+		const String& welcomeMsg, POApplication* pApp);
 	
-	HWND   GetHandle();
 	String GetLastError() const;
 	void   AllowFileDropping(bool bAllow);
 
@@ -32,17 +32,18 @@ public:
 
 	///////////////////////////////////////////////////////////////////////////////
 	// Proxy functions to write inside the tracectl
-	void Write(const String& strText, COLORREF cr);
-	void Write(const String& strText, COLORREF cr, int minWidthEx, int justify);
-	void WriteLine(const String& strText, COLORREF cr);
-	void SetTraceCtlRedraw(bool bRedraw);
+	void Write(const String& strText, Color cr);
+	void Write(const String& strText, Color cr, int minWidthEx, int justify);
+	void WriteLine(const String& strText, Color cr);
+	void SetTraceCtlRedraw(bool redraw);
 	void ClearLine();
-	void AddLink(const String& strFileNameFinal, const String& strTotalFinalPath);
+	void AddLink(const String& fileNameFinal, const String& totalFinalPath);
 	///////////////////////////////////////////////////////////////////////////////
 
 	MainWnd();
 
 private:
+	POApplication* m_pApp;
 	POTraceCtl m_tracectl; // The main control of the window
 
 	String m_strErr;
@@ -60,8 +61,6 @@ private:
 
 	bool IsTraceCtlHwnd(HWND hwndCompare);
 	void Clear();
-
-	String GetDraggedFileName(HDROP hDrop, int nFile);
 
 	///////////////////////////////////////////////////////
 	virtual LRESULT WndProc(UINT nMsg, WPARAM wParam, LPARAM lParam);

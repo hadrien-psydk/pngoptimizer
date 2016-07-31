@@ -4,25 +4,21 @@
 // For conditions of distribution and use, see copyright notice in PngOptimizer.h
 /////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef PO_DLGSCREENSHOTSOPTIONS_H
-#define PO_DLGSCREENSHOTSOPTIONS_H
+#ifndef PO_SCREENSHOTSOPTIONSDLG_H
+#define PO_SCREENSHOTSOPTIONSDLG_H
 
-class DlgScreenshotsOptions : public Dialog
+#include "BmpcdSettings.h"
+
+class ScreenshotsOptionsDlg : public Dialog
 {
 public:
 	// Public settings [in,out]
-	bool           m_useDefaultDir;
-	chustd::String m_customDir;
-	bool           m_maximizeCompression;
-	bool           m_askForFileName;
+	BmpcdSettings m_settings;
 
 public:
-	int DoModal(HWND hParent);
-
-	DlgScreenshotsOptions();
+	ScreenshotsOptionsDlg();
 
 protected:
-	// Controls
 	RadioButton	m_radDefault;
 	RadioButton	m_radCustom;
 	EditBox	    m_editDirectory;
@@ -32,16 +28,15 @@ protected:
 	CheckButton	m_chkAskForFilename;
 
 protected:
-	virtual LRESULT DlgProc(UINT nMsg, WPARAM wParam, LPARAM lParam);
-	virtual BOOL OnInitDialog(HWND hCtl, LPARAM lParam);
+	virtual bool SetupUI();
+	virtual void SetupConnections();
+	virtual void LoadValues();
+	virtual bool StoreValues();
 
 	void OnCheckDefault();
 	void OnCheckCustom();
 	void OnButtonBrowse();
 
-	// Returns true if no problem
-	bool StoreControlValues();
-	void SyncControlStates();
 	void SyncRadioStates();
 };
 

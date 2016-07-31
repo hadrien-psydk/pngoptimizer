@@ -7,6 +7,8 @@
 #ifndef PO_POTRACECTL_H
 #define PO_POTRACECTL_H
 
+class POApplication;
+
 // Trace control used by PngOptimizer main window
 
 // What's new in comparison with the base class (TraceCtl) ?
@@ -14,11 +16,18 @@
 
 class POTraceCtl : public chuwin32::TraceCtl
 {
+public:
+	POTraceCtl();
+	void SetApplication(POApplication* pApp);
+
 protected:
 	virtual int  OnLinkDragBegin(const String& strUrl);
 	virtual void OnLinkDoubleClick(const String& strUrl);
 
 	HGLOBAL CreateDropFilesW(const String& strUrl);
+
+private:
+	POApplication* m_pApp;
 };
 
 #endif // ndef PO_POTRACECTL_H

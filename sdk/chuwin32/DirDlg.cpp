@@ -4,23 +4,23 @@
 // For conditions of distribution and use, see copyright notice in chuwin32.h
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "DirDlg.h"
 
-//////////////////////////////////////////////////////////////////////
-using namespace chuwin32;
-//////////////////////////////////////////////////////////////////////
+namespace chuwin32 {\
 
-DirDlg::DirDlg(HWND hParentWnd/*=NULL*/)
+///////////////////////////////////////////////////////////////////////////////
+DirDlg::DirDlg()
 {
-	m_hParentWnd = hParentWnd;
 }
 
+///////////////////////////////////////////////////////////////////////////////
 DirDlg::~DirDlg()
 {
 
 }
 
+///////////////////////////////////////////////////////////////////////////////
 // Permet de se placer tout de suite dans un répertoire à l'init
 // lpData contient l'ID du répertoire
 int CALLBACK DirDlg::BrowseCallbackProc(HWND hWnd, UINT uMsg, LPARAM, LPARAM lpData)
@@ -37,22 +37,28 @@ int CALLBACK DirDlg::BrowseCallbackProc(HWND hWnd, UINT uMsg, LPARAM, LPARAM lpD
 	return 0;
 }
 
-int DirDlg::DoModal()
+DialogResp DirDlg::DoModal(const Widget* parent)
 {
+	HWND hParent = 0;
+	if( parent )
+	{
+		hParent = parent->GetHandle();
+	}
+
 	int nReturn = IDCANCEL;
 	LPMALLOC pMalloc;    // Gets the Shell's default allocator
 	if( ::SHGetMalloc(&pMalloc) == NOERROR )
 	{
 		// Get the id matching the start dir
-		LPITEMIDLIST pidlSel = GetPIDLFromPath(m_strStartDir);
+		LPITEMIDLIST pidlSel = GetPIDLFromPath(m_startDir);
 	
 		wchar szBuffer[MAX_PATH];
 
 		BROWSEINFOW bi;
-		bi.hwndOwner = m_hParentWnd;
+		bi.hwndOwner = hParent;
 		bi.pidlRoot = NULL;
 		bi.pszDisplayName = szBuffer;
-		bi.lpszTitle = m_strTitle.GetBuffer();
+		bi.lpszTitle = m_title.GetBuffer();
 		bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_NEWDIALOGSTYLE;
 		bi.lpfn = BrowseCallbackProc; // Fonction callback
 		bi.lParam = LPARAM(pidlSel);    // lpDatat récupéré dans la fonction callback
@@ -65,7 +71,7 @@ int DirDlg::DoModal()
 			if( ::SHGetPathFromIDListW(pItemIDList, szBuffer2) )
 			{ 
 				// Save the result
-				m_strDir = szBuffer2;
+				m_dir = szBuffer2;
 				nReturn = IDOK;
 			}
 			// Free the PIDL allocated by SHBrowseForFolder.
@@ -78,9 +84,8 @@ int DirDlg::DoModal()
 		// Release the shell's allocator.
 		pMalloc->Release();
 	}
-	return nReturn;
+	return DialogResp(nReturn);
 }
-
 
 LPITEMIDLIST DirDlg::GetPIDLFromPath(const chustd::String& strPath)
 {
@@ -122,16 +127,16 @@ LPITEMIDLIST DirDlg::GetPIDLFromPath(const chustd::String& strPath)
 	return NULL;
 }
 
-void DirDlg::SetTitle(const chustd::String& strTitle)
+void DirDlg::SetTitle(const chustd::String& title)
 {
-	m_strTitle = strTitle;
+	m_title = title;
 }
 
-void DirDlg::SetStartDir(const chustd::String& strStartDir)
+void DirDlg::SetStartDir(const chustd::String& startDir)
 {
-	m_strStartDir = strStartDir;
+	m_startDir = startDir;
 
-	if( m_strStartDir == L"\\" || m_strStartDir == L"/" )
+	if( m_startDir == L"\\" || m_startDir == L"/" )
 	{
 		// If the the initial directory is "/" or "\" then we change
 		// its value to match a drive volume letter
@@ -139,12 +144,15 @@ void DirDlg::SetStartDir(const chustd::String& strStartDir)
 		wchar szCurDir[MAX_PATH];
 		GetCurrentDirectoryW(ARRAY_SIZE(szCurDir), szCurDir);
 
-		m_strStartDir = chustd::File::GetDrive(szCurDir);
-		m_strStartDir = m_strStartDir + L"\\";
+		m_startDir = chustd::File::GetDrive(szCurDir);
+		m_startDir = m_startDir + L"\\";
 	}
 }
 
 const chustd::String& DirDlg::GetDir() const
 {
-	return m_strDir;
+	return m_dir;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 }

@@ -4,29 +4,29 @@
 // For conditions of distribution and use, see copyright notice in chuwin32.h
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef CHUWIN32_DIRDLG_H
-#define CHUWIN32_DIRDLG_H
+#ifndef CHUI_DIRDLG_H
+#define CHUI_DIRDLG_H
 
-namespace chuwin32 {
+#include "Dialog.h"
+
+namespace chuwin32 {\
 
 class DirDlg
 {
 public:
-	void SetTitle(const chustd::String& strTitle);
-
-	const chustd::String& GetDir() const;
-	void SetStartDir(const chustd::String& strDir);
-
-	int DoModal();
-
-	DirDlg(HWND hParentWnd=NULL);	
+	DirDlg();
 	virtual ~DirDlg();
 
+	void SetTitle(const chustd::String& title);
+	const chustd::String& GetDir() const;
+	void SetStartDir(const chustd::String& startDir);
+
+	DialogResp DoModal(const Widget* parent);
+
 protected:
-	HWND m_hParentWnd;
-	chustd::String m_strTitle;
-	chustd::String m_strStartDir;
-	chustd::String m_strDir;
+	chustd::String m_title;
+	chustd::String m_startDir;
+	chustd::String m_dir;
 
 protected:
 	static int CALLBACK BrowseCallbackProc(HWND hWnd, UINT uMsg,
@@ -34,6 +34,7 @@ protected:
 	LPITEMIDLIST GetPIDLFromPath(const chustd::String& strPath);
 };
 
-} // namespace chuwin32
+///////////////////////////////////////////////////////////////////////////////
+}
 
-#endif // ndef CHUWIN32_DIRDLG_H
+#endif

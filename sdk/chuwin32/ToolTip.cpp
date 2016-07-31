@@ -35,19 +35,19 @@ bool ToolTip::Create(HWND hwndParent)
 
 	HINSTANCE hInstance = GetModuleHandle(NULL);
 
-	m_hWnd = CreateWindowEx(NULL, TOOLTIPS_CLASS, NULL,
+	m_handle = CreateWindowEx(NULL, TOOLTIPS_CLASS, NULL,
                             WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP,
                             CW_USEDEFAULT, CW_USEDEFAULT,
                             CW_USEDEFAULT, CW_USEDEFAULT,
                             hwndParent, NULL, hInstance,
                             NULL);
 
-	if( m_hWnd == NULL )
+	if( m_handle == NULL )
 	{
 		return false;
 	}
 
-	SetWindowPos(m_hWnd, HWND_TOPMOST,0, 0, 0, 0,
+	SetWindowPos(m_handle, HWND_TOPMOST,0, 0, 0, 0,
 				 SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
 
 	// Prepare TOOLINFO structure for use as tracking ToolTip.
@@ -63,11 +63,11 @@ bool ToolTip::Create(HWND hwndParent)
 	m_ti.rect.left = m_ti.rect.top = m_ti.rect.bottom = m_ti.rect.right = 0; 
 	m_ti.rect.bottom = m_ti.rect.right = 20; 
 
-	Window wndParent(hwndParent);
+	//Window wndParent(hwndParent);
 	//m_ti.rect = wndParent.GetClientRect();
 
 	// Add the tool to the control, displaying an error if needed.
-	if( !SendMessage(m_hWnd, TTM_ADDTOOL, 0, (LPARAM)&m_ti) )
+	if( !SendMessage(m_handle, TTM_ADDTOOL, 0, (LPARAM)&m_ti) )
 	{
 		return false;
 	}
@@ -75,7 +75,7 @@ bool ToolTip::Create(HWND hwndParent)
 	// Activate (display) the tracking ToolTip. Then, set a global
 	// flag value to indicate that the ToolTip is active, so other
 	// functions can check to see if it's visible.
-	//SendMessage(m_hWnd, TTM_TRACKACTIVATE, (WPARAM)TRUE, (LPARAM)&m_ti);
+	//SendMessage(m_handle, TTM_TRACKACTIVATE, (WPARAM)TRUE, (LPARAM)&m_ti);
 	//g_bIsVisible = TRUE;
 
 	return true;
@@ -86,7 +86,7 @@ void ToolTip::SetText(const chustd::String& strText)
 	m_strText = strText;
 	m_ti.lpszText = const_cast<LPTSTR>(strText.GetBuffer());
 
-	SendMessage(m_hWnd, TTM_UPDATETIPTEXT, 0, LPARAM(&m_ti));
+	SendMessage(m_handle, TTM_UPDATETIPTEXT, 0, LPARAM(&m_ti));
 }
 
 void ToolTip::TrackActivate(bool bShow)
@@ -97,16 +97,16 @@ void ToolTip::TrackActivate(bool bShow)
 	}
 	m_bVisible = bShow;
 	
-	SendMessage(m_hWnd, TTM_TRACKACTIVATE, bShow, LPARAM(&m_ti));
+	SendMessage(m_handle, TTM_TRACKACTIVATE, bShow, LPARAM(&m_ti));
 }
 
 void ToolTip::TrackPosition(int x, int y)
 {
-	SendMessage(m_hWnd, TTM_TRACKPOSITION, 0, LPARAM(DWORD( MAKELONG(x, y) )) );
+	SendMessage(m_handle, TTM_TRACKPOSITION, 0, LPARAM(DWORD( MAKELONG(x, y) )) );
 }
 
 void ToolTip::NewRect(const RECT& rect)
 {
 	m_ti.rect = rect;
-	SendMessage(m_hWnd, TTM_NEWTOOLRECT, 0, LPARAM(&m_ti));
+	SendMessage(m_handle, TTM_NEWTOOLRECT, 0, LPARAM(&m_ti));
 }

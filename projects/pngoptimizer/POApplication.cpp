@@ -5,14 +5,15 @@
 /////////////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#include "PngOptimizer.h"
+#include "POApplication.h"
+
 #include "resource.h"
 
 #include "POTraceCtl.h"
-#include "DlgScreenshotsOptions.h"
+#include "ScreenshotsOptionsDlg.h"
 #include "BmpClipboardDumper.h"
 #include "MainWnd.h"
-#include "DlgAskForFileName.h"
+#include "AskForFileNameDlg.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Main window title
@@ -25,25 +26,22 @@ static const char k_szWelcomeMessage[] = "Drop PNG, GIF, BMP or TGA files here";
 static const char k_szCreating[] = "Creating ";
 static const char k_szCreatingAndOptimizing[] = "Creating & Optimizing ";
 
+// In case something goes really bad upon startup
+static const char k_szPngOptimizerError[] = "PngOptimizer error";
+
 ///////////////////////////////////////////////////////////////////////////////
-POApplication g_app;
-
-POApplication& POApplication::GetInstance()
-{
-	return g_app;
-}
-
-bool POApplication::IsBmpAvailable() const
-{
-	return m_bmpcd.IsBmpAvailable();
-}
-
 POApplication::POApplication()
 {
 	m_hInstance = NULL;
 	m_hAccel = NULL;
 	m_hMutexPngOptimizer = NULL;
 	m_pTaskbarList = NULL;
+}
+
+//////////////////////////////////////////////////////////////
+bool POApplication::IsBmpAvailable() const
+{
+	return m_bmpcd.IsBmpAvailable();
 }
 
 //////////////////////////////////////////////////////////////
@@ -64,7 +62,7 @@ void POApplication::ThreadProc()
 	// But we cannot use PostThreadMessage because the main thread may not receive the message.
 	// This can occur if the main thread is stuck in another message loop than the one we wrote here.
 	// For example, when the user is dragging the scrollbar.
-	BOOL bPostOk = ::PostMessage(POApplication::GetInstance().m_mainwnd.m_hWnd, WM_APP_THREADJOBDONE, 0, 0);
+	BOOL bPostOk = ::PostMessage(m_mainwnd.GetHandle(), WM_APP_THREADJOBDONE, 0, 0);
 	bPostOk;
 }
 
@@ -90,7 +88,7 @@ void POApplication::StartJob()
 
 	if( !m_workingThread.Start(ThreadProcStatic, this) )
 	{
-		m_mainwnd.WriteLine(L"Cannot create working thread", POEngine::TT_ErrorMsg);
+		m_mainwnd.WriteLine(L"Cannot create working thread", CrFromTc(POEngine::TT_ErrorMsg));
 	}
 }
 
@@ -102,26 +100,26 @@ void POApplication::OnJobDone()
 }
 
 //////////////////////////////////////////////////////////////
-COLORREF POApplication::CrFromTc(POEngine::TextType tt)
+Color POApplication::CrFromTc(POEngine::TextType tt)
 {
-	Color32 col = POEngine::ColorFromTextType(tt);
-	return RGB(col.r, col.g, col.b);
+	Color col = POEngine::ColorFromTextType(tt);
+	return col;
 }
 //////////////////////////////////////////////////////////////
 
 // Handle files given from the command line
 void POApplication::ProcessCmdLineArgs()
 {
-	StringArray astrArgs = Process::CommandLineToArgv( Process::GetCommandLine());
-	const int32 nArgCount = astrArgs.GetSize();
-	if( nArgCount <= 1 )
+	StringArray args = Process::CommandLineToArgv( Process::GetCommandLine());
+	const int argCount = args.GetSize();
+	if( argCount <= 1 )
 		return;
 
 	m_filePaths.SetSize(0);
-	m_filePaths.EnsureCapacity(nArgCount - 1);
-	for(int32 i = 1; i < nArgCount; ++i)
+	m_filePaths.EnsureCapacity(argCount - 1);
+	for(int i = 1; i < argCount; ++i)
 	{
-		m_filePaths.Add(astrArgs[i]);
+		m_filePaths.Add(args[i]);
 	}
 
 	StartJob();
@@ -175,7 +173,7 @@ void POApplication::ChangeRectBecauseOfOverlap(RECT& rcWnd)
 void POApplication::OnMainWndFilesDropped(const chustd::StringArray& filePaths)
 {
 	m_filePaths = filePaths;
-	StartJob();	
+	StartJob();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -187,8 +185,16 @@ void POApplication::OnMainWndDestroying()
 	wp.length = sizeof(WINDOWPLACEMENT);
 	if( GetWindowPlacement(hWnd, &wp) )
 	{
+		MainWndSettings mws;
+		mws.top = wp.rcNormalPosition.top;
+		mws.left = wp.rcNormalPosition.left;
+		mws.bottom = wp.rcNormalPosition.bottom;
+		mws.right = wp.rcNormalPosition.right;
+		mws.topLeftValid = true;
+		mws.alwaysOnTop = m_mainwnd.GetAlwaysOnTop();
+
 		AppSettings appSettings;
-		appSettings.Write(*this, wp.rcNormalPosition, m_mainwnd.GetAlwaysOnTop()); // Save settings in the registry
+		appSettings.Write(m_engine.m_settings, &m_bmpcd.m_settings, &mws);
 	}
 	
 	// Suspend the thread so the application won't crash if resources allocated by the main
@@ -247,24 +253,24 @@ void POApplication::OnBmpcdStateChanged(BmpClipboardDumper::DumpState eDumpState
 	{
 	case BmpClipboardDumper::DS_AskForFileName:
 		{
-			DlgAskForFileName dlg;
-			dlg.m_strFileName = m_bmpcd.GetPreviousFileName();
-			if( dlg.m_strFileName.IsEmpty() )
+			AskForFileNameDlg dlg;
+			dlg.m_fileName = m_bmpcd.GetPreviousFileName();
+			if( dlg.m_fileName.IsEmpty() )
 			{
 				// Use the computed file name
-				dlg.m_strFileName = m_bmpcd.GetFileName();
-				dlg.m_bIncrementFileName = false;
+				dlg.m_fileName = m_bmpcd.GetFileName();
+				dlg.m_incrementFileName = false;
 			}
 			else
 			{
-				dlg.m_bIncrementFileName = true;
+				dlg.m_incrementFileName = true;
 			}
 
-			dlg.m_strScreenshotDir = m_bmpcd.GetDir();
+			dlg.m_screenshotDir = m_bmpcd.GetDir();
 
-			if( dlg.DoModal( m_mainwnd.GetHandle()) == IDOK )
+			if( dlg.DoModal(&m_mainwnd) == DialogResp::Ok )
 			{
-				m_bmpcd.SetFileName(dlg.m_strFileName);
+				m_bmpcd.SetFileName(dlg.m_fileName);
 			}
 			else
 			{
@@ -288,7 +294,7 @@ void POApplication::OnBmpcdStateChanged(BmpClipboardDumper::DumpState eDumpState
 // This function is called from the working thread
 void POApplication::OnEngineProgressing(const POEngine::ProgressingArg& arg)
 {
-	COLORREF cr = CrFromTc(arg.textType);
+	Color cr = CrFromTc(arg.textType);
 	int minWidthEx = 0;
 	int justify = 0;
 	if( arg.textType == POEngine::TT_SizeInfoNum )
@@ -401,11 +407,13 @@ bool POApplication::Initialize(HINSTANCE hInstance)
 
 	///////////////////////////////////////////////////////////////////////
 	// Read application settings
-	RECT rcWnd;
-	bool centerWindow;
-	bool alwaysOnTop;
+	MainWndSettings mws;
 	AppSettings appSettings;
-	appSettings.Read(*this, rcWnd, centerWindow, alwaysOnTop);
+	appSettings.Read(m_engine.m_settings, &m_bmpcd.m_settings, &mws);
+
+	RECT rcWnd = { mws.left, mws.top, mws.right, mws.bottom };
+	bool centerWindow = !mws.topLeftValid;
+	bool alwaysOnTop = mws.alwaysOnTop;
 
 	if( bOneInstanceAlreadyRunning )
 	{
@@ -413,15 +421,14 @@ bool POApplication::Initialize(HINSTANCE hInstance)
 		
 		// Write back the settings so the new window rectangle 
 		// for the N+1-th instance will be updated
-		appSettings.Write(*this, rcWnd, alwaysOnTop);
+		appSettings.Write(m_engine.m_settings, &m_bmpcd.m_settings, &mws);
 	}
 
-	static const char szPngOptimizerError[] = "PngOptimizer error";
-
-	if( !m_mainwnd.Create(k_szTitle, rcWnd, alwaysOnTop, k_szWelcomeMessage) )
+	if( !m_mainwnd.Create(k_szTitle, rcWnd, alwaysOnTop, k_szWelcomeMessage, this) )
 	{
 		String strErr = "Cannot create main gui window : " + m_mainwnd.GetLastError();
-		MessageBoxW(NULL, strErr.GetBuffer(), String(szPngOptimizerError).GetBuffer(), MB_OK);
+		MsgDialog md(strErr, k_szPngOptimizerError, CMT_Warning, CBT_Ok);
+		md.DoModal(nullptr);
 		return false;
 	}
 
@@ -431,7 +438,7 @@ bool POApplication::Initialize(HINSTANCE hInstance)
 	}
 
 	OnMainWndListCleared();
-	m_mainwnd.Show(SW_SHOW);
+	m_mainwnd.Show(CS_Show);
 	m_mainwnd.Update();
 
 	m_pTaskbarList = NULL;
@@ -446,8 +453,8 @@ bool POApplication::Initialize(HINSTANCE hInstance)
 	// Perform some early resources creation to speedup first optimization
 	if( !m_engine.WarmUp() )
 	{
-		String strErr = "POEngine warm-up failed";
-		MessageBoxW(NULL, strErr.GetBuffer(), String(szPngOptimizerError).GetBuffer(), MB_OK);
+		MsgDialog md("POEngine warm-up failed", k_szPngOptimizerError, CMT_Warning, CBT_Ok);
+		md.DoModal(nullptr);
 		return false;
 	}
 
@@ -497,7 +504,7 @@ POApplication::~POApplication()
 /////////////////////////////////////////////////////////////
 // Main application loop
 
-int32 POApplication::Run()
+int POApplication::Run()
 {	
 	HWND hMainWnd = m_mainwnd.GetHandle();
 	
@@ -514,15 +521,5 @@ int32 POApplication::Run()
 		}
 	}
 	return 0;
-}
-
-/////////////////////////////////////////////////////////////
-int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
-{
-	if( !g_app.Initialize(hInstance) )
-	{
-		return 1;
-	}
-	return g_app.Run();
 }
 

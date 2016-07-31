@@ -1,30 +1,33 @@
-/////////////////////////////////////////////////////////////////////////////////////
+﻿///////////////////////////////////////////////////////////////////////////////
 // This file is part of the PngOptimizer application
 // Copyright (C) Hadrien Nilsson - psydk.org
 // For conditions of distribution and use, see copyright notice in PngOptimizer.h
-/////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
 #include "MainWnd.h"
 
 #include "resource.h"
-#include "PngOptimizer.h"
-#include "DlgPngOptions.h"
-#include "DlgScreenshotsOptions.h"
-#include "DlgAbout.h"
+#include "POApplication.h"
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#include "PngOptionsDlg.h"
+#include "ScreenshotsOptionsDlg.h"
+#include "AboutDlg.h"
+
+///////////////////////////////////////////////////////////////////////////////
 MainWnd::MainWnd()
 {
 	m_alwaysOnTop = false;
+	m_pApp = nullptr;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-bool MainWnd::Create(const String& title, RECT rcWnd, bool alwaysOnTop, const String& welcomeMsg)
+///////////////////////////////////////////////////////////////////////////////
+bool MainWnd::Create(const String& title, RECT rcWnd, bool alwaysOnTop,
+                     const String& welcomeMsg, POApplication* pApp)
 {
-	HINSTANCE hInstance = POApplication::GetInstance().m_hInstance;
+	m_pApp = pApp;
 
-	/////////////////////////////////////////////////////////////
+	HINSTANCE hInstance = m_pApp->m_hInstance;
 	// Register window class
 	
 	static const wchar szClassName[] = L"PngOptimizer Main Window Class";
@@ -67,11 +70,12 @@ bool MainWnd::Create(const String& title, RECT rcWnd, bool alwaysOnTop, const St
 		return false;
 	}
 	
-	RECT rect = GetClientRect();
-	const int clientWidth = rect.right;
-	const int clientHeight = rect.bottom;
+	Rect rect = GetClientRect();
+	const int clientWidth = rect.Width();
+	const int clientHeight = rect.Height();
 
-	bool bOk = m_tracectl.Create(0, 0, clientWidth, clientHeight, m_hWnd, 1200, welcomeMsg);
+	m_tracectl.SetApplication(m_pApp);
+	bool bOk = m_tracectl.Create(0, 0, clientWidth, clientHeight, m_handle, 1200, welcomeMsg);
 	if( !bOk )
 	{
 		m_strErr = L"Cannot create trace control";
@@ -81,11 +85,6 @@ bool MainWnd::Create(const String& title, RECT rcWnd, bool alwaysOnTop, const St
 	return true;
 }
 
-HWND MainWnd::GetHandle()
-{
-	return m_hWnd;
-}
-
 String MainWnd::GetLastError() const
 {
 	return m_strErr;
@@ -93,58 +92,43 @@ String MainWnd::GetLastError() const
 
 void MainWnd::AllowFileDropping(bool bAllow)
 {
-	if( !m_hWnd )
+	if( !m_handle )
 		return;
 
 	BOOL b2 = bAllow ? TRUE : FALSE;
-	DragAcceptFiles(m_hWnd, b2);
+	DragAcceptFiles(m_handle, b2);
 }
 
 void MainWnd::DoPngOptions()
 {
-	DlgPngOptions dlg;
-
-	POApplication& app = POApplication::GetInstance();
-
-	dlg.m_settings = app.m_engine.m_settings;
-
-	int nRet = dlg.DoModal(m_hWnd);
-	if( nRet == IDCANCEL )
+	PngOptionsDlg dlg;
+	dlg.m_settings = m_pApp->m_engine.m_settings;
+	if( dlg.DoModal(this) == DialogResp::Cancel )
 		return;
 	
-	app.m_engine.m_settings = dlg.m_settings;
+	m_pApp->m_engine.m_settings = dlg.m_settings;
 }
 
 void MainWnd::DoScreenshotsOptions()
 {
-	DlgScreenshotsOptions dlg;
-
-	POApplication& app = POApplication::GetInstance();
-
-	dlg.m_useDefaultDir = app.m_bmpcd.m_settings.useDefaultDir;
-	dlg.m_customDir = app.m_bmpcd.m_settings.customDir;
-	dlg.m_maximizeCompression = app.m_bmpcd.m_settings.maximizeCompression;
-	dlg.m_askForFileName = app.m_bmpcd.m_settings.askForFileName;
-	
-	int nRet = dlg.DoModal(m_hWnd);
-	if( nRet == IDCANCEL )
+	ScreenshotsOptionsDlg dlg;
+	dlg.m_settings = m_pApp->m_bmpcd.m_settings;
+	DialogResp ret = dlg.DoModal(this);
+	if( ret == DialogResp::Cancel )
 		return;
-
-	app.m_bmpcd.m_settings.useDefaultDir = dlg.m_useDefaultDir;
-	app.m_bmpcd.m_settings.customDir = dlg.m_customDir;
-	app.m_bmpcd.m_settings.maximizeCompression = dlg.m_maximizeCompression;
-	app.m_bmpcd.m_settings.askForFileName = dlg.m_askForFileName;
+	
+	m_pApp->m_bmpcd.m_settings = dlg.m_settings;
 }
 
 void MainWnd::DoAbout()
 {
-	DlgAbout dlg;
-	dlg.DoModal(m_hWnd);
+	AboutDlg dlg;
+	dlg.DoModal(this);
 }
 
 void MainWnd::OnWmMouseWheel(WPARAM wParam, LPARAM lParam)
 {
-	::SendMessage(m_tracectl.m_hWnd, WM_MOUSEWHEEL, wParam, lParam);
+	::SendMessage(m_tracectl.GetHandle(), WM_MOUSEWHEEL, wParam, lParam);
 }
 
 void MainWnd::ResizeTraceCtl(int cx, int cy)
@@ -155,7 +139,7 @@ void MainWnd::ResizeTraceCtl(int cx, int cy)
 void MainWnd::SetTraceCtlRedraw(bool bRedraw)
 {
 	const int nWParam = bRedraw ? TRUE : FALSE;
-	::SendMessage(m_tracectl.m_hWnd, WM_SETREDRAW, nWParam, 0);
+	::SendMessage(m_tracectl.GetHandle(), WM_SETREDRAW, nWParam, 0);
 }
 
 void MainWnd::ClearLine()
@@ -175,12 +159,12 @@ void MainWnd::AddLink(const String& strFileNameFinal, const String& strTotalFina
 	m_tracectl.AddLink(strFileNameFinal, strTotalFinalPath);
 }
 
-void MainWnd::Write(const String& strText, COLORREF cr)
+void MainWnd::Write(const String& strText, Color cr)
 {
 	m_tracectl.AddText(strText, cr);
 }
 
-void MainWnd::Write(const String& strText, COLORREF cr, int minWidthEx, int justify)
+void MainWnd::Write(const String& strText, Color cr, int minWidthEx, int justify)
 {
 	TraceCtl::TextPiece tp;
 	tp.text = strText;
@@ -191,12 +175,12 @@ void MainWnd::Write(const String& strText, COLORREF cr, int minWidthEx, int just
 }
 
 
-void MainWnd::WriteLine(const String& strText, COLORREF cr)
+void MainWnd::WriteLine(const String& strText, Color cr)
 {
 	m_tracectl.AddLine(strText, cr);
 }
 
-String MainWnd::GetDraggedFileName(HDROP hDrop, int nFile)
+static String GetDraggedFileName(HDROP hDrop, int nFile)
 {
 	String strFileName;
 
@@ -225,14 +209,12 @@ void MainWnd::OnWmDropFiles(WPARAM wParam, LPARAM)
 
 bool MainWnd::IsTraceCtlHwnd(HWND hwndCompare)
 {
-	return hwndCompare == m_tracectl.m_hWnd;
+	return hwndCompare == m_tracectl.GetHandle();
 }
 
 /////////////////////////////////////////////////////////////
 LRESULT MainWnd::WndProc(UINT nMsg, WPARAM wParam, LPARAM lParam)
 {
-	POApplication& app = POApplication::GetInstance();
-
 	PAINTSTRUCT ps;
 	HDC hdc;
 	int cx, cy;
@@ -240,8 +222,8 @@ LRESULT MainWnd::WndProc(UINT nMsg, WPARAM wParam, LPARAM lParam)
 	switch(nMsg) 
 	{
 	case WM_PAINT:
-		hdc = BeginPaint(m_hWnd, &ps);
-		EndPaint(m_hWnd, &ps);
+		hdc = BeginPaint(m_handle, &ps);
+		EndPaint(m_handle, &ps);
 		break;
 	
 	case WM_ERASEBKGND:
@@ -267,7 +249,7 @@ LRESULT MainWnd::WndProc(UINT nMsg, WPARAM wParam, LPARAM lParam)
 		{
 			Activated.Fire();
 		}
-		return DefWindowProc(m_hWnd, nMsg, wParam, lParam);
+		return DefWindowProc(m_handle, nMsg, wParam, lParam);
 
 	case WM_NOTIFY:
 		{
@@ -277,7 +259,7 @@ LRESULT MainWnd::WndProc(UINT nMsg, WPARAM wParam, LPARAM lParam)
 				POINT point;
 				GetCursorPos(&point);
 				
-				HINSTANCE hInstance = POApplication::GetInstance().m_hInstance;
+				HINSTANCE hInstance = m_pApp->m_hInstance;
 				HMENU hMenu = LoadMenu(hInstance, MAKEINTRESOURCE(IDR_MENU));
 				HMENU hSubMenu = GetSubMenu(hMenu, 0);
 
@@ -287,7 +269,7 @@ LRESULT MainWnd::WndProc(UINT nMsg, WPARAM wParam, LPARAM lParam)
 				checkAlwaysOnTop |= m_alwaysOnTop ? MF_CHECKED : MF_UNCHECKED;
 				CheckMenuItem(hSubMenu, IDM_ALWAYSONTOP, checkAlwaysOnTop);
 
-				TrackPopupMenu(hSubMenu, TPM_LEFTALIGN | TPM_RIGHTBUTTON, point.x, point.y, 0, m_hWnd, NULL);
+				TrackPopupMenu(hSubMenu, TPM_LEFTALIGN | TPM_RIGHTBUTTON, point.x, point.y, 0, m_handle, NULL);
 			}
 		}
 		break;
@@ -310,12 +292,12 @@ LRESULT MainWnd::WndProc(UINT nMsg, WPARAM wParam, LPARAM lParam)
 			}
 			else if( nId == IDM_SHOWSCREENSHOTSDIRECTORY )
 			{
-				String strDir = app.m_bmpcd.GetDir();
+				String strDir = m_pApp->m_bmpcd.GetDir();
 				
 				// The / is a valid path, but the Shell does not like it, so we convert it
 				// into something it likes, "D:\" "E:\" etc.
 				strDir = File::GetAbsolutePath(strDir);
-				::ShellExecuteW(m_hWnd, L"open", strDir.GetBuffer(), L"", L"", SW_SHOWNORMAL);
+				::ShellExecuteW(m_handle, L"open", strDir.GetBuffer(), L"", L"", SW_SHOWNORMAL);
 				return 0;
 			}
 			else if( nId == IDM_ALWAYSONTOP )
@@ -334,12 +316,12 @@ LRESULT MainWnd::WndProc(UINT nMsg, WPARAM wParam, LPARAM lParam)
 				DoAbout();
 				return 0;
 			}
-			else if( !app.IsJobRunning() )
+			else if( !m_pApp->IsJobRunning() )
 			{
 				switch(nId)
 				{
 				case IDM_PASTEFROMCLIPBOARD:
-					app.DumpScreenshot();
+					m_pApp->DumpScreenshot();
 					return 0;
 				default:
 					break;
@@ -362,12 +344,12 @@ LRESULT MainWnd::WndProc(UINT nMsg, WPARAM wParam, LPARAM lParam)
 	case WM_APP_THREADJOBDONE:
 		{
 			// The working thread notified us that its job is done
-			POApplication::GetInstance().OnJobDone();
+			m_pApp->OnJobDone();
 		}
 		break;
 
 	default:
-		return DefWindowProc(m_hWnd, nMsg, wParam, lParam);
+		return DefWindowProc(m_handle, nMsg, wParam, lParam);
 	}
 	return 0;
 }
@@ -375,10 +357,8 @@ LRESULT MainWnd::WndProc(UINT nMsg, WPARAM wParam, LPARAM lParam)
 ///////////////////////////////////////////////////////////////////
 void MainWnd::HandleMenuItemStates(HMENU hSubMenu)
 {
-	POApplication& app = POApplication::GetInstance();
-
 	int nEnable = MF_GRAYED;
-	if( !app.IsJobRunning() )
+	if( !m_pApp->IsJobRunning() )
 	{
 		nEnable = MF_ENABLED;
 	}
@@ -386,9 +366,9 @@ void MainWnd::HandleMenuItemStates(HMENU hSubMenu)
 
 	nEnable = MF_GRAYED;
 
-	if( !app.IsJobRunning() )
+	if( !m_pApp->IsJobRunning() )
 	{
-		if( app.IsBmpAvailable() )
+		if( m_pApp->IsBmpAvailable() )
 		{
 			nEnable = MF_ENABLED;
 		}
@@ -401,7 +381,7 @@ void MainWnd::SetAlwaysOnTop(bool alwaysOnTop)
 {
 	m_alwaysOnTop = alwaysOnTop;
 	HWND hWndAfter = alwaysOnTop ? HWND_TOPMOST : HWND_NOTOPMOST;
-	SetWindowPos(m_hWnd, hWndAfter, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE);
+	SetWindowPos(m_handle, hWndAfter, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE);
 }
 
 ///////////////////////////////////////////////////////////////////
