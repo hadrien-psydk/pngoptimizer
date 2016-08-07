@@ -19,7 +19,10 @@ Thread::Thread()
 Thread::~Thread()
 {
 #if defined(_WIN32)
-	::CloseHandle(m_handle);
+	if( m_handle )
+	{
+		::CloseHandle(m_handle);
+	}
 #endif
 }
 

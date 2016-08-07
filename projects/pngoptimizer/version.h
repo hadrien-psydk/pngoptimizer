@@ -4,7 +4,14 @@
 // For conditions of distribution and use, see copyright notice in PngOptimizer.h
 /////////////////////////////////////////////////////////////////////////////////////
 
+// @todo Rename this file as it contains more than the version now
+
+// Version
 #define PNGO_APPNAME   "PngOptimizer"
 #define PNGO_VERSION   "2.5-beta"
 #define PNGO_WEBSITE   "http://pngoptimizer.org"
-#define PNGO_COPYRIGHT "Copyright \xA9 2002/2016 Hadrien Nilsson"
+#define PNGO_COPYRIGHT "Copyright \xC2\xA9 2002/2016 Hadrien Nilsson"
+
+// UI texts
+#define WELCOME_MESSAGE "Drop PNG, GIF, BMP or TGA files here"
+#define PNGO_ERROR      "PngOptimizer error"

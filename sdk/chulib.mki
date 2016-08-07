@@ -24,8 +24,8 @@ LD  := ld
 OBJCOPY := objcopy
 
 CFLAGS := -Wall
-CFLAGS += -fdata-sections -ffunction-sections
-LDFLAGS := --gc-sections
+CFLAGS += -fdata-sections -ffunction-sections -fvisibility=hidden
+LDFLAGS := --gc-sections,--no-export-dynamic
 
 # In Debug, store debug symbols (-g)
 # In Release, optimize and strip symbols with the linker

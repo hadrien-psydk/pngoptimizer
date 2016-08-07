@@ -15,19 +15,15 @@
 #include "MainWnd.h"
 #include "AskForFileNameDlg.h"
 
+#include "version.h"
+
 ///////////////////////////////////////////////////////////////////////////////
 // Main window title
 static const char k_szTitle[] = "PngOptimizer";
 
-// Welcome message
-static const char k_szWelcomeMessage[] = "Drop PNG, GIF, BMP or TGA files here";
-
 // Screenshot comments
 static const char k_szCreating[] = "Creating ";
 static const char k_szCreatingAndOptimizing[] = "Creating & Optimizing ";
-
-// In case something goes really bad upon startup
-static const char k_szPngOptimizerError[] = "PngOptimizer error";
 
 ///////////////////////////////////////////////////////////////////////////////
 POApplication::POApplication()
@@ -424,10 +420,10 @@ bool POApplication::Initialize(HINSTANCE hInstance)
 		appSettings.Write(m_engine.m_settings, &m_bmpcd.m_settings, &mws);
 	}
 
-	if( !m_mainwnd.Create(k_szTitle, rcWnd, alwaysOnTop, k_szWelcomeMessage, this) )
+	if( !m_mainwnd.Create(k_szTitle, rcWnd, alwaysOnTop, WELCOME_MESSAGE, this) )
 	{
 		String strErr = "Cannot create main gui window : " + m_mainwnd.GetLastError();
-		MsgDialog md(strErr, k_szPngOptimizerError, CMT_Warning, CBT_Ok);
+		MsgDialog md(strErr, PNGO_ERROR, CMT_Warning, CBT_Ok);
 		md.DoModal(nullptr);
 		return false;
 	}
@@ -453,7 +449,7 @@ bool POApplication::Initialize(HINSTANCE hInstance)
 	// Perform some early resources creation to speedup first optimization
 	if( !m_engine.WarmUp() )
 	{
-		MsgDialog md("POEngine warm-up failed", k_szPngOptimizerError, CMT_Warning, CBT_Ok);
+		MsgDialog md("POEngine warm-up failed", PNGO_ERROR, CMT_Warning, CBT_Ok);
 		md.DoModal(nullptr);
 		return false;
 	}

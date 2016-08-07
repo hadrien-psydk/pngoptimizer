@@ -22,6 +22,8 @@ MainWnd::MainWnd()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// [in] welcomeMsg  Message to display when the content is empty (first creation
+//                  or when a clear command is done)
 bool MainWnd::Create(const String& title, RECT rcWnd, bool alwaysOnTop,
                      const String& welcomeMsg, POApplication* pApp)
 {

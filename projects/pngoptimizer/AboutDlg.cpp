@@ -41,7 +41,7 @@ bool AboutDlg::SetupUI()
 	wndVer.SetText(version);
 
 	Label labelCopyright = GetItem(IDC_STATIC_COPYRIGHT);
-	labelCopyright.SetText(PNGO_COPYRIGHT);
+	labelCopyright.SetText( String::FromUtf8Z(PNGO_COPYRIGHT) );
 
 	// Make the main text bold
 	m_hFont = CreateBoldWindowFont(wndVer); 
