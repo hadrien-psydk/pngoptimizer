@@ -4,7 +4,7 @@
 // For conditions of distribution and use, see copyright notice in PngOptimizer.h
 /////////////////////////////////////////////////////////////////////////////////////
 
-// @todo Rename this file as it contains more than the version now
+// Encoding should be UTF-8
 
 // Version
 #define PNGO_APPNAME   "PngOptimizer"

@@ -1,5 +1,5 @@
 -----------------------------------------------------------------------------
-  PngOptimizerCL - Copyright (C) 2002/2014 Hadrien Nilsson - psydk.org
+  PngOptimizerCL - Copyright (C) 2002/2016 Hadrien Nilsson - psydk.org
 -----------------------------------------------------------------------------
 
   This program is free software; you can redistribute it and/or modify
@@ -19,7 +19,7 @@
 
 Platform  : Windows XP/Vista/Seven - x86/x64
 Licence   : GNU GPL 2
-Version   : 2.4
+Version   : 2.5-beta
 Home page : http://psydk.org/PngOptimizer
 Contact   : PngOptimizer@psydk.org
 
@@ -28,7 +28,7 @@ Please report to the PngOptimizer Readme.txt file for more information.
 
 Run PngOptimizerCL.exe with no argument to display the usage.
 
-== About the KeepBackgroundColor option ==
+== About KeepBackgroundColor option ==
 
 By default, PngOptimizerCL will remove any background color information found in a PNG (bkGD chunk).
 If the option is provided, the background color information will be kept.
@@ -42,7 +42,7 @@ KeepBackgroundColor can also receive an argument:
 
 PngOptimizerCL -file:"myfile.png" -KeepBackgroundColor:F -BkColor:FF425A
 
-== About the KeepTextualData option ==
+== About KeepTextualData option ==
 
 By default, PngOptimizerCL will remove any textual data information found in a PNG.
 If the option is provided, the textual information found as tEXt chunks will be kept.
@@ -56,3 +56,13 @@ KeepTextualData can also receive an argument:
   with the ForcedTextKeyword and ForcedTextData options. Example:
 
 PngOptimizerCL -file:"myfile.png" -KeepTextualData:F -ForcedTextKeyword:Author -ForcedTextData:"Hadrien Nilsson"
+
+== About KeepFrameControl option ==
+
+With an APNG file, you can change the play speed by changing the fcTL chunk delay_num and delay_den:
+- Use KeepFrameControl:K (or 1) to keep the fcTL chunk as-is (default argument)
+- Use KeepFrameControl:F (or 2) with -ForcedDelayNumerator:XX and -ForcedDelayDenominator:YY.
+  XX/YY being a fraction of a second. For example, -ForcedDelayNumerator:1 -ForcedDelayDenominator:30 means
+  the animation will play at 30 frames per second.
+
+

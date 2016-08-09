@@ -11,7 +11,7 @@
 #include "MsgDialog.h"
 #include "AppSettings.h"
 
-#include "../version.h"
+#include "../msgtable.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 POApplication::POApplication()

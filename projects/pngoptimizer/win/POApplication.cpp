@@ -15,7 +15,7 @@
 #include "MainWnd.h"
 #include "AskForFileNameDlg.h"
 
-#include "version.h"
+#include "../msgtable.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Main window title

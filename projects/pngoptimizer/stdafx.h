@@ -12,10 +12,8 @@
 #ifdef _WIN32
 
 #include <chuwin32/chuwin32.h>
-#include <chui/chui.h>
 
 using namespace chuwin32;
-using namespace chui;
 
 #else
 

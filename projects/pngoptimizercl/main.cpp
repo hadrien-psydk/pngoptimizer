@@ -49,8 +49,6 @@ int main(int argc, char** argv)
 #endif
 
 {
-	String cmdLine = Process::GetCommandLine();
-
 	ArgvParser ap(argc, argv);
 	if( !ap.HasFlag("file") )
 	{

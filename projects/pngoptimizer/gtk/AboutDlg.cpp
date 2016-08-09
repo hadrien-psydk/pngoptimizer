@@ -6,7 +6,7 @@
 
 #include "stdafx.h"
 #include "AboutDlg.h"
-#include "../version.h"
+#include "../msgtable.h"
 
 // The Makefile will create logo48.o with those references from logo48.png
 extern "C" const char _binary_gtk_logo48_png_start[];

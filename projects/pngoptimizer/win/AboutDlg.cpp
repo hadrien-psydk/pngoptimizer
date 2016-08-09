@@ -7,7 +7,7 @@
 #include "stdafx.h"
 #include "AboutDlg.h"
 
-#include "version.h"
+#include "../msgtable.h"
 #include "resource.h"
 
 /////////////////////////////////////////////////////////////////////////////////////

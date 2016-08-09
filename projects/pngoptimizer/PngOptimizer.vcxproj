@@ -274,29 +274,19 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="Main.ico" />
+    <None Include="win/Main.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AboutDlg.cpp" />
-    <ClCompile Include="AppSettings.cpp" />
-    <ClCompile Include="AskForFileNameDlg.cpp" />
-    <ClCompile Include="BmpClipboardDumper.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="MainWnd.cpp">
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
-    <ClCompile Include="PngOptionsDlg.cpp" />
-    <ClCompile Include="POApplication.cpp" />
-    <ClCompile Include="POTraceCtl.cpp">
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
-    <ClCompile Include="ScreenshotsOptionsDlg.cpp" />
+    <ClCompile Include="win/AboutDlg.cpp" />
+    <ClCompile Include="win/AppSettings.cpp" />
+    <ClCompile Include="win/AskForFileNameDlg.cpp" />
+    <ClCompile Include="win/BmpClipboardDumper.cpp" />
+    <ClCompile Include="win/main.cpp" />
+    <ClCompile Include="win/MainWnd.cpp" />
+    <ClCompile Include="win/PngOptionsDlg.cpp" />
+    <ClCompile Include="win/POApplication.cpp" />
+    <ClCompile Include="win/POTraceCtl.cpp" />
+    <ClCompile Include="win/ScreenshotsOptionsDlg.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -305,23 +295,24 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AboutDlg.h" />
-    <ClInclude Include="AppSettings.h" />
-    <ClInclude Include="AskForFileNameDlg.h" />
-    <ClInclude Include="BmpcdSettings.h" />
-    <ClInclude Include="BmpClipboardDumper.h" />
-    <ClInclude Include="MainWnd.h" />
-    <ClInclude Include="PngOptionsDlg.h" />
-    <ClInclude Include="POApplication.h" />
-    <ClInclude Include="POTraceCtl.h" />
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="ScreenshotsOptionsDlg.h" />
+    <ClInclude Include="msgtable.h" />
+    <ClInclude Include="win/AboutDlg.h" />
+    <ClInclude Include="win/AppSettings.h" />
+    <ClInclude Include="win/AskForFileNameDlg.h" />
+    <ClInclude Include="win/BmpcdSettings.h" />
+    <ClInclude Include="win/BmpClipboardDumper.h" />
+    <ClInclude Include="win/MainWnd.h" />
+    <ClInclude Include="win/PngOptionsDlg.h" />
+    <ClInclude Include="win/POApplication.h" />
+    <ClInclude Include="win/POTraceCtl.h" />
+    <ClInclude Include="win/resource.h" />
+    <ClInclude Include="win/ScreenshotsOptionsDlg.h" />
+    <ClInclude Include="win/stdafx.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="version.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="manifest.rc" />
-    <ResourceCompile Include="PngOptimizer.rc">
+    <ResourceCompile Include="win/manifest.rc" />
+    <ResourceCompile Include="win/PngOptimizer.rc">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
