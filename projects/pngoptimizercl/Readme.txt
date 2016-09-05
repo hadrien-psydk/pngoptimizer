@@ -1,5 +1,5 @@
 -----------------------------------------------------------------------------
-  PngOptimizerCL - Copyright (C) 2002/2014 Hadrien Nilsson - psydk.org
+  PngOptimizerCL - Copyright (C) 2002/2016 Hadrien Nilsson - psydk.org
 -----------------------------------------------------------------------------
 
   This program is free software; you can redistribute it and/or modify
@@ -17,16 +17,16 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 -----------------------------------------------------------------------------
 
-Platform  : Windows XP/Vista/Seven - x86/x64
+Platform  : Windows/Linux - x86/x64
 Licence   : GNU GPL 2
-Version   : 2.4
-Home page : http://psydk.org/PngOptimizer
-Contact   : PngOptimizer@psydk.org
+Version   : 2.5-beta
+Home page : http://pngoptimizer.org
+Contact   : pngoptimizer@psydk.org
 
 This is the command line version of PngOptimizer.
 Please report to the PngOptimizer Readme.txt file for more information.
 
-Run PngOptimizerCL.exe with no argument to display the usage.
+Run pngoptimizercl with no argument to display the usage.
 
 == About the KeepBackgroundColor option ==
 
@@ -40,7 +40,7 @@ KeepBackgroundColor can also receive an argument:
 - Use KeepBackgroundColor:F (or 2) to force a background color. The color is specificed with
   the BkColor option and a color in hexadecimal RGB format. Example:
 
-PngOptimizerCL -file:"myfile.png" -KeepBackgroundColor:F -BkColor:FF425A
+pngoptimizercl -file:"myfile.png" -KeepBackgroundColor:F -BkColor:FF425A
 
 == About the KeepTextualData option ==
 
@@ -55,4 +55,4 @@ KeepTextualData can also receive an argument:
 - Use KeepTextualData:F (or 2) to remove all tXTt chunks and force one, using a key/data pair provided
   with the ForcedTextKeyword and ForcedTextData options. Example:
 
-PngOptimizerCL -file:"myfile.png" -KeepTextualData:F -ForcedTextKeyword:Author -ForcedTextData:"Hadrien Nilsson"
+pngoptimizercl -file:"myfile.png" -KeepTextualData:F -ForcedTextKeyword:Author -ForcedTextData:"Hadrien Nilsson"

@@ -82,6 +82,7 @@ int DynamicMemoryFile::Write(const void* pBuffer, int size)
 	int newSize = m_position + size;
 	if( newSize > m_content.GetSize() )
 	{
+		// Realloc
 		if( !m_content.SetSize(newSize) )
 		{
 			return -1;
@@ -131,32 +132,90 @@ const Buffer& DynamicMemoryFile::GetContent()
 	return m_content;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 // Writes to this DynamicMemoryFile using another file as the source
+//
+// [in,out] fileSrc  Source file
+// [in]     size     Number of bytes to read from fileSrc. If -1, the
+//                   source file is read until EOF is found
+//
+// [ret] number of bytes read
+///////////////////////////////////////////////////////////////////////////////
 int DynamicMemoryFile::WriteFromFile(IFile& fileSrc, int size)
 {
 	if( size < 0 )
 	{
-		return -1;
-	}
-	bool resized = false;
-	int newSize = m_position + size;
-	if( newSize > m_content.GetSize() )
-	{
-		if( !m_content.SetSize(newSize) )
+		if( size != -1 )
 		{
 			return -1;
 		}
+	}
+	bool resized = false;
+	int readAmount = 0;
+	if( size >= 0 )
+	{
+		int newSize = m_position + size;
+		if( newSize > m_content.GetSize() )
+		{
+			if( !m_content.SetSize(newSize) )
+			{
+				return -1;
+			}
+			resized = true;
+		}
+		readAmount = size;
+	}
+	else
+	{
+		// We will have to guess the size so a resize will occur
+		// at the end to match the exact number of bytes of the source
 		resized = true;
+
+		// Number of bytes to read from source for each iteration
+		readAmount = 4096;
 	}
 
-	uint8* pDst = m_content.GetWritePtr() + m_position;
-	int32 read = fileSrc.Read(pDst, size);
-	m_position += read;
+	int64 totalRead = 0;
+	for(;;)
+	{
+		int newSize = m_position + readAmount;
+		if( newSize > m_content.GetSize() )
+		{
+			// Realloc
+			if( !m_content.SetSize(newSize) )
+			{
+				return -1;
+			}
+		}
+
+		uint8* pDst = m_content.GetWritePtr() + m_position;
+		int32 read = fileSrc.Read(pDst, readAmount);
+		if( read > 0 )
+		{
+			m_position += read;
+			totalRead += read;
+
+			if( totalRead == size )
+			{
+				// Requested size reached
+				break;
+			}
+		}
+		else if( read == 0 )
+		{
+			// EOF found
+			break;
+		}
+		else
+		{
+			// Error
+			return -1;
+		}
+	}
 	// Update size in case we read less
 	if( resized )
 	{
 		m_content.SetSize(m_position);
 	}
-	return read;
+	return static_cast<int>(totalRead);
 }

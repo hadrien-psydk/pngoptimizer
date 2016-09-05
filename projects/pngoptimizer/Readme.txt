@@ -17,7 +17,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 -----------------------------------------------------------------------------
 
-Platform  : Windows XP/Vista/Seven/10 - x86/x64
+Platform  : Windows/Linux - x86/x64
 Licence   : GNU GPL 2
 Version   : 2.5-beta
 Home page : http://pngoptimizer.org
@@ -25,7 +25,7 @@ Contact   : pngoptimizer@psydk.org
 
 Contributions : 
 - PngOptimizer icon by Guillaume Schaeffer
-- Beta testing, bug reports : many friends & contributors, thanks for all !
+- Beta testing, bug reports : many friends & contributors, thanks for all!
 
 Thank you for downloading PngOptimizer. If you like PngOptimizer, please
 consider making a donation through the PayPal button on the home page.

@@ -36,6 +36,7 @@ const char k_szCorruptedChunkStructure[] = "Corrupted chunk structure";
 const char k_szPathIsNotAFile[] = "Not a file";
 const char k_szUnsupportedFileType[] = "Unsupported file type";
 const char k_szInvalidArgument[] = "Invalid argument";
+const char k_szCannotSetFilePosition[] = "Cannot set file position";
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -435,17 +436,30 @@ bool POEngine::TryToConvertIndexedToGreyscale(PngDumpData& dd)
 /////////////////////////////////////////////////////////////////////////////////////////////
 // Dumps either to file or to memory the best optmization result.
 //
-// [in] OptiTarget  Structure containing the file or the memory buffer information to use for the dump
+// [in,out] target  in:  Structure containing the file or the memory buffer information to use for the dump
+//                  out: size receives the size of the file dumped
 //
 // Returns true upon success
 /////////////////////////////////////////////////////////////////////////////////////////////
 bool POEngine::DumpBestResultToFile(OptiTarget& target)
 {
 	DynamicMemoryFile& dmf = m_resultmgr.GetSmallest();
-	int32 sizeToDump = (int32) dmf.GetPosition();
+	int sizeToDump = static_cast<int>(dmf.GetPosition());
 
-	if( !target.filePath.IsEmpty() )
+	if( target.type == OptiTarget::Type::Stdout )
 	{
+		StdFile file(StdFileType::Stdout);
+		int32 written = file.Write(dmf.GetContent().GetReadPtr(), sizeToDump);
+		if( written != sizeToDump )
+		{
+			AddError(k_szCannotWriteUncomplete);
+			return false;
+		}
+		target.size = sizeToDump;
+	}
+	else if( target.type == OptiTarget::Type::File )
+	{
+		ASSERT(!target.filePath.IsEmpty());
 		// Target is a file
 		File file;
 		if( !file.Open(target.filePath, File::modeWrite) )
@@ -472,6 +486,7 @@ bool POEngine::DumpBestResultToFile(OptiTarget& target)
 	}
 	else
 	{
+		ASSERT(target.type == OptiTarget::Type::Memory);
 		// Target is memory buffer
 		if( target.buf == nullptr )
 		{
@@ -1417,7 +1432,11 @@ bool POEngine::InsertCleanOriginalPngAsResult(IFile& file)
 		AddError(k_szNotEnoughMemoryToKeepOriginalFile);
 		return false;
 	}
-	dmf.SetPosition(0);
+	if( !dmf.SetPosition(0) )
+	{
+		AddError(k_szCannotSetFilePosition);
+		return false;
+	}
 
 	if( !PngDumper::WriteSignature(dmf) )
 	{
@@ -1433,8 +1452,8 @@ bool POEngine::InsertCleanOriginalPngAsResult(IFile& file)
 
 	while( !bIENDFound)
 	{
-		bool bChunkPresent = chfIn.BeginChunkRead();
-		if( !bChunkPresent )
+		bool chunkPresent = chfIn.BeginChunkRead();
+		if( !chunkPresent )
 		{
 			break;
 		}
@@ -1647,19 +1666,79 @@ bool POEngine::OptimizeSingleFileMem(const uint8* imgBuf, int imgSize, uint8* ds
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+// Optimizes/Converts a single file from stdin and output the result to stdout.
+//
+// Returns true upon success
+///////////////////////////////////////////////////////////////////////////////////////////////////
+bool POEngine::OptimizeStdio()
+{
+	m_astrErrors.SetSize(0);
+	m_resultmgr.Reset();
+	m_originalFileWriteTime = DateTime();
+
+	StdFile fileImage(StdFileType::Stdin);
+	OptiTarget target; // No argument means stdout
+	bool ret = OptimizeSingleFileNoBackup(fileImage, target);
+	return ret;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Loads a file or stdin content to a memory buffer
+// Closes fileImage.
+static bool LoadFileToMem(IFile& fileImage, DynamicMemoryFile& dmfAsIs)
+{
+	const int64 fileSize = fileImage.GetSize();
+	if( fileSize > MAX_INT32 )
+	{
+		return false;
+	}
+	// -1 is accepted, means stdin
+	int initialCapacity = 0;
+	if( fileSize >= 0 )
+	{
+		initialCapacity = fileSize;
+	}
+
+	if( !dmfAsIs.Open(initialCapacity) )
+	{
+		return false;
+	}
+	int ret = dmfAsIs.WriteFromFile(fileImage, int(fileSize));
+	// Regular file has a known file size
+	if( fileSize > 0 && ret != fileSize )
+	{
+		return false;
+	}
+	// File size unknown, just check if the number of bytes read is enough
+	if( fileSize < 0 && ret <= 0 )
+	{
+		return false;
+	}
+	if( !dmfAsIs.SetPosition(0) )
+	{
+		return false;
+	}
+	fileImage.Close(); // No need for the file anymore
+	return true;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 bool POEngine::OptimizeSingleFileNoBackup(IFile& fileImage, OptiTarget& target)
 {
 	m_astrErrors.Clear();
 
-	const int64 fileSize = fileImage.GetSize();
-	if( fileSize > MAX_INT32 )
+	/////////////////////////////////////////////
+	// Load as-is in memory
+	DynamicMemoryFile dmfAsIs;
+	if( !LoadFileToMem(fileImage, dmfAsIs) )
 	{
-		AddError(k_szFileTooLarge);
+		AddError(k_szCannotLoadFile);
 		return false;
 	}
 
+	/////////////////////////////////////////////
 	ImageLoader imgloader;
-	if( !imgloader.InstanciateLosslessFormat(fileImage) )
+	if( !imgloader.InstanciateLosslessFormat(dmfAsIs) )
 	{
 		AddError(k_szUnsupportedFileFormat);
 		return false;
@@ -1670,21 +1749,6 @@ bool POEngine::OptimizeSingleFileNoBackup(IFile& fileImage, OptiTarget& target)
 
 	if( imgloader.m_type == ImageLoader::Type_Png )
 	{
-		// Load as-is in memory
-		DynamicMemoryFile dmfAsIs;
-		if( !dmfAsIs.Open(int32(fileSize)) )
-		{
-			AddError(k_szCannotLoadFile);
-			return false;
-		}
-		if( dmfAsIs.WriteFromFile(fileImage, int32(fileSize)) != fileSize )
-		{
-			AddError(k_szCannotLoadFile);
-			return false;
-		}
-		fileImage.Close(); // No need for the file anymore
-
-		dmfAsIs.SetPosition(0);
 		loadOk = img.LoadFromFile(dmfAsIs);
 
 		// Insert a clean version of the source PNG
@@ -1700,8 +1764,7 @@ bool POEngine::OptimizeSingleFileNoBackup(IFile& fileImage, OptiTarget& target)
 	}
 	else
 	{
-		loadOk = img.LoadFromFile(fileImage);
-		fileImage.Close();
+		loadOk = img.LoadFromFile(dmfAsIs);
 	}
 
 	if( !loadOk )

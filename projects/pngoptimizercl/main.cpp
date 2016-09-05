@@ -22,21 +22,46 @@
 
 using namespace chustd;
 
+// Do not write to stdout at all except for the result file
+// when the -stdio flag is used
+bool g_stdioMode = false;
+
 class POApplicationConsole
 {
 public:
 	void OnEngineProgressing(const POEngine::ProgressingArg& arg)
 	{
-		Color col = POEngine::ColorFromTextType(arg.textType);
-		if( col.r == 0 && col.g == 0 && col.b == 0 )
+		const bool useStderr = (
+			   arg.textType == POEngine::TT_ActionFail
+			|| arg.textType == POEngine::TT_ErrorMsg);
+
+		IConsoleWriter* pCw;
+		if( useStderr )
 		{
-			Console::ResetTextColor();
+			pCw = &Console::Stderr();
 		}
 		else
 		{
-			Console::SetTextColor(col);
+			if( g_stdioMode )
+			{
+				// -stdio mode, do not output progress messages to stdout,
+				// only the result png
+				return;
+			}
+			pCw = &Console::Stdout();
 		}
-		Console::Write(arg.text);
+		IConsoleWriter& cw = *pCw; // I want Rust block expressions
+
+		Color col = POEngine::ColorFromTextType(arg.textType);
+		if( col.r == 0 && col.g == 0 && col.b == 0 )
+		{
+			cw.ResetTextColor();
+		}
+		else
+		{
+			cw.SetTextColor(col);
+		}
+		cw.Write(arg.text);
 	}
 };
 
@@ -49,10 +74,10 @@ int main(int argc, char** argv)
 #endif
 
 {
-	String cmdLine = Process::GetCommandLine();
-
 	ArgvParser ap(argc, argv);
-	if( !ap.HasFlag("file") )
+	const bool fileFlag = ap.HasFlag("file");
+	const bool stdioFlag = ap.HasFlag("stdio");
+	if( !fileFlag && !stdioFlag )
 	{
 		// Display usage
 		String version = "PngOptimizerCL 2.5-beta";
@@ -65,8 +90,13 @@ int main(int argc, char** argv)
 		Console::WriteLine("Converts GIF, BMP and TGA files to optimized PNG files.");
 		Console::WriteLine("Optimizes and cleans PNG files.");
 		Console::WriteLine("");
-		Console::WriteLine("Usage:  pngoptimizercl -file:\"yourfile.png\" [-recurs]");
+		Console::WriteLine("Usage:  pngoptimizercl (-file:\"yourfile.png\" | -stdio) [-recurs]");
 		POEngineSettings::WriteArgvUsage("  ");
+		Console::WriteLine("");
+		Console::WriteLine("-file option specifies a file to be read from and written to");
+		Console::WriteLine("-stdio option specifies that the input will be read from stdin and the");
+		Console::WriteLine("result will be written to stdout.");
+		Console::WriteLine("-recurs is valid only if the -file option is specified.");
 		Console::WriteLine("");
 		Console::WriteLine("Values enclosed with [] are optional.");
 		Console::WriteLine("Chunk option meaning: R=Remove, K=Keep, F=Force. 0|1|2 can be used too.");
@@ -82,8 +112,11 @@ int main(int argc, char** argv)
 		Console::WriteLine("  pngoptimizercl -file:\".png|*.bmp\" -recurs");
 		Console::WriteLine("Handle a specific directory (recursive):");
 		Console::WriteLine("  pngoptimizercl -file:\"gfx/\"");
+		Console::WriteLine("Handle a file written to stdin and capture stdout to make a new file:");
+		Console::WriteLine("  pngoptimizercl -stdio < icon.png > icon2.png");
 		Console::WriteLine("");
 	
+		// For Windows when we just double-click on the executable file from the file explorer
 		if( Console::IsOwned() )
 		{
 			Console::Write("Press any key to continue");
@@ -99,7 +132,7 @@ int main(int argc, char** argv)
 	POEngine engine;
 	if( !engine.WarmUp() )
 	{
-		Console::WriteLine("Warm-up failed");
+		Console::Stderr().WriteLine("Warm-up failed");
 		return 1;
 	}
 	engine.Progressing.Connect(&app, &POApplicationConsole::OnEngineProgressing);
@@ -107,33 +140,48 @@ int main(int argc, char** argv)
 	engine.m_settings.LoadFromArgv(ap);
 
 	//////////////////////////////////////////////////////////////////
-	String filePath = ap.GetFlagString("file");
-	String dir, fileName;
-	FilePath::Split(filePath, dir, fileName);
-	StringArray filePaths;
-	String joker;
-	if( ap.HasFlag("recurs") )
+	if( fileFlag )
 	{
-		filePaths.Add(dir);
-		joker = fileName;
-	}
-	else
-	{
-		filePaths = Directory::GetFileNames(dir, fileName, true);
-		if( filePaths.IsEmpty() )
+		String filePath = ap.GetFlagString("file");
+		String dir, fileName;
+		FilePath::Split(filePath, dir, fileName);
+		StringArray filePaths;
+		String joker;
+		if( ap.HasFlag("recurs") )
 		{
-			// For pngoptimizercl, it is an error if we have nothing to optimize
-			Color col = POEngine::ColorFromTextType(POEngine::TT_ErrorMsg);
-			Console::SetTextColor(col);
-			Console::WriteLine("File not found: " + filePath);
-			Console::ResetTextColor();
+			filePaths.Add(dir);
+			joker = fileName;
+		}
+		else
+		{
+			filePaths = Directory::GetFileNames(dir, fileName, true);
+			if( filePaths.IsEmpty() )
+			{
+				// For pngoptimizercl, it is an error if we have nothing to optimize
+				Color col = POEngine::ColorFromTextType(POEngine::TT_ErrorMsg);
+				Console::Stderr().SetTextColor(col);
+				Console::Stderr().WriteLine("File not found: " + filePath);
+				Console::Stderr().ResetTextColor();
+				return 1;
+			}
+		}
+
+		if( !engine.OptimizeFiles(filePaths, joker) )
+		{
+			Console::Stderr().WriteLine(engine.GetLastErrorString());
 			return 1;
 		}
 	}
-
-	if( !engine.OptimizeFiles(filePaths, joker) )
+	else
 	{
-		return 1;
+		ASSERT(stdioFlag);
+		g_stdioMode = true;
+
+		if( !engine.OptimizeStdio() )
+		{
+			Console::Stderr().WriteLine(engine.GetLastErrorString());
+			return 1;
+		}
 	}
 	return 0;
 }

@@ -4,16 +4,16 @@
 // For conditions of distribution and use, see copyright notice in chustd.h
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef CHUSTD_STATICMEMORYFILE_H
-#define CHUSTD_STATICMEMORYFILE_H
+#ifndef CHUSTD_STDFILE_H
+#define CHUSTD_STDFILE_H
 
 #include "IFile.h"
-#include "Buffer.h"
+#include "Console.h"
 
 namespace chustd {
 
-// Acts like a file, but in memory. Works with an external memory buffer.
-class StaticMemoryFile : public IFile
+// Acts like a file, but for stdin, stdout or stderr
+class StdFile : public IFile
 {
 public:
 	///////////////////////////////////////////////////////////////////////
@@ -27,20 +27,16 @@ public:
 	virtual void Close();
 	///////////////////////////////////////////////////////////////////////
 
-	bool OpenRead(const void* buf, int size);
-	bool OpenWrite(void* buf, int size);
-	
-	// Writes to this StaticMemoryFile from content found in an external file
-	int WriteFromFile(IFile& fileSrc, int size);
-
-	StaticMemoryFile();
+	StdFile(StdFileType);
 
 private:
-	void*     m_buf;
-	int       m_bufSize;
-	int       m_position;
-	int       m_maxPosition; // Also the size of the file
-	ByteOrder m_byteOrder;
+	union Impl
+	{
+		void* handle;
+		int fd;
+		bool IsValid() const { return handle != (void*)-1; }
+	} m_impl;
+	ByteOrder   m_byteOrder;
 };
 
 } // namespace chustd

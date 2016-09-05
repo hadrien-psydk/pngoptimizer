@@ -50,6 +50,7 @@
 #include "File.h"
 #include "DynamicMemoryFile.h"
 #include "StaticMemoryFile.h"
+#include "StdFile.h"
 #include "Console.h"
 #include "TextEncoding.h"
 #include "Directory.h"
