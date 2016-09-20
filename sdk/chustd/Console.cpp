@@ -198,7 +198,7 @@ static void ConsoleWrite(StdFileType ct, const String& str)
 	{
 		// Write to the window
 		DWORD length = str.GetLength();
-		BOOL bOk = WriteConsoleW(hStdOut, str.GetBuffer(), length, &written, nullptr);
+		BOOL bOk = WriteConsoleW(handle, str.GetBuffer(), length, &written, nullptr);
 		bOk;
 	}
 	else
@@ -211,7 +211,7 @@ static void ConsoleWrite(StdFileType ct, const String& str)
 		// Write as UTF-8
 		SetConsoleOutputCP(CP_UTF8); // Default in Windows 7, not sure for previous versions
 		ByteArray bytes = unified.ToBytes(TextEncoding::Utf8());
-		WriteFile(hStdOut, bytes.GetPtr(), bytes.GetSize(), &written, nullptr);
+		WriteFile(handle, bytes.GetPtr(), bytes.GetSize(), &written, nullptr);
 	}
 #elif defined(__linux__)
 	int fd;

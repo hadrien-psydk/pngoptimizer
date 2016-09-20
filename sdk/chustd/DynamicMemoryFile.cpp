@@ -172,7 +172,7 @@ int DynamicMemoryFile::WriteFromFile(IFile& fileSrc, int size)
 		resized = true;
 
 		// Number of bytes to read from source for each iteration
-		readAmount = 4096;
+		readAmount = 1024*1024;
 	}
 
 	int64 totalRead = 0;

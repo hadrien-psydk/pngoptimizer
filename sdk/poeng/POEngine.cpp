@@ -1696,7 +1696,7 @@ static bool LoadFileToMem(IFile& fileImage, DynamicMemoryFile& dmfAsIs)
 	int initialCapacity = 0;
 	if( fileSize >= 0 )
 	{
-		initialCapacity = fileSize;
+		initialCapacity = static_cast<int>(fileSize);
 	}
 
 	if( !dmfAsIs.Open(initialCapacity) )

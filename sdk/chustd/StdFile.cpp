@@ -89,7 +89,6 @@ int StdFile::Read(void* pBuffer, int size)
 	}
 #elif defined(__linux__)
 	int read = ::read(m_impl.fd, pBuffer, size);
-	//Console::Write("StdFile::Read" + String::FromInt(size) + " returns " + String::FromInt(read));
 #endif
 	return int(read);
 

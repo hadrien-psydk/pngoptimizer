@@ -219,6 +219,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="StdFile.cpp" />
     <ClCompile Include="Thread.cpp" />
     <ClCompile Include="Array.cpp">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -499,6 +500,7 @@
     <ClInclude Include="Semaphore.h" />
     <ClInclude Include="StaticMemoryFile.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="StdFile.h" />
     <ClInclude Include="Thread.h" />
     <ClInclude Include="Array.h" />
     <ClInclude Include="BitBuffer.h" />
