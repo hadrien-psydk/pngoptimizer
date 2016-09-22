@@ -37,7 +37,7 @@ public:
 	const Buffer& GetContent();
 
 	// Writes to this DynamicMemoryFile from content found in an external file
-	int WriteFromFile(IFile& fileSrc, int size);
+	int WriteFromFile(IFile& fileSrc, int size, int readAmount = -1);
 
 	DynamicMemoryFile();
 

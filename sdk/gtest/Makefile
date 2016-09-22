@@ -31,10 +31,14 @@ GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
 
 # House-keeping build targets.
 
-all: $(OUTDIR) $(OUTPATH)
+all: welcome_msg $(OUTDIR) $(OUTPATH)
 
-clean:
-	rm -f $(OUTDIR)
+clean: welcome_msg
+	$(info cleaning...)
+	@rm -rf $(OUTDIR)
+
+welcome_msg:
+	$(info ----------------------- gtest $(CONFIG) -----------------------)
 
 # Create output directory
 # -p is to ignore error if the directory already exists

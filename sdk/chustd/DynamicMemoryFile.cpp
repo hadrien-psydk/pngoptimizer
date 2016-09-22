@@ -135,13 +135,15 @@ const Buffer& DynamicMemoryFile::GetContent()
 ///////////////////////////////////////////////////////////////////////////////
 // Writes to this DynamicMemoryFile using another file as the source
 //
-// [in,out] fileSrc  Source file
-// [in]     size     Number of bytes to read from fileSrc. If -1, the
-//                   source file is read until EOF is found
+// [in,out] fileSrc     Source file
+// [in]     size        Number of bytes to read from fileSrc. If -1, the
+//                      source file is read until EOF is found
+// [in]     readAmount  If size is -1, the number of bytes to read in a loop
+//                      until EOF is found. If -1, a default value is used.
 //
-// [ret] number of bytes read
+// [ret] number of bytes read, negative upon error
 ///////////////////////////////////////////////////////////////////////////////
-int DynamicMemoryFile::WriteFromFile(IFile& fileSrc, int size)
+int DynamicMemoryFile::WriteFromFile(IFile& fileSrc, int size, int readAmount)
 {
 	if( size < 0 )
 	{
@@ -149,10 +151,13 @@ int DynamicMemoryFile::WriteFromFile(IFile& fileSrc, int size)
 		{
 			return -1;
 		}
+		if( readAmount <= 0 )
+		{
+			// readAmount is not provided, use a default arbitrary value
+			readAmount = 1024*1024;
+		}
 	}
-	bool resized = false;
-	int readAmount = 0;
-	if( size >= 0 )
+	else
 	{
 		int newSize = m_position + size;
 		if( newSize > m_content.GetSize() )
@@ -161,18 +166,8 @@ int DynamicMemoryFile::WriteFromFile(IFile& fileSrc, int size)
 			{
 				return -1;
 			}
-			resized = true;
 		}
 		readAmount = size;
-	}
-	else
-	{
-		// We will have to guess the size so a resize will occur
-		// at the end to match the exact number of bytes of the source
-		resized = true;
-
-		// Number of bytes to read from source for each iteration
-		readAmount = 1024*1024;
 	}
 
 	int64 totalRead = 0;
@@ -213,9 +208,7 @@ int DynamicMemoryFile::WriteFromFile(IFile& fileSrc, int size)
 		}
 	}
 	// Update size in case we read less
-	if( resized )
-	{
-		m_content.SetSize(m_position);
-	}
+	m_content.SetSize(m_position);
+
 	return static_cast<int>(totalRead);
 }

@@ -95,7 +95,7 @@ TEST(File, Append)
 
 	ASSERT_TRUE( nContent == MAKE32('A','A','A','A') );
 	
-	ASSERT_TRUE( File::Delete(filePath));
+	ASSERT_TRUE( File::Delete(filePath) );
 }
 
 TEST(File, LastWriteTime)
@@ -123,11 +123,12 @@ TEST(File, LastWriteTime)
 	}
 
 	ASSERT_TRUE( File::Delete("test-file.txt") );
-	//ASSERT_TRUE( File::Delete("test-file2.txt") );
+	ASSERT_TRUE( File::Delete("test-file2.txt") );
 }
 
 TEST(File, Rename)
 {
 	ASSERT_TRUE( File::WriteTextUtf8("test-file.txt", "rename") );
 	ASSERT_TRUE( File::Rename("test-file.txt", "test-file-renamed.txt") );
+	ASSERT_TRUE( File::Delete("test-file-renamed.txt") );
 }
