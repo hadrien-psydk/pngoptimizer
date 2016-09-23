@@ -71,15 +71,18 @@ public:
 		}
 	};
 
-	// Optimizes or convert one single file.
+	// Optimizes or converts one single file.
 	bool OptimizeSingleFile(const chustd::String& filePath, const chustd::String& displayDir, SingleOptiInfo& singleOptiInfo);
 
-	// Optimizes or convert one single file loaded in memory.
+	// Optimizes or converts one single file loaded in memory.
 	bool OptimizeSingleFileMem(const uint8* imgBuf, int imgSize, uint8* dst, int dstCapacity, int* pDstSize);
+
+	// Optimizes or converts a file coming from stdin and write result to stdout
+	bool OptimizeStdio();
 
 	static chustd::Color ColorFromTextType(TextType tt);
 
-	// Initializes some structure. To be called before any optimization function to avoid making the first call
+	// Initializes some structures. To be called before any optimization function to avoid making the first call
 	// slower than other calls (first call will do the warmup if it is not done).
 	bool WarmUp();
 
@@ -114,18 +117,33 @@ private:
 
 	bool m_unicodeArrowEnabled; // To have a nice arrow for ->
 
-	// Hold either a target file path or a target buffer
+	// Holds target information: stdout, a file path or a memory buffer
 	struct OptiTarget
 	{
+		enum class Type { Stdout, File, Memory };
+		Type   type;
 		String filePath;
 		void*  buf;
 		int    bufCapacity;
 		int    size;
 
+		OptiTarget() : type(Type::Stdout)
+		{
+			buf = nullptr;
+			bufCapacity = 0;
+			size = 0;
+		}
+
 		OptiTarget(const String& filePathArg) 
-			: filePath(filePathArg) {}
+			: type(Type::File), filePath(filePathArg)
+		{
+			buf = nullptr;
+			bufCapacity = 0;
+			size = 0;
+		}
+
 		OptiTarget(void* bufArg, int bufCapacityArg) 
-			: buf(bufArg), bufCapacity(bufCapacityArg), size(0) {}
+			: type(Type::Memory), buf(bufArg), bufCapacity(bufCapacityArg), size(0) {}
 	};
 
 private:

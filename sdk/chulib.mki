@@ -11,8 +11,11 @@
 # Command line options:
 # (default)       builds all with debug configuration
 # CONFIG=release  builds all with release configuration
+# CONFIG=coverage builds all with coverage configuration
 # clean           cleans current project and its dependencies
 # rebuild         cleans then builds
+# run             runs the application
+# cov             creates coverage files. make CONFIG=coverage should have been called
 
 INCDIRS += ../../sdk
 CONFIG ?= debug
@@ -26,19 +29,24 @@ OBJCOPY := objcopy
 CFLAGS := -Wall
 CFLAGS += -fdata-sections -ffunction-sections -fvisibility=hidden
 LDFLAGS := --gc-sections,--no-export-dynamic
+EXTLIBS := -pthread -lrt
 
 # In Debug, store debug symbols (-g)
 # In Release, optimize and strip symbols with the linker
 ifeq ($(CONFIG),debug)
 	CFLAGS += -g
-else
+else ifeq ($(CONFIG),release)
 	CFLAGS += -O2 -Werror
 	LDFLAGS := $(LDFLAGS),-s
+else ifeq ($(CONFIG),coverage)
+	CFLAGS += -g -fprofile-arcs -ftest-coverage
+	EXTLIBS += -lgcov
+else
+$(error Bad CONFIG value)
 endif
 
 CPPFLAGS := $(CFLAGS) -Wextra
 CPPFLAGS += -std=c++0x $(addprefix -I,$(INCDIRS))
-EXTLIBS := -pthread -lrt
 
 # Most includes for GTK+ are in /usr/include but some of them are
 # very specific. pkg-config gives us all the needed paths.
@@ -140,3 +148,22 @@ rebuild: clean all
 
 run: all
 	$(OUTPATH)
+
+# -----------------------------------------------------------------------------
+# Unit test code coverage
+# sudo apt install lcov
+OTHER_GCDA_DIRS := $(addprefix --directory ,$(SDK_DIRS))
+
+cov: linux-coverage/html/index.html
+	xdg-open linux-coverage/html/index.html
+
+linux-coverage/html/index.html: linux-coverage/coverage.info
+	genhtml linux-coverage/coverage.info --output-dir linux-coverage/html
+
+# .gcda files should be present. They are created when executing the application.
+# Just check one .gcda presence to know if running should be done
+linux-coverage/coverage.info: linux-coverage/stdafx.gcda
+	lcov --capture --directory linux-coverage $(OTHER_GCDA_DIRS) --output-file linux-coverage/coverage.info
+
+linux-coverage/stdafx.gcda: linux-coverage/$(PROJECT_NAME)
+	linux-coverage/$(PROJECT_NAME)

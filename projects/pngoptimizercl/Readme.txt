@@ -17,16 +17,16 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 -----------------------------------------------------------------------------
 
-Platform  : Windows XP/Vista/Seven - x86/x64
+Platform  : Windows/Linux - x86/x64
 Licence   : GNU GPL 2
 Version   : 2.5-beta
-Home page : http://psydk.org/PngOptimizer
-Contact   : PngOptimizer@psydk.org
+Home page : http://pngoptimizer.org
+Contact   : pngoptimizer@psydk.org
 
 This is the command line version of PngOptimizer.
 Please report to the PngOptimizer Readme.txt file for more information.
 
-Run PngOptimizerCL.exe with no argument to display the usage.
+Run pngoptimizercl with no argument to display the usage.
 
 == About KeepBackgroundColor option ==
 
@@ -40,7 +40,7 @@ KeepBackgroundColor can also receive an argument:
 - Use KeepBackgroundColor:F (or 2) to force a background color. The color is specificed with
   the BkColor option and a color in hexadecimal RGB format. Example:
 
-PngOptimizerCL -file:"myfile.png" -KeepBackgroundColor:F -BkColor:FF425A
+pngoptimizercl -file:"myfile.png" -KeepBackgroundColor:F -BkColor:FF425A
 
 == About KeepTextualData option ==
 
@@ -55,7 +55,7 @@ KeepTextualData can also receive an argument:
 - Use KeepTextualData:F (or 2) to remove all tXTt chunks and force one, using a key/data pair provided
   with the ForcedTextKeyword and ForcedTextData options. Example:
 
-PngOptimizerCL -file:"myfile.png" -KeepTextualData:F -ForcedTextKeyword:Author -ForcedTextData:"Hadrien Nilsson"
+pngoptimizercl -file:"myfile.png" -KeepTextualData:F -ForcedTextKeyword:Author -ForcedTextData:"Hadrien Nilsson"
 
 == About KeepFrameControl option ==
 
@@ -64,5 +64,4 @@ With an APNG file, you can change the play speed by changing the fcTL chunk dela
 - Use KeepFrameControl:F (or 2) with -ForcedDelayNumerator:XX and -ForcedDelayDenominator:YY.
   XX/YY being a fraction of a second. For example, -ForcedDelayNumerator:1 -ForcedDelayDenominator:30 means
   the animation will play at 30 frames per second.
-
 

@@ -53,7 +53,6 @@ TEST(Directory, GetFileNames)
 	ASSERT_TRUE( "file3.xml" == fileNames[2] );
 
 	
-
 	fileNames = Directory::GetFileNames("mydir", "*.txt");
 	ASSERT_EQ( 2, fileNames.GetSize() );
 	fileNames = fileNames.Sort();
@@ -73,6 +72,17 @@ TEST(Directory, GetFileNames)
 	ASSERT_TRUE( "mydir/file1.txt" == fileNames[0] );
 	ASSERT_TRUE( "mydir/file2.txt" == fileNames[1] );
 	ASSERT_TRUE( "mydir/file3.xml" == fileNames[2] );
+
+	// Cleanup
+	// Should fail, mydir is not empty
+	ASSERT_FALSE( Directory::Delete("mydir") );
+
+	ASSERT_TRUE( File::Delete("mydir/file1.txt") );
+	ASSERT_TRUE( File::Delete("mydir/file2.txt") );
+	ASSERT_TRUE( File::Delete("mydir/file3.xml") );
+
+	// Should be ok now
+	ASSERT_TRUE( Directory::Delete("mydir") );
 }
 
 TEST(Joker, Matches)
@@ -111,14 +121,4 @@ TEST(Joker, Matches)
 	ASSERT_FALSE( joker.Matches("abc") );
 	}
 }
-
-
-
-
-
-
-
-
-
-
 

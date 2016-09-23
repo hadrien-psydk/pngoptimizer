@@ -77,6 +77,10 @@ bool ImageLoader::InstanciateLosslessFormat(IFile& file)
 	m_type = Type_None;
 
 	int64 pos = file.GetPosition();
+	if( pos < 0 )
+	{
+		return false;
+	}
 	
 	if( Png::IsPng(file) )
 	{

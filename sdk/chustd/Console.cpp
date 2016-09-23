@@ -46,24 +46,51 @@ public:
 		}
 
 #if defined(_WIN32)
+		HANDLE handle;
+		if( m_type == StdFileType::Stdout )
+		{
+			handle = GetStdHandle(STD_OUTPUT_HANDLE);
+		}
+		else if( m_type == StdFileType::Stderr )
+		{
+			handle = GetStdHandle(STD_ERROR_HANDLE);
+		}
+		else
+		{
+			return;
+		}
+
 		if( col.r > th2 || col.g > th2 || col.b > th2 )
 		{
 			ccol |= FOREGROUND_INTENSITY;
 		}
 
-		HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
 		if( !m_initialized )
 		{
 			CONSOLE_SCREEN_BUFFER_INFO ci;
-			GetConsoleScreenBufferInfo(hStdOut, &ci);
+			GetConsoleScreenBufferInfo(handle, &ci);
 			m_original = ci.wAttributes;
 			m_initialized = true;
 		}
 		int mask = ~(FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE|FOREGROUND_INTENSITY);
 		WORD att = static_cast<WORD>((m_original & mask) | ccol);
-		SetConsoleTextAttribute(hStdOut, att);
+		SetConsoleTextAttribute(handle, att);
 
 #elif defined(__linux__)
+		int fd;
+		if( m_type == StdFileType::Stdout )
+		{
+			fd = STDOUT_FILENO;
+		}
+		else if( m_type == StdFileType::Stderr )
+		{
+			fd = STDERR_FILENO;
+		}
+		else
+		{
+			return;
+		}
+
 		static const int k_cis[] = {
 			30, 31, 32, 33, 34, 35, 36, 37
 		};
@@ -75,7 +102,7 @@ public:
 		}
 		char buf[20];
 		sprintf(buf, "\033[%dm", ci);
-		if( ::write(1, buf, strlen(buf)) < 0 )
+		if( ::write(fd, buf, strlen(buf)) < 0 )
 		{
 			return;
 		}
@@ -84,55 +111,59 @@ public:
 
 	void SetNormalColor()
 	{
+		if( m_normalColor )
+		{
+			// Nothing to do
+			return;
+		}
+		m_normalColor = true; // Back to normal color
+
 #if defined(_WIN32)
 		if( m_initialized )
 		{
-			HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
-			SetConsoleTextAttribute(hStdOut, static_cast<WORD>(m_original));
+			HANDLE handle;
+			if( m_type == StdFileType::Stdout )
+			{
+				handle = GetStdHandle(STD_OUTPUT_HANDLE);
+			}
+			else if( m_type == StdFileType::Stderr )
+			{
+				handle = GetStdHandle(STD_ERROR_HANDLE);
+			}
+			else
+			{
+				return;
+			}
+			SetConsoleTextAttribute(handle, static_cast<WORD>(m_original));
 		}
 #elif defined(__linux__)
+		int fd;
+		if( m_type == StdFileType::Stdout )
+		{
+			fd = STDOUT_FILENO;
+		}
+		else if( m_type == StdFileType::Stderr )
+		{
+			fd = STDERR_FILENO;
+		}
+		else
+		{
+			return;
+		}
 		static const char sz[] = "\033[0m";
-		if( ::write(1, sz, sizeof(sz)-1) < 0 )
+		if( ::write(fd, sz, sizeof(sz)-1) < 0 )
 		{
 			return;
 		}
 #endif
 	}
 
-	Color GetColor()
-	{
-		Color ret;
-#if defined(_WIN32)
-		HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
-		CONSOLE_SCREEN_BUFFER_INFO ci;
-		GetConsoleScreenBufferInfo(hStdOut, &ci);
-		int mask = (FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE|FOREGROUND_INTENSITY);
-		WORD ccol = (ci.wAttributes & mask);
-
-		uint8 th = 127;
-		if( ccol & FOREGROUND_INTENSITY )
-		{
-			th = 255;
-		}
-		if( ccol & FOREGROUND_RED )
-		{
-			ret.r = th;
-		}
-		if( ccol & FOREGROUND_GREEN )
-		{
-			ret.g = th;
-		}
-		if( ccol & FOREGROUND_BLUE )
-		{
-			ret.b = th;
-		}
-#endif
-		return ret;
-	}
-
-	ConsoleColorSetter()
+	ConsoleColorSetter(StdFileType type)
 	{
 		m_initialized = false;
+		// By default we assume the current color when the program starts is the normal one
+		m_normalColor = true;
+		m_type = type;
 		m_original = 0;
 	}
 	~ConsoleColorSetter()
@@ -141,43 +172,33 @@ public:
 	}
 private:
 	bool m_initialized;
+	bool m_normalColor; // true if current color changed back to normal
+	StdFileType m_type;
 	uint32 m_original;
 };
 
-static ConsoleColorSetter g_consoleColorSetter;
-
-///////////////////////////////////////////////////////////////////////////////
-Console::Console()
-{
-
-}
-
-///////////////////////////////////////////////////////////////////////////////
-Console::~Console()
-{
-
-}
-
-///////////////////////////////////////////////////////////////////////////////
-void Console::WriteLine(const String& str)
-{
-	Write(str + "\r\n");
-}
-
-///////////////////////////////////////////////////////////////////////////////
-void Console::Write(const String& str)
+static void ConsoleWrite(StdFileType ct, const String& str)
 {
 #if defined(_WIN32)
+	HANDLE handle;
+	if( ct == StdFileType::Stdout )
+	{
+		handle = GetStdHandle(STD_OUTPUT_HANDLE);
+	}
+	else if( ct == StdFileType::Stderr )
+	{
+		handle = GetStdHandle(STD_ERROR_HANDLE);
+	}
+
 	DWORD written = 0;
 
 	// Windows functions
-	HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
-	DWORD fileType = GetFileType(hStdOut);
+	DWORD fileType = GetFileType(handle);
 	if( fileType == FILE_TYPE_CHAR )
 	{
 		// Write to the window
 		DWORD length = str.GetLength();
-		BOOL bOk = WriteConsoleW(hStdOut, str.GetBuffer(), length, &written, nullptr);
+		BOOL bOk = WriteConsoleW(handle, str.GetBuffer(), length, &written, nullptr);
 		bOk;
 	}
 	else
@@ -190,23 +211,71 @@ void Console::Write(const String& str)
 		// Write as UTF-8
 		SetConsoleOutputCP(CP_UTF8); // Default in Windows 7, not sure for previous versions
 		ByteArray bytes = unified.ToBytes(TextEncoding::Utf8());
-		WriteFile(hStdOut, bytes.GetPtr(), bytes.GetSize(), &written, nullptr);
+		WriteFile(handle, bytes.GetPtr(), bytes.GetSize(), &written, nullptr);
 	}
 #elif defined(__linux__)
-	String unified = str.UnifyNewlines(String::NT_Dos);
+	int fd;
+	if( ct == StdFileType::Stdout )
+	{
+		fd = STDOUT_FILENO;
+	}
+	else if( ct == StdFileType::Stderr )
+	{
+		fd = STDERR_FILENO;
+	}
+	else
+	{
+		return;
+	}
+
+	String unified = str.UnifyNewlines(String::NT_Unix);
 	ByteArray bytes = unified.ToBytes(TextEncoding::Utf8());
-	if( ::write(1, bytes.GetPtr(), bytes.GetSize()) < 0 )
+	if( ::write(fd, bytes.GetPtr(), bytes.GetSize()) < 0 )
 	{
 		return;
 	}
 #endif
 }
 
-///////////////////////////////////////////////////////////////////////////////
-bool Console::WaitForInput(String& str)
+static class Stdout : public IConsoleWriter
 {
-	static char szPrompt[] = ">";
-	return WaitForInput(szPrompt, str);
+public:
+	virtual void Write(const String& str)     { ConsoleWrite(StdFileType::Stdout, str); }
+	virtual void WriteLine(const String& str) { ConsoleWrite(StdFileType::Stdout, str + "\n"); }
+
+	virtual void SetTextColor(Color col) { m_colorSetter.SetColor(col); }
+	virtual void ResetTextColor()        { m_colorSetter.SetNormalColor(); }
+
+	Stdout() : m_colorSetter(StdFileType::Stdout) {}
+
+private:
+	ConsoleColorSetter m_colorSetter;
+} g_stdout;
+
+static class Stderr : public IConsoleWriter
+{
+public:
+	virtual void Write(const String& str)     { ConsoleWrite(StdFileType::Stderr, str); }
+	virtual void WriteLine(const String& str) { ConsoleWrite(StdFileType::Stderr, str + "\n"); }
+
+	virtual void SetTextColor(Color col) { m_colorSetter.SetColor(col); }
+	virtual void ResetTextColor()        { m_colorSetter.SetNormalColor(); }
+
+	Stderr() : m_colorSetter(StdFileType::Stderr) {}
+
+private:
+	ConsoleColorSetter m_colorSetter;
+} g_stderr;
+
+///////////////////////////////////////////////////////////////////////////////
+IConsoleWriter& Console::Stdout()
+{
+	return g_stdout;
+}
+
+IConsoleWriter& Console::Stderr()
+{
+	return g_stderr;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -217,7 +286,7 @@ bool Console::WaitForInput(String& str)
 ///////////////////////////////////////////////////////////////////////////////
 bool Console::WaitForInput(const String& prompt, String& input)
 {
-	Write(prompt);
+	Stdout().Write(prompt);
 
 	wchar szBuffer[128];
 
@@ -248,6 +317,13 @@ bool Console::WaitForInput(const String& prompt, String& input)
 	int32 realCharCount = i + 1;
 	input.SetBuffer(szBuffer, realCharCount);
 	return true;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+bool Console::WaitForInput(String& str)
+{
+	static char szPrompt[] = ">";
+	return WaitForInput(szPrompt, str);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -286,18 +362,6 @@ uint32 Console::WaitForKey()
 	SetConsoleMode(hStdIn, oldMode);
 #endif
 	return char32;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-void Console::SetTextColor(Color col)
-{
-	g_consoleColorSetter.SetColor(col);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-void Console::ResetTextColor()
-{
-	g_consoleColorSetter.SetNormalColor();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

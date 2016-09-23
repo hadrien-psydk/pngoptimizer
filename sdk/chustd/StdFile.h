@@ -4,16 +4,16 @@
 // For conditions of distribution and use, see copyright notice in chustd.h
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef CHUSTD_DYNAMICMEMORYFILE_H
-#define CHUSTD_DYNAMICMEMORYFILE_H
+#ifndef CHUSTD_STDFILE_H
+#define CHUSTD_STDFILE_H
 
 #include "IFile.h"
-#include "Buffer.h"
+#include "Console.h"
 
 namespace chustd {
 
-// Acts like a file, but in memory. The content automatically grows if needed.
-class DynamicMemoryFile : public IFile
+// Acts like a file, but for stdin, stdout or stderr
+class StdFile : public IFile
 {
 public:
 	///////////////////////////////////////////////////////////////////////
@@ -27,26 +27,18 @@ public:
 	virtual void Close();
 	///////////////////////////////////////////////////////////////////////
 
-	// Opens the memory file. Default flags are :
-	// ReadWrite mode + Big Endian mode
-	bool Open(int32 initialCapacity);
-	
-	bool EnsureCapacity(int32 capacity);
-
-	// Gets the file content
-	const Buffer& GetContent();
-
-	// Writes to this DynamicMemoryFile from content found in an external file
-	int WriteFromFile(IFile& fileSrc, int size, int readAmount = -1);
-
-	DynamicMemoryFile();
+	StdFile(StdFileType);
 
 private:
-	Buffer    m_content;
-	ByteOrder m_byteOrder;
-	int32     m_position;
+	union Impl
+	{
+		void* handle;
+		int fd;
+		bool IsValid() const { return handle != (void*)-1; }
+	} m_impl;
+	ByteOrder   m_byteOrder;
 };
 
 } // namespace chustd
 
-#endif // ndef CHUSTD_DYNAMICMEMORYFILE_H
+#endif
