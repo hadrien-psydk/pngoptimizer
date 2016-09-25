@@ -31,15 +31,15 @@ public:
 	// Example: run -value:"100" // GetFlagInt("value") returns 100
 	int GetFlagInt(const String& flagName) const;
 
-protected:
-	StringArray m_argv;
+	// Returns the list of all arguments that are not flags
+	StringArray GetRegularArgs() const;
 
-	class Arg
+protected:
+	struct Arg
 	{
-	public:
-		bool m_flag;
-		String m_name;
-		String m_flagString;
+		bool   flag;  // Argument is a flag?
+		String name;
+		String flagString; // If the argument is a flag with value
 	};
 	Array<Arg> m_args;
 

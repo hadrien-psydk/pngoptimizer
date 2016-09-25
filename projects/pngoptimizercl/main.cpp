@@ -65,6 +65,54 @@ public:
 	}
 };
 
+static void WriteVersion()
+{
+	String version = "PngOptimizerCL 2.5-beta";
+#if defined(_M_X64)
+	version = version + String(" (x64)");
+#elif defined(_M_IX86)  
+	version = version + String(" (x86)");
+#endif
+	Console::WriteLine(version);
+}
+
+static void WriteHelp()
+{
+	WriteVersion();
+	Console::WriteLine("Copyright \xA9 2002/2016 Hadrien Nilsson - psydk.org");
+	Console::WriteLine("Converts GIF, BMP and TGA files to optimized PNG files.");
+	Console::WriteLine("Optimizes and cleans PNG files.");
+	Console::WriteLine("");
+	Console::WriteLine("Usage:  pngoptimizercl (FILE [FILE2 [FILE3...]] | -file:\"yourfile.png\" | -stdio) [-recurs]");
+	POEngineSettings::WriteArgvUsage("  ");
+	Console::WriteLine("");
+	Console::WriteLine("-file option specifies a file pattern to match files to be read from and written to.");
+	Console::WriteLine("      To be used when no specific file path is given.");
+	Console::WriteLine("-stdio option specifies that the input will be read from stdin and the");
+	Console::WriteLine("       result will be written to stdout.");
+	Console::WriteLine("-recurs is valid only if the -file option is specified.");
+	Console::WriteLine("");
+	Console::WriteLine("Values enclosed with [] are optional.");
+	Console::WriteLine("Chunk option meaning: R=Remove, K=Keep, F=Force. 0|1|2 can be used too.");
+	Console::WriteLine("");
+	Console::WriteLine("Input examples:");
+	Console::WriteLine("Handle a specific file:");
+	Console::WriteLine("  pngoptimizercl icon.png");
+	Console::WriteLine("Handle a specific file (alternate syntax):");
+	Console::WriteLine("  pngoptimizercl -file:\"icon.png\"");
+	Console::WriteLine("Handle specific file types in the current directory:");
+	Console::WriteLine("  pngoptimizercl -file:\"*.png|*.bmp\"");
+	Console::WriteLine("Handle any supported file in the current directory:");
+	Console::WriteLine("  pngoptimizercl -file:\"*\"");
+	Console::WriteLine("Handle specific file types in the current directory (recursive):");
+	Console::WriteLine("  pngoptimizercl -file:\".png|*.bmp\" -recurs");
+	Console::WriteLine("Handle a specific directory (recursive):");
+	Console::WriteLine("  pngoptimizercl -file:\"gfx/\"");
+	Console::WriteLine("Handle a file written to stdin and capture stdout to make a new file:");
+	Console::WriteLine("  pngoptimizercl -stdio < icon.png > icon2.png");
+	Console::WriteLine("");
+}
+
 #if defined(_WIN32)
 // Use the W version of main on Windows to ensure we get a known text encoding (UTF-16)
 int wmain(int argc, wchar_t** argv)
@@ -75,47 +123,28 @@ int main(int argc, char** argv)
 
 {
 	ArgvParser ap(argc, argv);
+	if( ap.HasFlag("help") )
+	{
+		// Explicitely ask to display help
+		WriteHelp();
+		return 0;
+	}
+
+	if( ap.HasFlag("version") )
+	{
+		WriteVersion();
+		return 0;
+	}
+
+	StringArray argFilePaths = ap.GetRegularArgs();
 	const bool fileFlag = ap.HasFlag("file");
 	const bool stdioFlag = ap.HasFlag("stdio");
-	if( !fileFlag && !stdioFlag )
+
+	if( argFilePaths.IsEmpty() && !fileFlag && !stdioFlag )
 	{
-		// Display usage
-		String version = "PngOptimizerCL 2.5-beta";
-#if defined(_M_X64)
-		version = version + String(" (x64)");
-#elif defined(_M_IX86)  
-		version = version + String(" (x86)");
-#endif
-		Console::WriteLine(version + " \xA9 2002/2016 Hadrien Nilsson - psydk.org");
-		Console::WriteLine("Converts GIF, BMP and TGA files to optimized PNG files.");
-		Console::WriteLine("Optimizes and cleans PNG files.");
-		Console::WriteLine("");
-		Console::WriteLine("Usage:  pngoptimizercl (-file:\"yourfile.png\" | -stdio) [-recurs]");
-		POEngineSettings::WriteArgvUsage("  ");
-		Console::WriteLine("");
-		Console::WriteLine("-file option specifies a file to be read from and written to");
-		Console::WriteLine("-stdio option specifies that the input will be read from stdin and the");
-		Console::WriteLine("result will be written to stdout.");
-		Console::WriteLine("-recurs is valid only if the -file option is specified.");
-		Console::WriteLine("");
-		Console::WriteLine("Values enclosed with [] are optional.");
-		Console::WriteLine("Chunk option meaning: R=Remove, K=Keep, F=Force. 0|1|2 can be used too.");
-		Console::WriteLine("");
-		Console::WriteLine("Input examples:");
-		Console::WriteLine("Handle a specific file:");
-		Console::WriteLine("  pngoptimizercl -file:\"icon.png\"");
-		Console::WriteLine("Handle specific file types in the current directory:");
-		Console::WriteLine("  pngoptimizercl -file:\"*.png|*.bmp\"");
-		Console::WriteLine("Handle any supported file in the current directory:");
-		Console::WriteLine("  pngoptimizercl -file:\"*\"");
-		Console::WriteLine("Handle specific file types in the current directory (recursive):");
-		Console::WriteLine("  pngoptimizercl -file:\".png|*.bmp\" -recurs");
-		Console::WriteLine("Handle a specific directory (recursive):");
-		Console::WriteLine("  pngoptimizercl -file:\"gfx/\"");
-		Console::WriteLine("Handle a file written to stdin and capture stdout to make a new file:");
-		Console::WriteLine("  pngoptimizercl -stdio < icon.png > icon2.png");
-		Console::WriteLine("");
-	
+		// No input, display help
+		WriteHelp();
+
 		// For Windows when we just double-click on the executable file from the file explorer
 		if( Console::IsOwned() )
 		{
@@ -140,8 +169,18 @@ int main(int argc, char** argv)
 	engine.m_settings.LoadFromArgv(ap);
 
 	//////////////////////////////////////////////////////////////////
-	if( fileFlag )
+	if( !argFilePaths.IsEmpty() )
 	{
+		// Explicit file paths
+		if( !engine.OptimizeFiles(argFilePaths) )
+		{
+			Console::Stderr().WriteLine(engine.GetLastErrorString());
+			return 1;
+		}
+	}
+	else if( fileFlag )
+	{
+		// -file
 		String filePath = ap.GetFlagString("file");
 		String dir, fileName;
 		FilePath::Split(filePath, dir, fileName);

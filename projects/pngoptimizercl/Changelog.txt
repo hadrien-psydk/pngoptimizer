@@ -3,10 +3,16 @@
 Note: for engine optimization, see PngOptimizer Changelog instead.
 
 -----------------
-2016-09-05 (2.5-beta)
+2016-09-25 (2.5-beta)
 
 - new: option to change frame rate of animated pngs
 - new: -stdio option to read from stdin and write to stdout
+- new: can pass directly one or more files without the -file:"" option
+- new: flags can be written with a double-dash, like "--stdio"
+- new: support of "--" argument to separate flags from file path
+- new: support of "--help" and "--version"
+
+- change: removed support of flags starting with a slash
 
 -----------------
 2016-07-24 (2.4.3)

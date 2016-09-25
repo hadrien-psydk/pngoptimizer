@@ -91,7 +91,7 @@ welcome_msg:
 
 build_deps:
 ifneq ($(PROJECT_TYPE), lib)
-	@for dir in $(SDK_DIRS); do $(MAKE) --no-print-directory -C $$dir; done
+	@for dir in $(SDK_DIRS); do $(MAKE) --no-print-directory -C $$dir || exit; done
 endif
 
 build: welcome_msg $(OUTDIR) $(SUBDIRS) $(OUTPATH)
@@ -148,6 +148,10 @@ rebuild: clean all
 
 run: all
 	$(OUTPATH)
+
+install: all
+	@cp $(OUTPATH) /usr/bin/
+	@echo installed
 
 # -----------------------------------------------------------------------------
 # Unit test code coverage

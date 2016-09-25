@@ -13,4 +13,10 @@
 
 using namespace chustd;
 
+inline std::ostream& operator<<(std::ostream& stream, const String& str)
+{
+    char tmp[200];
+    str.ToUtf8Z(tmp);
+    return stream << tmp;
+}
 #endif

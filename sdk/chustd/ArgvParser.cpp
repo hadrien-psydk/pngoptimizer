@@ -57,9 +57,9 @@ int ArgvParser::GetFlagIndex(const String& flagName) const
 	const int argCount = m_args.GetSize();
 	for(int i = 0; i < argCount; ++i)
 	{
-		if( m_args[i].m_flag )
+		if( m_args[i].flag )
 		{
-			String strName = m_args[i].m_name.ToLowerCase();
+			String strName = m_args[i].name.ToLowerCase();
 
 			if( strName == strWanted )
 				return i;
@@ -86,7 +86,7 @@ String ArgvParser::GetFlagString(const String& flagName) const
 	{
 		return String();
 	}
-	return m_args[index].m_flagString;
+	return m_args[index].flagString;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -98,99 +98,141 @@ int ArgvParser::GetFlagInt(const String& flagName) const
 		return 0;
 	}
 	int value = 0;
-	m_args[index].m_flagString.ToInt(value);
+	m_args[index].flagString.ToInt(value);
 	return value;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// Builds the m_args array from the list of command line arguments.
+// Stop interpereting flags when "--" is found.
 void ArgvParser::ConvertToArgs(const StringArray& astrArgs)
 {
+	bool doubleDashFound = false;
 	const int argCount = astrArgs.GetSize();
 	for(int iArg = 0; iArg < argCount; ++iArg)
 	{
 		const String& strArg = astrArgs[iArg];
 		const int argLength = strArg.GetLength();
 
-		if( argLength > 0 )
+		if( argLength == 0 )
 		{
-			int index = m_args.Add();
-			Arg& arg = m_args[index];
+			// Ignore empty arguments
+			continue;
+		}
 
-			wchar cFirst = strArg.GetAt(0);
-			if( cFirst == '/' || cFirst == '-' )
+		if( strArg == "--" )
+		{
+			doubleDashFound = true;
+			// Do not store the double dash in the list
+			continue;
+		}
+
+		int index = m_args.Add();
+		Arg& arg = m_args[index];
+
+		wchar cFirst = strArg.GetAt(0);
+
+		if( !doubleDashFound && cFirst == '-' )
+		{
+			StringBuilder sbName;
+			StringBuilder sbFlagString;
+
+			// We've got an argument
+			arg.flag = true;
+
+			// Cut the argument
+			enum SearchMode
 			{
-				StringBuilder sbName;
-				StringBuilder sbFlagString;
+				SearchSecondDash,
+				SearchFlagName,
+				SearchPreFlagString,
+				SearchFlagStringNoDQ,
+				SearchFlagStringDQ
+			};
+			SearchMode searchMode = SearchSecondDash; // Accept "--flag" formatting
 
-				// We've got an argument
-				arg.m_flag = true;
+			for(int i = 1; i < argLength; ++i)
+			{
+				wchar c = strArg.GetAt(i);
 
-				// Cut the argument
-				enum SearchMode { searchFlagName, searchPreFlagString, searchFlagStringNoDQ, searchFlagStringDQ };
-				SearchMode searchMode = searchFlagName;
-
-				for(int i = 1; i < argLength; ++i)
+				if( searchMode == SearchSecondDash )
 				{
-					wchar c = strArg.GetAt(i);
-
-					if( searchMode == searchFlagName )
+					if( c != '-' )
 					{
-						if( c == ':' )
-						{
-							searchMode = searchPreFlagString;
-						}
-						else if( c == '"' )
-						{
-							searchMode = searchFlagStringDQ;
-						}
-						else
-						{
-							sbName += c;
-						}
+						sbName += c;
+					}
+					searchMode = SearchFlagName;
+				}
+				else if( searchMode == SearchFlagName )
+				{
+					if( c == ':' )
+					{
+						searchMode = SearchPreFlagString;
+					}
+					else if( c == '"' )
+					{
+						searchMode = SearchFlagStringDQ;
 					}
 					else
 					{
-						if( searchMode == searchFlagStringNoDQ )
-						{
-							sbFlagString += c;
-						}
-						else if( searchMode == searchFlagStringDQ )
-						{
-							if( c == '"' )
-							{
-								// We reached the end of this argument
-								break;
-							}
-							else
-							{
-								sbFlagString += c;
-							}
-						}
-						else if( searchMode == searchPreFlagString )
-						{
-							if( c == '"' )
-							{
-								searchMode = searchFlagStringDQ;
-							}
-							else
-							{
-								// The flag string is not in double-quotes
-								sbFlagString += c;
-								searchMode = searchFlagStringNoDQ;
-							}
-						}
+						sbName += c;
 					}
 				}
-				arg.m_name = sbName.ToString();
-				arg.m_flagString = sbFlagString.ToString();
+				else if( searchMode == SearchFlagStringNoDQ )
+				{
+					sbFlagString += c;
+				}
+				else if( searchMode == SearchFlagStringDQ )
+				{
+					if( c == '"' )
+					{
+						// We reached the end of this argument
+						break;
+					}
+					else
+					{
+						sbFlagString += c;
+					}
+				}
+				else if( searchMode == SearchPreFlagString )
+				{
+					if( c == '"' )
+					{
+						searchMode = SearchFlagStringDQ;
+					}
+					else
+					{
+						// The flag string is not in double-quotes
+						sbFlagString += c;
+						searchMode = SearchFlagStringNoDQ;
+					}
+				}
 			}
-			else
-			{
-				arg.m_flag = false;
-				arg.m_name = strArg;
-			}
+			arg.name = sbName.ToString();
+			arg.flagString = sbFlagString.ToString();
+		}
+		else
+		{
+			// Regular argument
+			arg.flag = false;
+			arg.name = strArg;
 		}
 	}
+}
+
+///////////////////////////////////////////////////////////////////////////////
+StringArray ArgvParser::GetRegularArgs() const
+{
+	StringArray ret;
+	foreach(m_args, i)
+	{
+		const Arg& arg = m_args[i];
+		if( !arg.flag )
+		{
+			ret.Add(arg.name);
+		}
+	}
+	return ret;
 }
 
 /////////////////////
