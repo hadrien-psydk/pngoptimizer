@@ -150,8 +150,26 @@ run: all
 	$(OUTPATH)
 
 install: all
-	@cp $(OUTPATH) /usr/bin/
+	cp $(OUTPATH) /usr/bin/
+ifeq ($(EXT_DEPS),gtk)
+	cp gtk/logo32.png              /usr/share/icons/hicolor/32x32/apps/$(PROJECT_NAME).png
+	cp gtk/logo64.png              /usr/share/icons/hicolor/64x64/apps/$(PROJECT_NAME).png
+	cp gtk/logo128.png             /usr/share/icons/hicolor/128x128/apps/$(PROJECT_NAME).png
+	gtk-update-icon-cache          /usr/share/icons/hicolor
+	cp gtk/$(PROJECT_NAME).desktop /usr/share/applications/
+endif
 	@echo installed
+
+.PHONY: uninstall
+uninstall:
+	rm /usr/bin/$(PROJECT_NAME)
+ifeq ($(EXT_DEPS),gtk)
+	rm /usr/share/icons/hicolor/32x32/apps/$(PROJECT_NAME).png
+	rm /usr/share/icons/hicolor/64x64/apps/$(PROJECT_NAME).png
+	rm /usr/share/icons/hicolor/128x128/apps/$(PROJECT_NAME).png
+	rm /usr/share/applications/$(PROJECT_NAME).desktop
+endif
+	@echo uninstalled
 
 # -----------------------------------------------------------------------------
 # Unit test code coverage

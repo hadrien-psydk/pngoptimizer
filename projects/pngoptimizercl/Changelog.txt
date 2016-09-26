@@ -3,7 +3,7 @@
 Note: for engine optimization, see PngOptimizer Changelog instead.
 
 -----------------
-2016-09-25 (2.5-beta)
+2016-09-26 (2.5)
 
 - new: option to change frame rate of animated pngs
 - new: -stdio option to read from stdin and write to stdout

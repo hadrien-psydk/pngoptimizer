@@ -1,7 +1,7 @@
 == PngOptimizer Changelog ==
 
 -----------------
-2016-08-09 (2.5-beta)
+2016-09-26 (2.5)
 
 - misc: update code for GTK+ version
 - misc: reorganize Windows code for multiplatform support
@@ -137,7 +137,7 @@ Private release by Paul Higginbottom
 -----------------
 2006-01-09 (1.5.4 aka 1.54)
 
-- uneeded bKGD chunk inserted when the « Keep background color » option was set.
+- uneeded bKGD chunk inserted when the ï¿½ Keep background color ï¿½ option was set.
 
 -----------------
 2006-01-07 (1.5.3 aka 1.53)
@@ -254,7 +254,7 @@ Private release by Paul Higginbottom
   .:: More Info
 
   It means you can select several files in the file explorer and drag them to the PngOptimizer 
-  executable file. You can also create a PngOptimizer shortcut into your « SendTo » folder. Then you
+  executable file. You can also create a PngOptimizer shortcut into your ï¿½ SendTo ï¿½ folder. Then you
   select several files in the file explorer and send them to PngOptimizer.
 
 - A new icon provided by Guillaume Schaeffer.

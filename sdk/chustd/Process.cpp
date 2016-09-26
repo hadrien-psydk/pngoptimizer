@@ -212,7 +212,7 @@ static String GetConfigPath(const String& appName, bool forWrite)
 		{
 			if( forWrite )
 			{
-				// First time PngOptimizer is run, create profile directory
+				// First time the application is run, create profile directory
 				if( !Directory::Create(appConfigDir) )
 				{
 					return "";

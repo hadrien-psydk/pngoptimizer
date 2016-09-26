@@ -14,7 +14,7 @@ static void OnDragDataReceived(GtkWidget*, GdkDragContext* context,
     GtkSelectionData* seldata, guint /*info*/, guint time,
     gpointer userData)
 {
-	Console::WriteLine("drop");
+	//Console::WriteLine("drop");
 
 	StringArray arg;
 
@@ -55,10 +55,11 @@ static void OnWindowStateEvent(GtkWidget*, GdkEvent* event, gpointer /*userData*
 	{
 		return;
 	}
-
+/*
 	printf("wse %08x %08x\n",
 		event->window_state.changed_mask,
 		event->window_state.new_window_state);
+		*/
 /*
 	if( event->window_state.changed_mask & GDK_WINDOW_STATE_ABOVE )
 	{
@@ -69,12 +70,11 @@ static void OnWindowStateEvent(GtkWidget*, GdkEvent* event, gpointer /*userData*
 	}*/
 }
 
-static void OnDeleteEvent(GtkWidget* widget, GdkEvent*, gpointer)
+static void OnDeleteEvent(GtkWidget* /*widget*/, GdkEvent*, gpointer)
 {
-	GdkWindow* gw = gtk_widget_get_window(widget);
-	GdkWindowState state = gdk_window_get_state(gw);
-	
-	printf("delete-event %08x\n", (unsigned int)(state));
+	//GdkWindow* gw = gtk_widget_get_window(widget);
+	//GdkWindowState state = gdk_window_get_state(gw);
+	//printf("delete-event %08x\n", (unsigned int)(state));
 
 	gtk_main_quit();
 }

@@ -67,7 +67,7 @@ public:
 
 static void WriteVersion()
 {
-	String version = "PngOptimizerCL 2.5-beta";
+	String version = "PngOptimizerCL 2.5";
 #if defined(_M_X64)
 	version = version + String(" (x64)");
 #elif defined(_M_IX86)  

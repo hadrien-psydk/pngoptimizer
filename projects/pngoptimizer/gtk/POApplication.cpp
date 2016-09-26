@@ -22,11 +22,13 @@ POApplication::POApplication()
 ///////////////////////////////////////////////////////////////////////////////
 void POApplication::OnFilesDropped(const StringArray& filePaths)
 {
+	/*
 	Console::WriteLine("po drop");
 	foreach(filePaths, i)
 	{
 		Console::WriteLine(filePaths[i]);
 	}
+	*/
 	m_lock.Enter();
 	m_filePaths = filePaths;
 	m_lock.Leave();

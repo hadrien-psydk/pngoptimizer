@@ -155,10 +155,9 @@ bool TraceCtl::OnDraw(GtkWidget* widget, cairo_t* cr)
 	//int marginLeft = 0;
 	int marginTop = cfe.ascent;
 	int lineHeight = cfe.height;
-	auto vadj = gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(m_handle));
-	double val = 0.0;
-	val = gtk_adjustment_get_value(vadj);
 	
+	//auto vadj = gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(m_handle));
+	//double val = gtk_adjustment_get_value(vadj);
 	//gdk_cairo_set_source_rgba(cr, &gc);
 	//cairo_move_to(cr, 0, 45);
 	//char tmp[100];

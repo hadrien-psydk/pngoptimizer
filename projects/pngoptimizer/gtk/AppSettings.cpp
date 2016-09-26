@@ -7,7 +7,7 @@
 #include "stdafx.h"
 #include "AppSettings.h"
 
-static const char k_appName[] = "PngOptimizer";
+static const char k_appName[] = "pngoptimizer"; // All lowercase on Linux
 
 static const char k_szFileComment1[] = "PngOptimizer settings";
 static const char k_szFileComment2[] = "This file is encoded in UTF-8";

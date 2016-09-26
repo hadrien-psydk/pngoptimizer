@@ -19,7 +19,7 @@
 
 Platform  : Windows/Linux - x86/x64
 Licence   : GNU GPL 2
-Version   : 2.5-beta
+Version   : 2.5
 Home page : http://pngoptimizer.org
 Contact   : pngoptimizer@psydk.org
 

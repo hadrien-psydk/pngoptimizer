@@ -1,5 +1,5 @@
 #!/bin/bash
-POVER=2.5-beta
+POVER=2.5
 
 # Set current directory to the one containing this script
 cd "$(dirname "$0")"
@@ -32,6 +32,14 @@ function HandleSuccess
 }
 
 ###############################################################################
+# PngOptimizer
+
+cp -v "../../projects/pngoptimizer/linux-release/pngoptimizer"  "linux/pngoptimizer/" || HandleFail
+cp -v "../../projects/pngoptimizer/Readme.txt"                  "linux/pngoptimizer/" || HandleFail
+cp -v "../../projects/pngoptimizer/License.txt"                 "linux/pngoptimizer/" || HandleFail
+cp -v "../../projects/pngoptimizer/Changelog.txt"               "linux/pngoptimizer/" || HandleFail
+
+###############################################################################
 # PngOptimizerCL
 
 cp -v "../../projects/pngoptimizercl/linux-release/pngoptimizercl"  "linux/pngoptimizercl/" || HandleFail
@@ -62,3 +70,4 @@ popd
 tput sgr0
 
 cp -v "/tmp/pngotmp/$TGZFILE" "." || HandleFail
+

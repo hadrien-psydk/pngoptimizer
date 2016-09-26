@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=PngOptimizer
+Type=Application
+Version=2.5
+GenericName=PNG optimizer/converter
+Comment=Optimize PNG files, convert other lossless image formats to PNG
+MimeType=image/png;image/gif;image/bmp;image/tga
+Exec=pngoptimizer %F
+Icon=pngoptimizer

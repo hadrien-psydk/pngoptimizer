@@ -8,7 +8,7 @@
 
 // Version
 #define PNGO_APPNAME   "PngOptimizer"
-#define PNGO_VERSION   "2.5-beta"
+#define PNGO_VERSION   "2.5"
 #define PNGO_WEBSITE   "http://pngoptimizer.org"
 #define PNGO_COPYRIGHT "Copyright \xC2\xA9 2002/2016 Hadrien Nilsson"
 
