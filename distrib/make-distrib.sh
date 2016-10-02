@@ -4,6 +4,9 @@ POVER=2.5
 # Set current directory to the one containing this script
 cd "$(dirname "$0")"
 
+# Create the directory that will contain the archives to be put on the web site
+mkdir -p download
+
 function HandleFail
 {
 	tput setaf 1
@@ -55,7 +58,7 @@ tput setaf 3
 echo "Creating $PODEBDIR.deb..."
 dpkg-deb --build $PODEBDIR
 # Move the .deb in the parent directory
-mv -v $PODEBDIR.deb ./
+mv -v $PODEBDIR.deb ./download
 tput sgr0
 
 ###############################################################################
@@ -80,6 +83,7 @@ cd tgz
 echo "Creating $TGZFILE..."
 tar -pczvf "$TGZFILE" "pngoptimizercl" || HandleFail
 cd ..
+mv -v tgz/$TGZFILE ./download
 tput sgr0
 
 
