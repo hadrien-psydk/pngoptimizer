@@ -38,10 +38,14 @@ rm -rf $PODEB
 mkdir -p $PODEB
 mkdir -p $PODEB/DEBIAN
 mkdir -p $PODEB/usr/bin
+mkdir -p $PODEB/usr/share/icons/hicolor/16x16/apps
+mkdir -p $PODEB/usr/share/icons/hicolor/48x48/apps
 mkdir -p $PODEB/usr/share/icons/hicolor/128x128/apps
 mkdir -p $PODEB/usr/share/applications
 
 cp -v "$POSRC/linux-release/pngoptimizer" "$PODEB/usr/bin/" || HandleFail
+cp -v "$POSRC/gtk/logo16.png"             "$PODEB/usr/share/icons/hicolor/16x16/apps/pngoptimizer.png" || HandleFail
+cp -v "$POSRC/gtk/logo48.png"             "$PODEB/usr/share/icons/hicolor/48x48/apps/pngoptimizer.png" || HandleFail
 cp -v "$POSRC/gtk/logo128.png"            "$PODEB/usr/share/icons/hicolor/128x128/apps/pngoptimizer.png" || HandleFail
 cp -v "$POSRC/gtk/pngoptimizer.desktop"   "$PODEB/usr/share/applications/" || HandleFail
 
@@ -50,10 +54,10 @@ SIZE=$(du -sk $PODEB | cut -f 1)
 cat > "$PODEB/DEBIAN/control" <<EOL
 Package: pngoptimizer
 Version: $POVER-1
-Section: base
-Priority: optional
 Architecture: amd64
 Maintainer: Hadrien Nilsson <pngoptimizer@psydk.org>
+Section: graphics
+Priority: optional
 Installed-Size: $SIZE
 Homepage: http://pngoptimizer.org
 Description: PngOptimizer
