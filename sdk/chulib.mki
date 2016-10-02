@@ -7,7 +7,8 @@
 # SDK_DEPS        needed library names in SDK/
 # EXT_DEPS        external libraries, like gtk got GTK+
 # INCDIRS         additional include directories
-#
+# DESTDIR         optional directory when installing/uninstalling
+
 # Command line options:
 # (default)       builds all with debug configuration
 # CONFIG=release  builds all with release configuration
@@ -16,6 +17,8 @@
 # rebuild         cleans then builds
 # run             runs the application
 # cov             creates coverage files. make CONFIG=coverage should have been called
+# install         install the application
+# uninstall       uninstall the application
 
 INCDIRS += ../../sdk
 CONFIG ?= debug
@@ -150,24 +153,48 @@ run: all
 	$(OUTPATH)
 
 install: all
-	cp $(OUTPATH) /usr/bin/
-ifeq ($(EXT_DEPS),gtk)
-	cp gtk/logo32.png              /usr/share/icons/hicolor/32x32/apps/$(PROJECT_NAME).png
-	cp gtk/logo64.png              /usr/share/icons/hicolor/64x64/apps/$(PROJECT_NAME).png
-	cp gtk/logo128.png             /usr/share/icons/hicolor/128x128/apps/$(PROJECT_NAME).png
-	gtk-update-icon-cache          /usr/share/icons/hicolor
-	cp gtk/$(PROJECT_NAME).desktop /usr/share/applications/
+# We only create the directory tree if we are installing for a package
+ifneq ($(DESTDIR),)
+	mkdir -p $(DESTDIR)/usr/bin
+	mkdir -p $(DESTDIR)/usr/share/icons/hicolor/16x16/apps
+	mkdir -p $(DESTDIR)/usr/share/icons/hicolor/48x48/apps
+	mkdir -p $(DESTDIR)/usr/share/icons/hicolor/128x128/apps
+	mkdir -p $(DESTDIR)/usr/share/applications
+	mkdir -p $(DESTDIR)/usr/share/doc
 endif
+
+	cp $(OUTPATH) $(DESTDIR)/usr/bin/
+
+ifeq ($(EXT_DEPS),gtk)
+	cp gtk/logo16.png              $(DESTDIR)/usr/share/icons/hicolor/16x16/apps/$(PROJECT_NAME).png
+	cp gtk/logo48.png              $(DESTDIR)/usr/share/icons/hicolor/48x48/apps/$(PROJECT_NAME).png
+	cp gtk/logo128.png             $(DESTDIR)/usr/share/icons/hicolor/128x128/apps/$(PROJECT_NAME).png
+	cp gtk/$(PROJECT_NAME).desktop $(DESTDIR)/usr/share/applications/
+
+# We only refresh the system icon cache when actually installing in the system
+ifeq ($(DESTDIR),)
+	@echo updating icon cache...
+	gtk-update-icon-cache          $(DESTDIR)/usr/share/icons/hicolor
+endif
+endif
+
+# Documentation
+	mkdir -p $(DESTDIR)/usr/share/doc/$(PROJECT_NAME)
+	cp Readme.txt   $(DESTDIR)/usr/share/doc/$(PROJECT_NAME)
+	cp Changelog.txt   $(DESTDIR)/usr/share/doc/$(PROJECT_NAME)
+	cp License.txt   $(DESTDIR)/usr/share/doc/$(PROJECT_NAME)
+
 	@echo installed
 
 .PHONY: uninstall
 uninstall:
-	rm /usr/bin/$(PROJECT_NAME)
+	rm $(DESTDIR)/usr/bin/$(PROJECT_NAME)
 ifeq ($(EXT_DEPS),gtk)
-	rm /usr/share/icons/hicolor/32x32/apps/$(PROJECT_NAME).png
-	rm /usr/share/icons/hicolor/64x64/apps/$(PROJECT_NAME).png
-	rm /usr/share/icons/hicolor/128x128/apps/$(PROJECT_NAME).png
-	rm /usr/share/applications/$(PROJECT_NAME).desktop
+	rm $(DESTDIR)/usr/share/icons/hicolor/16x16/apps/$(PROJECT_NAME).png
+	rm $(DESTDIR)/usr/share/icons/hicolor/48x48/apps/$(PROJECT_NAME).png
+	rm $(DESTDIR)/usr/share/icons/hicolor/128x128/apps/$(PROJECT_NAME).png
+	rm $(DESTDIR)/usr/share/applications/$(PROJECT_NAME).desktop
+	rm -rf $(DESTDIR)/usr/share/doc/$(PROJECT_NAME)
 endif
 	@echo uninstalled
 

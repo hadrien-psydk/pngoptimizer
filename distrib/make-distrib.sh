@@ -3,9 +3,6 @@ POVER=2.5
 
 # Set current directory to the one containing this script
 cd "$(dirname "$0")"
-mkdir -p pngoptimizer-$POVER
-cd pngoptimizer-$POVER || HandleFail
-echo $PWD
 
 function HandleFail
 {
@@ -29,29 +26,19 @@ function HandleSuccess
 
 ###############################################################################
 # PngOptimizer
-echo "========== Packaging PngOptimizer =========="
-make -C ../../projects/pngoptimizer/ CONFIG=release
+echo -e "\e[36m========== Packaging PngOptimizer ==========\e[0m"
+make -C ../projects/pngoptimizer/ CONFIG=release
 
-POSRC=../../projects/pngoptimizer
-PODEB=deb/pngoptimizer_$POVER-1_amd64
-rm -rf $PODEB
-mkdir -p $PODEB
-mkdir -p $PODEB/DEBIAN
-mkdir -p $PODEB/usr/bin
-mkdir -p $PODEB/usr/share/icons/hicolor/16x16/apps
-mkdir -p $PODEB/usr/share/icons/hicolor/48x48/apps
-mkdir -p $PODEB/usr/share/icons/hicolor/128x128/apps
-mkdir -p $PODEB/usr/share/applications
+PODEBDIR=deb/pngoptimizer_$POVER-1_amd64
+rm -rf $PODEBDIR
+mkdir -p $PODEBDIR
+mkdir -p $PODEBDIR/DEBIAN
 
-cp -v "$POSRC/linux-release/pngoptimizer" "$PODEB/usr/bin/" || HandleFail
-cp -v "$POSRC/gtk/logo16.png"             "$PODEB/usr/share/icons/hicolor/16x16/apps/pngoptimizer.png" || HandleFail
-cp -v "$POSRC/gtk/logo48.png"             "$PODEB/usr/share/icons/hicolor/48x48/apps/pngoptimizer.png" || HandleFail
-cp -v "$POSRC/gtk/logo128.png"            "$PODEB/usr/share/icons/hicolor/128x128/apps/pngoptimizer.png" || HandleFail
-cp -v "$POSRC/gtk/pngoptimizer.desktop"   "$PODEB/usr/share/applications/" || HandleFail
+make -C ../projects/pngoptimizer/ CONFIG=release DESTDIR=../../distrib/$PODEBDIR install
 
-SIZE=$(du -sk $PODEB | cut -f 1)
+SIZE=$(du -sk $PODEBDIR | cut -f 1)
 
-cat > "$PODEB/DEBIAN/control" <<EOL
+cat > "$PODEBDIR/DEBIAN/control" <<EOL
 Package: pngoptimizer
 Version: $POVER-1
 Architecture: amd64
@@ -64,43 +51,35 @@ Description: PngOptimizer
  Optimize PNGs and convert other lossless formats to PNG
 EOL
 
-dpkg-deb --build $PODEB
+tput setaf 3
+echo "Creating $PODEBDIR.deb..."
+dpkg-deb --build $PODEBDIR
 # Move the .deb in the parent directory
-mv -v $PODEB.deb ./
+mv -v $PODEBDIR.deb ./
+tput sgr0
 
 ###############################################################################
 # PngOptimizerCL
 echo ""
-echo "========== Packaging PngOptimizerCL =========="
-make -C ../../projects/pngoptimizercl/ CONFIG=release
+echo -e "\e[36m========== Packaging PngOptimizerCL ==========\e[0m"
+make -C ../projects/pngoptimizercl/ CONFIG=release
 
-mkdir -p linux/pngoptimizercl
-cp -v "../../projects/pngoptimizercl/linux-release/pngoptimizercl"  "linux/pngoptimizercl/" || HandleFail
-cp -v "../../projects/pngoptimizercl/Readme.txt"                    "linux/pngoptimizercl/" || HandleFail
-cp -v "../../projects/pngoptimizercl/License.txt"                   "linux/pngoptimizercl/" || HandleFail
-cp -v "../../projects/pngoptimizercl/Changelog.txt"                 "linux/pngoptimizercl/" || HandleFail
+POCLDIR=tgz/pngoptimizercl
+rm -rf $POCLDIR
+mkdir -p $POCLDIR
 
-###############################################################################
-# Create PngOptimizerCL archive.
-# We first need to fix file permissions that are not handled by
-# the NTFS partition.
-# To do that we copy the files to /tmp and change the permissions there
-# before creating the tgz archive
+cp -v "../projects/pngoptimizercl/linux-release/pngoptimizercl"  "$POCLDIR" || HandleFail
+cp -v "../projects/pngoptimizercl/Readme.txt"                    "$POCLDIR" || HandleFail
+cp -v "../projects/pngoptimizercl/License.txt"                   "$POCLDIR" || HandleFail
+cp -v "../projects/pngoptimizercl/Changelog.txt"                 "$POCLDIR" || HandleFail
+
 TGZFILE="pngoptimizercl-$POVER-linux-x64.tgz"
 
 tput setaf 3
-pushd .
-rm -rf /tmp/pngotmp
-mkdir /tmp/pngotmp || HandleFail
-cp -avr linux/pngoptimizercl /tmp/pngotmp || HandleFail
-cd /tmp/pngotmp/
-chmod 0755 pngoptimizercl
-chmod 0644 pngoptimizercl/*
-chmod 0755 pngoptimizercl/pngoptimizercl
+cd tgz
 echo "Creating $TGZFILE..."
 tar -pczvf "$TGZFILE" "pngoptimizercl" || HandleFail
-popd
+cd ..
 tput sgr0
 
-cp -v "/tmp/pngotmp/$TGZFILE" "." || HandleFail
 
