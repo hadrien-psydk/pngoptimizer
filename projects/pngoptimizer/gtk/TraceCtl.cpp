@@ -21,7 +21,7 @@ bool TraceCtl::Create(Window* parent, const String& welcomeMsg)
 	m_welcomeMsg = welcomeMsg;
 
 	auto parentHandle = parent->GetHandle();
-	auto scrolledWindow = gtk_scrolled_window_new(NULL, NULL);
+	auto scrolledWindow = gtk_scrolled_window_new(nullptr, nullptr);
 	gtk_container_add(GTK_CONTAINER(parentHandle), scrolledWindow);
 
     m_drawingArea = gtk_drawing_area_new();
@@ -43,8 +43,7 @@ gboolean TraceCtl::OnDrawStatic(GtkWidget* widget, cairo_t* cr, gpointer data)
 	return that->OnDraw(widget, cr);
 }
 
-int TraceCtl::DrawLine(const TextLine& line, cairo_t* cr, bool computeOnly,
-                       int y)
+int TraceCtl::DrawLine(const TextLine& line, cairo_t* cr, bool computeOnly, int y)
 {
 	cairo_text_extents_t extents;
 	GdkRGBA gc;
@@ -113,6 +112,66 @@ void TraceCtl::SyncDocumentMetrics(cairo_t* cr, int lineHeight)
 	}
 }
 
+// Make the color components between 0 and 1
+static inline void fixColor(GdkRGBA& col)
+{
+	if( col.red < 0.0 ) { col.red = 0.0; }
+	if( col.red > 1.0 ) { col.red = 1.0; }
+	if( col.green < 0.0 ) { col.green = 0.0; }
+	if( col.green > 1.0 ) { col.green = 1.0; }
+	if( col.blue < 0.0 ) { col.blue = 0.0; }
+	if( col.blue > 1.0 ) { col.blue = 1.0; }
+}
+
+static double getScreenResolution(GtkWidget* widget)
+{
+	const double defaultResolution = 96.0;
+	GdkScreen* screen = gtk_widget_get_screen(widget);
+	if( !screen )
+	{
+		return defaultResolution;
+	}
+	double resolution = gdk_screen_get_resolution(screen);
+	if( resolution < 0 )
+	{
+		return defaultResolution;
+	}
+	return resolution;
+}
+
+struct LineDrawingSettings
+{
+	int fontSize;
+	int lineSpacing;
+};
+// Gets the cairo compatible font size from the GTK current style font size. 
+// An official GTK function would be nice instead of doing this manually.
+static LineDrawingSettings getLineDrawingSettings(GtkWidget* widget)
+{
+	double resolution = getScreenResolution(widget);
+
+	GtkStyleContext* styleContext = gtk_widget_get_style_context(widget);
+
+	double fontSize;
+	gtk_style_context_get(styleContext,
+		GTK_STATE_FLAG_NORMAL,
+		"font-size", &fontSize,
+		 nullptr
+		 );
+	fontSize = (fontSize * resolution) / 72.0;
+	
+	// 0.2 is arbitrary for good looking
+	double lineSpacing = (fontSize * 0.2) + 0.5;
+	fontSize += 0.5;
+
+	LineDrawingSettings ret;
+	ret.fontSize = static_cast<int>(fontSize);
+	ret.lineSpacing = static_cast<int>(lineSpacing);
+
+	//Console::WriteLine("line spacing:" + String::FromInt(ret.lineSpacing));
+	return ret;
+}
+
 bool TraceCtl::OnDraw(GtkWidget* widget, cairo_t* cr)
 {
 	// Drawing text seems to be very slow, check times
@@ -125,18 +184,28 @@ bool TraceCtl::OnDraw(GtkWidget* widget, cairo_t* cr)
 	guint width = gtk_widget_get_allocated_width(widget);
 	guint height = gtk_widget_get_allocated_height(widget);
 
-	cairo_set_font_size(cr, 13);
-	cairo_text_extents_t extents;
+	auto lds = getLineDrawingSettings(widget);
+	cairo_set_font_size(cr, lds.fontSize);
 
 	if( m_lines.IsEmpty() )
 	{
-		Color col(0, 0, 200);
-		gc.red = double(col.r) / 255.0;
-		gc.green = double(col.g) / 255.0;
-		gc.blue = double(col.b) / 255.0;
+		// Print the welcome message
+
+		GdkRGBA styleColor;
+		// Look up the default text color in the theme
+		GtkStyleContext* styleContext = gtk_widget_get_style_context(widget);
+		gtk_style_context_get_color(styleContext, GTK_STATE_FLAG_NORMAL, &styleColor);
+		
+		// Make the color blueish
+		styleColor.red -= 0.1;
+		styleColor.green -= 0.1;
+		styleColor.blue += 0.1;
+		gc = styleColor;
 		gdk_cairo_set_source_rgba(cr, &gc);
 
 		m_welcomeMsg.ToUtf8Z(sz);
+
+		cairo_text_extents_t extents;
 		cairo_text_extents(cr, sz, &extents);
 
 		cairo_move_to(cr, width/2 - extents.width/2, height/2);
@@ -153,9 +222,12 @@ bool TraceCtl::OnDraw(GtkWidget* widget, cairo_t* cr)
 	cairo_font_extents(cr, &cfe);
 
 	//int marginLeft = 0;
-	int marginTop = cfe.ascent;
-	int lineHeight = cfe.height;
+	int marginTop = cfe.ascent + 1; // +1 pixel for a good looking margin
+
+	// Without line spacing the text is too compact
+	int lineHeight = cfe.height + lds.lineSpacing;
 	
+	// For debugging
 	//auto vadj = gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(m_handle));
 	//double val = gtk_adjustment_get_value(vadj);
 	//gdk_cairo_set_source_rgba(cr, &gc);
@@ -179,6 +251,7 @@ bool TraceCtl::OnDraw(GtkWidget* widget, cairo_t* cr)
 	SyncDocumentMetrics(cr, lineHeight);
 	uint64 time3 = System::GetTime64();
 
+	// For debugging
 /*
 	printf("---- times ----\n");
 	printf("%f\n", double(time0)/1000.0);
@@ -278,4 +351,3 @@ void TraceCtl::AddText(const chustd::String& text, Color col)
 
 	gtk_widget_queue_draw(GTK_WIDGET(m_drawingArea));
 }
-
