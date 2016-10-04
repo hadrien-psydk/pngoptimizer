@@ -49,7 +49,7 @@ Maintainer: Hadrien Nilsson <pngoptimizer@psydk.org>
 Section: graphics
 Priority: optional
 Installed-Size: $SIZE
-Homepage: http://pngoptimizer.org
+Homepage: http://psydk.org/pngoptimizer
 Description: PngOptimizer
  Optimize PNGs and convert other lossless formats to PNG
 EOL

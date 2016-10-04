@@ -111,7 +111,7 @@ bool MainWnd::Create(const char* welcomeMsg)
 	//gtk_window_set_keep_above(GTK_WINDOW(window), mwsettings.alwaysOnTop);
 
 	gtk_window_set_title(GTK_WINDOW(window), "PngOptimizer");
-	gtk_window_set_default_size(GTK_WINDOW(window), 482, 300);
+	gtk_window_set_default_size(GTK_WINDOW(window), 580, 300);
 	gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
 
 	GtkTargetEntry targets[] = {
