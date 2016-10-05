@@ -93,7 +93,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../../sdk/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdk/</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>false</ExceptionHandling>
@@ -104,7 +104,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <BrowseInformation>false</BrowseInformation>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <OmitDefaultLibName>false</OmitDefaultLibName>
@@ -141,7 +141,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <BrowseInformation>false</BrowseInformation>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <OmitDefaultLibName>false</OmitDefaultLibName>
@@ -271,9 +271,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\sdk\chustd\chustd.vcxproj">
       <Project>{b652613d-54e8-44dd-aca0-1aa26ea391ef}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\sdk\chuwin32\chuwin32.vcxproj">
-      <Project>{ac7241c5-9d27-4d85-b5cd-2ed4ccf73838}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\sdk\poeng\poeng.vcxproj">
       <Project>{b682613e-54e8-8d8d-acb3-1bb26ea391e2}</Project>

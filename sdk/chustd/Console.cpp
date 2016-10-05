@@ -189,6 +189,10 @@ static void ConsoleWrite(StdFileType ct, const String& str)
 	{
 		handle = GetStdHandle(STD_ERROR_HANDLE);
 	}
+	else
+	{
+		return;
+	}
 
 	DWORD written = 0;
 

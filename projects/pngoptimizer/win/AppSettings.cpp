@@ -30,7 +30,7 @@ static const char k_szWndAlwaysOnTop[] = "AlwaysOnTop";
 /////////////////////////////////////////////////////////////
 bool AppSettings::Read(POEngineSettings& pos, BmpcdSettings* pBs, MainWndSettings* pMws)
 {
-	const int defaultWidth = 482;
+	const int defaultWidth = 520;
 	const int defaultHeight = 300;
 
 	pMws->left = 0;

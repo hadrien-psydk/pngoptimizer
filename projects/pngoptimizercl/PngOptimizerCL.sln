@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Express 2012 for Windows Desktop
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PngOptimizerCL", "PngOptimizerCL.vcxproj", "{BA2C6171-6254-462F-A55C-489DB3A6CCBE}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "chustd", "..\..\sdk\chustd\chustd.vcxproj", "{B652613D-54E8-44DD-ACA0-1AA26EA391EF}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "chuwin32", "..\..\sdk\chuwin32\chuwin32.vcxproj", "{AC7241C5-9D27-4D85-B5CD-2ED4CCF73838}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "poeng", "..\..\sdk\poeng\poeng.vcxproj", "{B682613E-54E8-8D8D-ACB3-1BB26EA391E2}"
 EndProject
@@ -33,14 +33,6 @@ Global
 		{B652613D-54E8-44DD-ACA0-1AA26EA391EF}.Release|Win32.Build.0 = Release|Win32
 		{B652613D-54E8-44DD-ACA0-1AA26EA391EF}.Release|x64.ActiveCfg = Release|x64
 		{B652613D-54E8-44DD-ACA0-1AA26EA391EF}.Release|x64.Build.0 = Release|x64
-		{AC7241C5-9D27-4D85-B5CD-2ED4CCF73838}.Debug|Win32.ActiveCfg = Debug|Win32
-		{AC7241C5-9D27-4D85-B5CD-2ED4CCF73838}.Debug|Win32.Build.0 = Debug|Win32
-		{AC7241C5-9D27-4D85-B5CD-2ED4CCF73838}.Debug|x64.ActiveCfg = Debug|x64
-		{AC7241C5-9D27-4D85-B5CD-2ED4CCF73838}.Debug|x64.Build.0 = Debug|x64
-		{AC7241C5-9D27-4D85-B5CD-2ED4CCF73838}.Release|Win32.ActiveCfg = Release|Win32
-		{AC7241C5-9D27-4D85-B5CD-2ED4CCF73838}.Release|Win32.Build.0 = Release|Win32
-		{AC7241C5-9D27-4D85-B5CD-2ED4CCF73838}.Release|x64.ActiveCfg = Release|x64
-		{AC7241C5-9D27-4D85-B5CD-2ED4CCF73838}.Release|x64.Build.0 = Release|x64
 		{B682613E-54E8-8D8D-ACB3-1BB26EA391E2}.Debug|Win32.ActiveCfg = Debug|Win32
 		{B682613E-54E8-8D8D-ACB3-1BB26EA391E2}.Debug|Win32.Build.0 = Debug|Win32
 		{B682613E-54E8-8D8D-ACB3-1BB26EA391E2}.Debug|x64.ActiveCfg = Debug|x64
