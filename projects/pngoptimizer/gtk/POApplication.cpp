@@ -57,6 +57,8 @@ void POApplication::DoEngineProgressing()
 	m_lock.Leave();
 
 	Color cr = POEngine::ColorFromTextType(progArg.textType);
+
+	// This is a test to pretty format file sizes
 	/*
 	int minWidthEx = 0;
 	int justify = 0;
@@ -78,6 +80,8 @@ void POApplication::OnEngineProgressing(const POEngine::ProgressingArg& arg)
 	m_progArgs.Add(arg);
 	m_lock.Leave();
 
+	// Here we are in the engine thread, we want to update the TraceCtl
+	// from the UI thread
 	g_idle_add(&DoEngineProgressingStatic, this);
 }
 
@@ -168,11 +172,11 @@ bool POApplication::Init(int argc, char** argv)
 	m_mainwnd.FilesDropped.Connect(this, &POApplication::OnFilesDropped);
 	m_engine.Progressing.Connect(this, &POApplication::OnEngineProgressing);
 
-/*
 	// Test TraceCtl
-	for(int i = 0; i < 5; ++i)
+	/*
+	for(int i = 0; i < 10; ++i)
 	{
-		m_mainwnd.AddText("0 onk", Color::Black);
+		m_mainwnd.AddText(String::FromInt(i) + " onk", Color::Black);
 		m_mainwnd.AddText("plop", Color::Red);
 		m_mainwnd.AddText("chabada", Color::Green);
 		m_mainwnd.AddText("chabadaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", Color::Magenta);
@@ -181,7 +185,8 @@ bool POApplication::Init(int argc, char** argv)
 		m_mainwnd.AddText( String(&x, 1), Color(50, 50, 50) );
 		m_mainwnd.AddText("(OK) lorem ipsum doloret truc\n", Color(100, 100, 100));
 	}
-*/
+	*/
+
 	ProcessCmdLineArgs(argc, argv);
 
 	/////////////////////////////////////////////////////////////

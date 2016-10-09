@@ -38,6 +38,8 @@ private:
 		~TextLine();
 	};
 	Array<TextLine> m_lines;
+	
+	// Variables used to recompute the max line width
 	int m_maxLineWidthPx;
 	int m_maxLineWidthWhen; // m_lines size when maxLineWidthPx was computed
 	int m_maxHeightPx;

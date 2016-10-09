@@ -16,6 +16,13 @@ TraceCtl::TraceCtl()
 	m_maxHeightPx = 0;
 }
 
+// Performs autoscroll to the bottom
+static void OnVAdjChangedStatic(GtkAdjustment* adjustment, gpointer)
+{
+	double upper = gtk_adjustment_get_upper(adjustment);
+	gtk_adjustment_set_value(adjustment, upper);
+}
+
 bool TraceCtl::Create(Window* parent, const String& welcomeMsg)
 {
 	m_welcomeMsg = welcomeMsg;
@@ -24,17 +31,17 @@ bool TraceCtl::Create(Window* parent, const String& welcomeMsg)
 	auto scrolledWindow = gtk_scrolled_window_new(nullptr, nullptr);
 	gtk_container_add(GTK_CONTAINER(parentHandle), scrolledWindow);
 
-    m_drawingArea = gtk_drawing_area_new();
-    gtk_widget_set_size_request(m_drawingArea, 10, 10);
-    gtk_container_add(GTK_CONTAINER(scrolledWindow), m_drawingArea);
+	m_drawingArea = gtk_drawing_area_new();
+	gtk_widget_set_size_request(m_drawingArea, 10, 10);
+	gtk_container_add(GTK_CONTAINER(scrolledWindow), m_drawingArea);
 
-	//gtk_widget_set_double_buffered(m_drawingArea, false);
-    g_signal_connect(m_drawingArea, "draw", G_CALLBACK(OnDrawStatic), this);
+	auto vadj = gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(scrolledWindow));
+
+	g_signal_connect(vadj, "changed", G_CALLBACK(OnVAdjChangedStatic), this);
+	g_signal_connect(m_drawingArea, "draw", G_CALLBACK(OnDrawStatic), this);
     
 	m_handle = scrolledWindow;
-    //auto view = gtk_text_view_new();
-    //gtk_container_add(GTK_CONTAINER(scrolledWindow), view);
-    return true;
+	return true;
 }
 
 gboolean TraceCtl::OnDrawStatic(GtkWidget* widget, cairo_t* cr, gpointer data)
@@ -43,6 +50,16 @@ gboolean TraceCtl::OnDrawStatic(GtkWidget* widget, cairo_t* cr, gpointer data)
 	return that->OnDraw(widget, cr);
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Draws a line of text
+//
+// [in]     line        Line of text made of several words/colors
+// [in,out] cr          Drawing context
+// [in]     computeOnly true to just compute the line width
+// [in]     y           Vertical position of the line in pixels
+//
+// [ret] line width in pixels
+///////////////////////////////////////////////////////////////////////////////
 int TraceCtl::DrawLine(const TextLine& line, cairo_t* cr, bool computeOnly, int y)
 {
 	cairo_text_extents_t extents;
@@ -78,14 +95,12 @@ int TraceCtl::DrawLine(const TextLine& line, cairo_t* cr, bool computeOnly, int 
 void TraceCtl::SyncDocumentMetrics(cairo_t* cr, int lineHeight)
 {
 	int lineCount = m_lines.GetSize();
+	if( lineCount == 0 )
+	{
+		return;
+	}
 
 	bool refresh = false;
-
-	// Do not count last empty line
-	if( lineCount > 0 && !m_lines[lineCount-1].first )
-	{
-		lineCount--;
-	}
 
 	// Width
 	for(; m_maxLineWidthWhen < lineCount; ++m_maxLineWidthWhen)
@@ -97,6 +112,9 @@ void TraceCtl::SyncDocumentMetrics(cairo_t* cr, int lineHeight)
 			refresh = true;
 		}
 	}
+
+	// Stay on the last line because it may change
+	m_maxLineWidthWhen--;
 
 	// Height
 	int totalHeight = lineCount * lineHeight + 1;
@@ -113,7 +131,7 @@ void TraceCtl::SyncDocumentMetrics(cairo_t* cr, int lineHeight)
 }
 
 // Make the color components between 0 and 1
-static inline void fixColor(GdkRGBA& col)
+static inline void FixColor(GdkRGBA& col)
 {
 	if( col.red < 0.0 ) { col.red = 0.0; }
 	if( col.red > 1.0 ) { col.red = 1.0; }
@@ -123,7 +141,7 @@ static inline void fixColor(GdkRGBA& col)
 	if( col.blue > 1.0 ) { col.blue = 1.0; }
 }
 
-static double getScreenResolution(GtkWidget* widget)
+static double GetScreenResolution(GtkWidget* widget)
 {
 	const double defaultResolution = 96.0;
 	GdkScreen* screen = gtk_widget_get_screen(widget);
@@ -146,9 +164,9 @@ struct LineDrawingSettings
 };
 // Gets the cairo compatible font size from the GTK current style font size. 
 // An official GTK function would be nice instead of doing this manually.
-static LineDrawingSettings getLineDrawingSettings(GtkWidget* widget)
+static LineDrawingSettings GetLineDrawingSettings(GtkWidget* widget)
 {
-	double resolution = getScreenResolution(widget);
+	double resolution = GetScreenResolution(widget);
 
 	GtkStyleContext* styleContext = gtk_widget_get_style_context(widget);
 
@@ -167,8 +185,6 @@ static LineDrawingSettings getLineDrawingSettings(GtkWidget* widget)
 	LineDrawingSettings ret;
 	ret.fontSize = static_cast<int>(fontSize);
 	ret.lineSpacing = static_cast<int>(lineSpacing);
-
-	//Console::WriteLine("line spacing:" + String::FromInt(ret.lineSpacing));
 	return ret;
 }
 
@@ -184,7 +200,7 @@ bool TraceCtl::OnDraw(GtkWidget* widget, cairo_t* cr)
 	guint width = gtk_widget_get_allocated_width(widget);
 	guint height = gtk_widget_get_allocated_height(widget);
 
-	auto lds = getLineDrawingSettings(widget);
+	auto lds = GetLineDrawingSettings(widget);
 	cairo_set_font_size(cr, lds.fontSize);
 
 	if( m_lines.IsEmpty() )
@@ -200,6 +216,7 @@ bool TraceCtl::OnDraw(GtkWidget* widget, cairo_t* cr)
 		styleColor.red -= 0.1;
 		styleColor.green -= 0.1;
 		styleColor.blue += 0.1;
+		FixColor(styleColor);
 		gc = styleColor;
 		gdk_cairo_set_source_rgba(cr, &gc);
 
@@ -214,6 +231,7 @@ bool TraceCtl::OnDraw(GtkWidget* widget, cairo_t* cr)
 	}
 
 	////////////////////////////
+	// Get text color
 	gtk_style_context_get_color(gtk_widget_get_style_context(widget),
 	                           GTK_STATE_FLAG_NORMAL,
 	                           &gc);
@@ -345,9 +363,5 @@ void TraceCtl::AddText(const chustd::String& text, Color col)
 	{
 		m_lines.Add();
 	}
-	auto vadj = gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(m_handle));
-	double val = gtk_adjustment_get_upper(vadj);
-	gtk_adjustment_set_value(vadj, val);
-
 	gtk_widget_queue_draw(GTK_WIDGET(m_drawingArea));
 }

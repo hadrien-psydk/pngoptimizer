@@ -55,6 +55,9 @@ static void OnWindowStateEvent(GtkWidget*, GdkEvent* event, gpointer /*userData*
 	{
 		return;
 	}
+
+	// This is an attempt to get the "Always on top" setting from the Window Manager
+	// It seems buggy at this time
 /*
 	printf("wse %08x %08x\n",
 		event->window_state.changed_mask,
