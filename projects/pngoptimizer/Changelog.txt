@@ -1,7 +1,7 @@
 == PngOptimizer Changelog ==
 
 -----------------
-2016-10-02 (2.5)
+2016-10-09 (2.5)
 
 - misc: update code for GTK+ version
 - misc: reorganize Windows code for multiplatform support
