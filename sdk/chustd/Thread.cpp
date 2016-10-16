@@ -115,7 +115,7 @@ void Thread::Sleep(int delayMs)
 	struct timespec ts;
 	ts.tv_sec = delayMs / 1000;
 	ts.tv_nsec = (delayMs % 1000) * 1000000;
-	nanosleep(&ts, NULL);
+	nanosleep(&ts, nullptr);
 #endif
 }
 

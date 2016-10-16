@@ -59,7 +59,7 @@ bool Semaphore::Create(int initialCount)
 ///////////////////////////////////////////////////////////////////////////////
 void Semaphore::Close()
 {
-	static void* const empty[ARRAY_SIZE(m_impl)] = { 0 };
+	static void* const empty[ARRAY_SIZE(m_impl)] = {};
 	if( memcmp(m_impl, empty, sizeof(empty)) == 0 )
 	{
 		// Not created

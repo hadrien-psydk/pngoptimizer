@@ -765,7 +765,7 @@ bool File::Copy(const String& srcFilePath, const String& dstFilePath)
 	struct stat stat;
 	fstat(source, &stat);
 
-	sendfile(dest, source, 0, stat.st_size);
+	sendfile(dest, source, nullptr, stat.st_size);
 
 	close(source);
 	close(dest);

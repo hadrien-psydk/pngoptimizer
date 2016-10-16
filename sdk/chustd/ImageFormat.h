@@ -106,9 +106,9 @@ public:
 		value32 = 0xff000000;
 	}
 
-	Color(uint32 r, uint32 g, uint32 b, uint32 a = 255)
+	Color(uint32 rx, uint32 gx, uint32 bx, uint32 ax = 255)
 	{
-		value32 = (a << 24) | (r << 16) | (g << 8) | b;
+		value32 = (ax << 24) | (rx << 16) | (gx << 8) | bx;
 	}
 
 	void SetRgb(uint8 rx, uint8 gx, uint8 bx)

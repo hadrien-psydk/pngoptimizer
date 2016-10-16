@@ -60,5 +60,5 @@ DeflateRet DeflateCompressor::Reset()
 
 uint32 DeflateCompressor::Bound(uint32 sourceLength)
 {
-	return deflateBound(0, sourceLength);
+	return deflateBound(nullptr, sourceLength);
 }

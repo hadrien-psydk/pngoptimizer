@@ -451,7 +451,7 @@ bool ImageFormat::UnpackPixels(Buffer& pixels, int width, int height, PixelForma
 	const uint8* pSrc = pixels.GetReadPtr();
 	uint8* pDst = newBuffer.GetWritePtr();
 
-	int32 mask = ~((~0L) << bitsPerPix);
+	int32 mask = ~((~0UL) << bitsPerPix);
 	int32 shift = 8 - bitsPerPix;
 	
 	int srcIndex = 0;

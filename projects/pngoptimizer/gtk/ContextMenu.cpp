@@ -9,9 +9,9 @@
 
 static gint my_popup_handler(GtkWidget* widget, GdkEvent* event)
 {
-	g_return_val_if_fail(widget != NULL, FALSE);
+	g_return_val_if_fail(widget != nullptr, FALSE);
 	g_return_val_if_fail(GTK_IS_MENU (widget), FALSE);
-	g_return_val_if_fail(event != NULL, FALSE);
+	g_return_val_if_fail(event != nullptr, FALSE);
 
 	// The "widget" is the menu that was supplied when 
  	// g_signal_connect_swapped() was called.
@@ -22,7 +22,7 @@ static gint my_popup_handler(GtkWidget* widget, GdkEvent* event)
 		GdkEventButton* event_button = (GdkEventButton*) event;
 		if( event_button->button == GDK_BUTTON_SECONDARY )
 		{
-			gtk_menu_popup(menu, NULL, NULL, NULL, NULL, 
+			gtk_menu_popup(menu, nullptr, nullptr, nullptr, nullptr, 
 				event_button->button, event_button->time);
 			return TRUE;
 		}

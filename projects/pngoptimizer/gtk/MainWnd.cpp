@@ -28,7 +28,7 @@ static void OnDragDataReceived(GtkWidget*, GdkDragContext* context,
 			if( !uri )
 				break;
 
-			gchar* path = g_filename_from_uri(uri, NULL, NULL);
+			gchar* path = g_filename_from_uri(uri, nullptr, nullptr);
 			if( path )
 			{
 				arg.Add( String::FromUtf8Z(path) );
@@ -124,7 +124,7 @@ bool MainWnd::Create(const char* welcomeMsg)
 	gtk_drag_dest_set(window, GTK_DEST_DEFAULT_ALL,
 		targets, ARRAY_SIZE(targets), GDK_ACTION_COPY);
 
-    g_signal_connect(window, "drag-data-received",
+	g_signal_connect(window, "drag-data-received",
         G_CALLBACK(OnDragDataReceived), this);
 
 	g_signal_connect(window, "window-state-event", 
@@ -145,7 +145,7 @@ bool MainWnd::Create(const char* welcomeMsg)
 	mi2->Activate.Connect(this, &MainWnd::OnAbout);
 	
 	//////////////////////////
-    m_traceCtl.Create(this, welcomeMsg);
+	m_traceCtl.Create(this, welcomeMsg);
 
 	g_signal_connect(window, "delete-event", G_CALLBACK(OnDeleteEvent), this);
 

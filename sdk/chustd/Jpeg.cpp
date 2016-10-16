@@ -1772,9 +1772,12 @@ void Jpeg::ConvertMcuToRgb(int32 mcuPixelX, int32 mcuPixelY, int32 mcuWidth, int
 			int32 gs = ( (y << 16) - int32(0.34414 * 65536) * u - int32(0.71414 * 65536) * v ) >> 16;
 			int32 bs = ( (y << 16) + int32(1.772 * 65536) * u ) >> 16;
 
-			if( rs < 0) rs = 0; if( rs > 255) rs = 255;
-			if( gs < 0) gs = 0; if( gs > 255) gs = 255;
-			if( bs < 0) bs = 0; if( bs > 255) bs = 255;
+			if( rs < 0) rs = 0;
+			if( rs > 255) rs = 255;
+			if( gs < 0) gs = 0;
+			if( gs > 255) gs = 255;
+			if( bs < 0) bs = 0;
+			if( bs > 255) bs = 255;
 			
 			pPixelBuffer[offset] = uint8(rs);
 			pPixelBuffer[offset + 1] = uint8(gs);

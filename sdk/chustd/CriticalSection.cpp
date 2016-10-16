@@ -18,7 +18,7 @@ CriticalSection::CriticalSection()
 #elif defined(__linux__)
 	static_assert(sizeof(m_impl) >= sizeof(pthread_mutex_t), "increase array");
 	auto mutex = reinterpret_cast<pthread_mutex_t*>(m_impl);
-	pthread_mutex_init(mutex, NULL);
+	pthread_mutex_init(mutex, nullptr);
 #endif
 }
 

@@ -29,7 +29,8 @@ namespace chustd {
 //	for(int i = 0; i < count; ++i ) 
 // with : 
 //  foreach(m_aSections, i) 
-#define foreach(varArray, varStep) for(int32 varStep = 0, count = varArray.GetSize(); varStep < count ; ++varStep) 
+#define foreach(varArray, varStep) for(int varStep = 0, count ## varStep = varArray.GetSize();\
+	varStep < (count ## varStep); ++varStep) 
 ///////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////
@@ -52,7 +53,7 @@ namespace chustd {
 		#define ASSERT(exp) ((void)0);
 	#else
 		#define ASSERT(exp) if(!(exp)) { static bool bOnce = false; if( !bOnce) { bOnce = true;\
-			ChustdAssertMessage(__FILE__, __LINE__, 0);\
+			ChustdAssertMessage(__FILE__, __LINE__, nullptr);\
 			INTERRUPT_EXECUTION() } };
 	#endif
 #endif
@@ -60,7 +61,7 @@ namespace chustd {
 //////////////////////////////////
 #ifndef VERIFY
 	#define VERIFY(exp) if(!(exp)) { static bool bOnce = false; if( !bOnce) { bOnce = true;\
-			ChustdAssertMessage(__FILE__, __LINE__, 0);\
+			ChustdAssertMessage(__FILE__, __LINE__, nullptr);\
 			INTERRUPT_EXECUTION() } };
 #endif
 

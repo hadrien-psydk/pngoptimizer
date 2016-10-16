@@ -22,7 +22,7 @@ public:
 	void AddText(const chustd::String& text, Color cr = Color::Black);
 	
 private:
-    ContextMenu m_ctm;
+	ContextMenu m_ctm;
 	TraceCtl m_traceCtl;
 
 private:

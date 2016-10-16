@@ -48,7 +48,10 @@ else
 $(error Bad CONFIG value)
 endif
 
-CPPFLAGS := $(CFLAGS) -Wextra
+CPPFLAGS := $(CFLAGS) -Wextra -Wshadow
+# Uncomment for tests. gtk and gtest make it difficult
+# CPPFLAGS +=-Wzero-as-null-pointer-constant
+CPPFLAGS += -Wlogical-op -Woverloaded-virtual
 CPPFLAGS += -std=c++0x $(addprefix -I,$(INCDIRS))
 
 # Most includes for GTK+ are in /usr/include but some of them are
