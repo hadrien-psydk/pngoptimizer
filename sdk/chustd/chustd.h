@@ -6,7 +6,7 @@
 //  
 ///////////////////////////////////////////////////////////////////////////////
 //
-// Copyright (C) 2005/2016 ChuTeam
+// Copyright (C) 2005/2017 ChuTeam
 //
 // This software is provided 'as-is', without any express or implied warranty.
 // In no event will the author be held liable for any damages arising from 

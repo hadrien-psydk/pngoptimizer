@@ -116,7 +116,7 @@ bool AppSettings::Read()
 		if( ini.GetInt(k_szWndX, wndX) && ini.GetInt(k_szWndY, wndY) )
 		{
 			// No need to center, the values are ok
-			pMWS->topLeftValid = false;
+			pMWS->topLeftValid = true;
 		}
 	
 		ini.GetInt(k_szWndWidth, wndWidth);

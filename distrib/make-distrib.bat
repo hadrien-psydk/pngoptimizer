@@ -1,4 +1,5 @@
-set POVER=2.5
+set POVER=2.5.1
+set POCLVER=2.5
 
 set ZIP="C:\Program Files\7-Zip\7z.exe" a -tzip -mx=5
 set VCBUILD="C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\devenv"
@@ -49,12 +50,12 @@ del *.zip
 
 cd x64
 %ZIP% "../../download/pngoptimizer-%POVER%-win-x64.zip"   "PngOptimizer"
-%ZIP% "../../download/pngoptimizercl-%POVER%-win-x64.zip" "PngOptimizerCL"
+%ZIP% "../../download/pngoptimizercl-%POCLVER%-win-x64.zip" "PngOptimizerCL"
 cd ..
 
 cd x86
 %ZIP% "../../download/pngoptimizer-%POVER%-win-x86.zip"   "PngOptimizer"
-%ZIP% "../../download/pngoptimizercl-%POVER%-win-x86.zip" "PngOptimizerCL"
+%ZIP% "../../download/pngoptimizercl-%POCLVER%-win-x86.zip" "PngOptimizerCL"
 cd ..
 cd ..
 

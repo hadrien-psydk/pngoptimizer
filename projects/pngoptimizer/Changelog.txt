@@ -1,6 +1,12 @@
 == PngOptimizer Changelog ==
 
 -----------------
+2017-02-12 (2.5.1)
+
+- fixed: window position would be always centered instead of being restored to the previous position (Windows only)
+- misc: fixed compilation warnings detected by GCC 6
+
+-----------------
 2016-10-09 (2.5)
 
 - misc: update code for GTK+ version

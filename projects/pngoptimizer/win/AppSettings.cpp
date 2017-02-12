@@ -80,7 +80,7 @@ bool AppSettings::Read(POEngineSettings& pos, BmpcdSettings* pBs, MainWndSetting
 		if( ini.GetInt(k_szWndX, wndX) && ini.GetInt(k_szWndY, wndY) )
 		{
 			// No need to center, the values are ok
-			pMws->topLeftValid = false;
+			pMws->topLeftValid = true;
 		}
 	
 		ini.GetInt(k_szWndWidth, wndWidth);

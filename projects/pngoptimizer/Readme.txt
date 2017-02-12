@@ -1,5 +1,5 @@
 -----------------------------------------------------------------------------
-  PngOptimizer - Copyright (C) 2002/2016 Hadrien Nilsson - psydk.org
+  PngOptimizer - Copyright (C) 2002/2017 Hadrien Nilsson - psydk.org
 -----------------------------------------------------------------------------
 
   This program is free software; you can redistribute it and/or modify
@@ -19,7 +19,7 @@
 
 Platform  : Windows/Linux - x86/x64
 Licence   : GNU GPL 2
-Version   : 2.5
+Version   : 2.5.1
 Home page : http://psydk.org/pngoptimizer
 Contact   : pngoptimizer@psydk.org
 
