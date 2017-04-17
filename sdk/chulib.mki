@@ -4,7 +4,7 @@
 # PROJECT_NAME    same as directory name
 # PROJECT_TYPE    lib or app
 # PROJECT_FILES   all files or wildcard like *.cpp
-# SDK_DEPS        needed library names in SDK/
+# SDK_DEPS        needed library names in sdk/
 # EXT_DEPS        external libraries, like gtk got GTK+
 # INCDIRS         additional include directories
 # DESTDIR         optional directory when installing/uninstalling
