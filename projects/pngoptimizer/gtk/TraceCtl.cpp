@@ -167,6 +167,7 @@ struct LineDrawingSettings
 static LineDrawingSettings GetLineDrawingSettings(GtkWidget* widget)
 {
 	double resolution = GetScreenResolution(widget);
+	printf("resolution: %lf\n", resolution);
 
 	GtkStyleContext* styleContext = gtk_widget_get_style_context(widget);
 
@@ -176,11 +177,13 @@ static LineDrawingSettings GetLineDrawingSettings(GtkWidget* widget)
 		"font-size", &fontSize,
 		 nullptr
 		 );
-	fontSize = (fontSize * resolution) / 72.0;
+	//fontSize = (fontSize * resolution) / 72.0;
+	fontSize = (13 * resolution) / 96.0;
 	
 	// 0.2 is arbitrary for good looking
-	double lineSpacing = (fontSize * 0.2) + 0.5;
-	fontSize += 0.5;
+	double lineSpacing = (fontSize * 0.2);
+	//fontSize += 0.5;
+	//fontSize = 14;
 
 	LineDrawingSettings ret;
 	ret.fontSize = static_cast<int>(fontSize);

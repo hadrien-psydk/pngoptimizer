@@ -31,6 +31,7 @@ OBJCOPY := objcopy
 
 CFLAGS := -Wall
 CFLAGS += -fdata-sections -ffunction-sections -fvisibility=hidden
+CFLAGS += -fPIC
 LDFLAGS := --gc-sections,--no-export-dynamic
 EXTLIBS := -pthread -lrt
 
