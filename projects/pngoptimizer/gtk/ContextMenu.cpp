@@ -22,7 +22,7 @@ static gint my_popup_handler(GtkWidget* widget, GdkEvent* event)
 		GdkEventButton* event_button = (GdkEventButton*) event;
 		if( event_button->button == GDK_BUTTON_SECONDARY )
 		{
-#if (GTK_MAJOR_VERSION*100+GTK_MINOR_VERSION) < 322
+#if !GTK_CHECK_VERSION(3,22,0)
 			// gtk_menu_popup() is deprecated since 3.22
 			gtk_menu_popup(menu, nullptr, nullptr, nullptr, nullptr, 
 				event_button->button, event_button->time);
