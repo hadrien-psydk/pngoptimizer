@@ -63,7 +63,7 @@ DynamicMemoryFile& POEngine::ResultManager::GetCandidate()
 	DynamicMemoryFile& dmf = (size1 > size0) ? m_dmf1 : m_dmf0;
 
 	// Open the dynamic memory file with allocation performed
-	
+
 	// The -64 is to be gentle with the memory allocator that needs room for its headers
 	const int32 firstAlloc = 512 * 1024 - 64;
 	dmf.Open(firstAlloc);
@@ -140,7 +140,7 @@ bool POEngine::IsBlackAndWhite(const Palette& pal, bool& shouldSwap)
 	}
 	Color col0 = pal.m_colors[0];
 	Color col1 = pal.m_colors[1];
-	
+
 	shouldSwap = false;
 
 	if( col0.IsEqualRgb(Color::Black) && col1.IsEqualRgb(Color::White) )
@@ -308,8 +308,8 @@ bool POEngine::TryToConvertIndexedToBlackAndWhite(PngDumpData& dd)
 	}
 
 	uint8 nAlpha0 = dd.palette.m_colors[0].GetAlpha();
-	uint8 nAlpha1 = dd.palette.m_colors[1].GetAlpha(); 
-			
+	uint8 nAlpha1 = dd.palette.m_colors[1].GetAlpha();
+
 	if( (nAlpha0 != 255 || nAlpha1 != 255) && m_settings.avoidGreyWithSimpleTransparency )
 	{
 		// A black&white picture with transparency, we stay in palette mode
@@ -398,11 +398,11 @@ bool POEngine::TryToConvertIndexedToGreyscale(PngDumpData& dd)
 		return false;
 	}
 
-	// The colors are ok, now check the alphas. We need no transparency at all 
+	// The colors are ok, now check the alphas. We need no transparency at all
 	// or only one fully transparent color
 	uint8 alpha0 = dd.palette.m_colors[0].GetAlpha();
 	uint8 alpha1 = dd.palette.m_colors[1].GetAlpha();
-		
+
 	if( alpha0 == 255 )
 	{
 		// Full opaque image
@@ -474,7 +474,7 @@ bool POEngine::DumpBestResultToFile(OptiTarget& target)
 			AddError(k_szCannotWriteUncomplete);
 			return false;
 		}
-		
+
 		// Write the same modification date than the original file.
 		// This should be done just before closing, because Write()
 		// will update the modification date too
@@ -527,9 +527,9 @@ static void AddFrameColorCounts(const ApngFrame* pFrame, uint32* pCounts)
 static void CountColors(const PngDumpData& dd, uint32* pCounts)
 {
 	ASSERT( dd.pixelFormat == PF_8bppIndexed );
-	
+
 	Memory::Zero32(pCounts, 256);
-	
+
 	const int frameCount = dd.frames.GetSize();
 
 	if( dd.hasDefaultImage || frameCount == 0 )
@@ -541,7 +541,7 @@ static void CountColors(const PngDumpData& dd, uint32* pCounts)
 			pCounts[ pPixels[i] ]++;
 		}
 	}
-	
+
 	for(int iFrame = 0; iFrame < frameCount; ++iFrame)
 	{
 		const ApngFrame* pFrame = dd.frames[iFrame];
@@ -561,11 +561,11 @@ bool POEngine::OptimizePaletteMode(PngDumpData& dd)
 	ASSERT( PF_1bppIndexed <= dd.pixelFormat && dd.pixelFormat <= PF_8bppIndexed);
 
 	UnpackPixelFrames(dd);
-	
+
 	// Count the number of times a color appears
 	uint32 colCounts[256];
 	CountColors(dd, colCounts);
-	
+
 	// Remove holes in the palette and create the conversion table old index -> new index
 	PaletteTranslator noHolesTranslator;
 	noHolesTranslator.BuildUnusedColors(dd.palette, colCounts);
@@ -635,7 +635,7 @@ bool POEngine::OptimizePaletteMode(PngDumpData& dd)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Find an unused color among the pixels
 // Needs memory allocation, thus can fail
-bool POEngine::FindUnusedColorHardcoreMethod(const uint8* pRgba, int32 pixelCount, 
+bool POEngine::FindUnusedColorHardcoreMethod(const uint8* pRgba, int32 pixelCount,
                                              uint8& nRed, uint8& nGreen, uint8& nBlue)
 {
 	ByteArray aSorted;
@@ -685,13 +685,13 @@ bool POEngine::FindUnusedColorHardcoreMethod(const uint8* pRgba, int32 pixelCoun
 		// Like a 4096*4096 picture
 		return false;
 	}
-	
+
 	uint32 nColor = nA + 1;
 
 	nRed = uint8(nColor & 0x000000ff);
 	nGreen = uint8((nColor & 0x0000ff00) >> 8);
 	nBlue = uint8((nColor & 0x00ff0000) >> 16);
-	
+
 	return true;
 }
 
@@ -714,9 +714,9 @@ bool POEngine::FindUnusedColor(const Buffer& aRgb, uint8& nRed, uint8& nGreen, u
 	aCandidates[4].SetRgb(0, 0, 1);
 	aCandidates[5].SetRgb(1, 0, 1);
 	aCandidates[6].SetRgb(0, 1, 0);
-	
+
 	const int32 pixelCount = aRgb.GetSize() / 3;
-	
+
 	foreach(aCandidates, iCandidate)
 	{
 		bool bGoodCandidate = true;
@@ -793,7 +793,7 @@ bool POEngine::Optimize32BitsMode(PngDumpData& dd)
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	// First step : set to 0 every color which alpha is 0
-	
+
 	// It will allow a potential optimisation 32 bits --> palette mode
 	// We set the fully transparent color to 0 as 4 bytes to 0 are nicely compressed
 
@@ -853,7 +853,7 @@ bool POEngine::Optimize32BitsMode(PngDumpData& dd)
 		pNewBuffer[2] = b;
 
 		alphaCounts[alpha] += 1;
-		
+
 		pSrcBuffer += 4;
 		pNewBuffer += 3;
 	}
@@ -877,10 +877,10 @@ bool POEngine::Optimize32BitsMode(PngDumpData& dd)
 
 		////////////////////////////////////////////////////
 		// First, check if black is a used color
-		
+
 		bool bBlackAsTransparentColor = CanBlackBeUsedAsTransparentColor32BppRGBX(dd);
 		////////////////////////////////////////////////////
-		
+
 		uint8 nTransRed = 0;
 		uint8 nTransGreen = 0;
 		uint8 nTransBlue = 0;
@@ -911,13 +911,13 @@ bool POEngine::Optimize32BitsMode(PngDumpData& dd)
 						pPixelsRgb[1] = nTransGreen;
 						pPixelsRgb[2] = nTransBlue;
 					}
-					
+
 					pPixelsRgba += 4;
 					pPixelsRgb += 3;
 				}
 			}
 		}
-		
+
 		if( bContinueIn24Bits )
 		{
 			// Now we have our 24 bits image + one color for transparency, continue with 24 bits optimization...
@@ -970,7 +970,7 @@ bool POEngine::Optimize24BitsMode(PngDumpData& dd)
 		uint8 r = pSrcBuffer[0];
 		uint8 g = pSrcBuffer[1];
 		uint8 b = pSrcBuffer[2];
-		
+
 		// Find the color in the palette
 		int32 iCol = 0;
 		for(; iCol < palTest.m_count; ++iCol)
@@ -1016,7 +1016,7 @@ bool POEngine::Optimize24BitsMode(PngDumpData& dd)
 	{
 		bTooMuchColors = true;
 	}
-	
+
 	///////////////////////////////////////////////////////////////////
 	//dd.pBuffer = pBuffer;
 	dd.pixelFormat = PF_24bppRgb;
@@ -1100,7 +1100,7 @@ int POEngine::CanSimplifyGreyAlpha(const PngDumpData& dd) const
 			}
 		}
 	}
-	
+
 	for(int iFrame = 0; iFrame < frameCount; ++iFrame)
 	{
 		const ApngFrame* pFrame = dd.frames[iFrame];
@@ -1181,7 +1181,7 @@ bool POEngine::OptimizeGrayScaleAlpha(PngDumpData& dd)
 		}
 		dd.pixels.SetSize(pixelCount); // Shrink buffer
 	}
-	
+
 	for(int iFrame = 0; iFrame < frameCount; ++iFrame)
 	{
 		ApngFrame* pFrame = dd.frames[iFrame];
@@ -1425,7 +1425,7 @@ bool POEngine::InsertCleanOriginalPngAsResult(IFile& file)
 
 	DynamicMemoryFile& dmf = m_resultmgr.GetCandidate();
 	dmf.SetByteOrder(boBigEndian);
-	
+
 	// Ensure capacity
 	if( !dmf.EnsureCapacity(fileSize32) )
 	{
@@ -1753,7 +1753,7 @@ bool POEngine::OptimizeSingleFileNoBackup(IFile& fileImage, OptiTarget& target)
 
 		// Insert a clean version of the source PNG
 		// "clean" means the same PNG expect some unwanted chunks (like the gamma chunk)
-		
+
 		// As we insert a copy of the source file, the source file becomes a candidate for the best result,
 		// thus if we cannot achieve a better compression than the original file, we just dump the original file
 		dmfAsIs.SetPosition(0);
@@ -1770,10 +1770,10 @@ bool POEngine::OptimizeSingleFileNoBackup(IFile& fileImage, OptiTarget& target)
 	if( !loadOk )
 	{
 		String strImgErr = img.GetLastErrorString();
-		
+
 		String strErr = "Cannot load image: ";
 		strErr = strErr + strImgErr;
-		
+
 		AddError(strErr);
 		return false;
 	}
@@ -1783,7 +1783,7 @@ bool POEngine::OptimizeSingleFileNoBackup(IFile& fileImage, OptiTarget& target)
 	const Buffer& pixels = img.GetPixels();
 	const Palette& palette = img.GetPalette();
 	PixelFormat pf = img.GetPixelFormat();
-	
+
 	//////////////////////////////////////////////////////////////
 	PngDumpData dd; // Final dump structure
 	dd.width = width;
@@ -1891,11 +1891,15 @@ bool POEngine::OptimizeSingleFileNoBackup(IFile& fileImage, OptiTarget& target)
 		dd.textInfos[0] = text;
 	}
 
-	if( img.IsAnimated() )
-	{
-		return OptimizeAnimated(img, dd, target);
+	if (m_settings.dontOptimize) {
+		return DumpBestResultToFile(target);
+	} else {
+		if (img.IsAnimated())
+		{
+			return OptimizeAnimated(img, dd, target);
+		}
+		return Optimize(dd, target);
 	}
-	return Optimize(dd, target);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1909,7 +1913,7 @@ void POEngine::PrintSizeChange(int64 sizeBefore, int64 sizeAfter)
 	int64 ratio = sizeAfter;
 	ratio *= 100;
 	ratio /= sizeBefore;
-			
+
 	String arrow;
 	if( m_unicodeArrowEnabled )
 	{
@@ -1922,7 +1926,7 @@ void POEngine::PrintSizeChange(int64 sizeBefore, int64 sizeAfter)
 	}
 	StringBuilder sb;
 	PrintText(String::FromInt64(sizeBefore), TT_SizeInfoNum);
-	PrintText(" bytes "+arrow+" ", TT_SizeInfo); 
+	PrintText(" bytes "+arrow+" ", TT_SizeInfo);
 	PrintText(String::FromInt64(sizeAfter), TT_SizeInfoNum);
 	PrintText(" bytes", TT_SizeInfo);
 
@@ -1998,7 +2002,7 @@ bool POEngine::OptimizeSingleFile(const String& filePath, const String& displayD
 		PrintText("Converting ", TT_ActionVerb);
 	}
 	///////////////////////////////////////////////////////////////////////
-	
+
 	if( !displayDir.IsEmpty() )
 	{
 		// Display the sub-directory
@@ -2014,7 +2018,7 @@ bool POEngine::OptimizeSingleFile(const String& filePath, const String& displayD
 
 	String oldFilePath;
 	String newFilePath;
-	
+
 	// If the source file is a PNG, we rename that source file with a "_" at the beginning of its name
 	if( fileExt == "png" || fileExt == "apng" )
 	{
@@ -2090,7 +2094,7 @@ bool POEngine::OptimizeSingleFile(const String& filePath, const String& displayD
 // [in] joker         Type of files managed
 // [in,out] optiInfo  Optimization information
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void POEngine::OptimizeFilesInternal(const String& baseDir, const StringArray& fileNames, const String& displayDir, 
+void POEngine::OptimizeFilesInternal(const String& baseDir, const StringArray& fileNames, const String& displayDir,
                                      const String& joker, OptiInfo& optiInfo)
 {
 	const int32 fileCount = fileNames.GetSize();
@@ -2157,7 +2161,7 @@ void POEngine::OptimizeFilesInternal(const String& baseDir, const StringArray& f
 //
 // [in] filePaths  Absolute file paths of files or directories to optimize
 // [in] joker      File types handled. ex: "*.png" or "*.gif|*.bmp"
-// 
+//
 // Returns true if all filtered files could be optimized or converted,
 //         false if at least one error was raised during the call.
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2184,7 +2188,7 @@ bool POEngine::OptimizeFiles(const StringArray& filePaths, const String& joker)
 		// OptimizeFilesInternal will silently filter out files that are not supported.
 		// However, for a public function, when no file at all is optimized, this is
 		// considered as an error.
-		if( optiInfo.optiCount == 0 && optiInfo.errorCount == 0 
+		if( optiInfo.optiCount == 0 && optiInfo.errorCount == 0
 		 && filePaths.GetSize() == 1 && File::Exists(filePaths[0]) )
 		{
 			PrintText(String(k_szUnsupportedFileType) + ": " + FilePath::GetName(filePaths[0]) + "\n", TT_ErrorMsg);
@@ -2465,7 +2469,7 @@ void MergePalettes(const ImageFormat& img, PngDumpData& dd)
 		}
 		frameNewPals[iFrame] = fnp;
 	}
-		
+
 	////////////////////////////////////////////////////////////////////
 	// Choose between Color and RGBA when switching to true colors
 	if( switchToTrueColors && hasTransparency )
@@ -2485,7 +2489,7 @@ void MergePalettes(const ImageFormat& img, PngDumpData& dd)
 			// Palette mode, look in the super palette
 			if( !hasTransparency )
 			{
-				// No transparent color to be used to create the default image. 
+				// No transparent color to be used to create the default image.
 				// Try to add a new entry in the palette
 				if( superPalette.m_count < 255 )
 				{
@@ -2523,7 +2527,7 @@ void MergePalettes(const ImageFormat& img, PngDumpData& dd)
 			int pixelCount = pFrame->m_fctl.width * pFrame->m_fctl.height;
 			uint8* pPixels = pFrame->m_pixels.GetWritePtr();
 			ASSERT(pFrame->m_pixels.GetSize() == pixelCount);
-					
+
 			fnp.translator.Translate(pPixels, pixelCount);
 		}
 	}
@@ -2538,7 +2542,7 @@ void MergePalettes(const ImageFormat& img, PngDumpData& dd)
 			int dstPixelSize = switchToRgba ? 4 : 3;
 			const int32 nPixCount = pDst->m_fctl.width * pDst->m_fctl.height;
 			pDst->m_pixels.SetSize(nPixCount * dstPixelSize);
-						
+
 			const uint8* pSrcPixels = pSrc->GetPixels().GetReadPtr();
 			uint8* pDstPixels = pDst->m_pixels.GetWritePtr();
 			const Palette* pPalette = &(pSrc->GetPalette());
@@ -2551,7 +2555,7 @@ void MergePalettes(const ImageFormat& img, PngDumpData& dd)
 				{
 					uint8 r, g, b, a;
 					pPalette->m_colors[ pSrcPixels[iPix] ].ToRgba(r, g, b, a);
-							
+
 					pDstPixels[0] = r;
 					pDstPixels[1] = g;
 					pDstPixels[2] = b;
@@ -2567,7 +2571,7 @@ void MergePalettes(const ImageFormat& img, PngDumpData& dd)
 				{
 					uint8 r, g, b, a;
 					pPalette->m_colors[ pSrcPixels[iPix] ].ToRgba(r, g, b, a);
-							
+
 					pDstPixels[0] = r;
 					pDstPixels[1] = g;
 					pDstPixels[2] = b;
@@ -2594,9 +2598,9 @@ void MergePalettes(const ImageFormat& img, PngDumpData& dd)
 
 		const uint8* pSrc = oldPixels.GetReadPtr();
 		uint8* pDst = dd.frames[0]->m_pixels.GetWritePtr();
-			
+
 		int bytesPerPixel = ImageFormat::SizeofPixelInBits(dd.pixelFormat) / 8;
-			
+
 		// Fill with transparent color
 		if( bytesPerPixel == 1 )
 		{
@@ -2647,19 +2651,19 @@ bool POEngine::OptimizeAnimated(const ImageFormat& img, PngDumpData& dd, OptiTar
 	{
 		return false;
 	}
-	
+
 	// Fills the dump settings
 	PrepareAnimatedDumpSettings(img, dd);
-	
+
 	// Unpack pixels to 8 bits per pixel if indexed to make treatment easier
 	UnpackPixelFrames(dd);
-	
+
 	// Merge palettes if frame local palettes are found (GIF)
 	// The pixel format can switch to Color or RGBA
 	MergePalettes(img, dd);
-	
+
 	dd.interlaced = false; // Always to false with animation
-	
+
 	PngDumpSettings ds;
 	ds.filtering = 0;
 	ds.zlibCompressionLevel = 9;

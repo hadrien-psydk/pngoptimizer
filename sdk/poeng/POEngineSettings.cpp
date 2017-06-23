@@ -15,6 +15,7 @@ static const char k_szKeepInterlacing[]       = "KeepInterlacing";
 static const char k_szAvoidGreyWithSimpleTransparency[] = "AvoidGreyWithSimpleTransparency";
 static const char k_szIgnoreAnimatedGifs[]    = "IgnoreAnimatedGifs";
 static const char k_szKeepFileDate[]          = "KeepFileDate";
+static const char k_szDontOptimize[]          = "DontOptimize";
 
 static const char k_szKeepBackgroundColor[]   = "KeepBackgroundColor";
 static const char k_szForcedBackgroundColor[] = "ForcedBackgroundColor";
@@ -40,6 +41,7 @@ POEngineSettings::POEngineSettings()
 	avoidGreyWithSimpleTransparency = false;
 	ignoreAnimatedGifs = false;
 	keepFileDate = false;
+	dontOptimize = false;
 
 	bkgdOption = POChunk_Remove;
 	textOption = POChunk_Remove;
@@ -82,6 +84,7 @@ void POEngineSettings::LoadFromIni(const MemIniFile& ini)
 	ini.GetBool(k_szAvoidGreyWithSimpleTransparency, avoidGreyWithSimpleTransparency);
 	ini.GetBool(k_szIgnoreAnimatedGifs, ignoreAnimatedGifs);
 	ini.GetBool(k_szKeepFileDate, keepFileDate);
+	ini.GetBool(k_szDontOptimize, dontOptimize);
 
 	int optionInt = int(bkgdOption);
 	ini.GetInt(k_szKeepBackgroundColor, optionInt);
@@ -137,6 +140,7 @@ void POEngineSettings::SaveToIni(MemIniFile& ini) const
 	ini.SetBool(k_szAvoidGreyWithSimpleTransparency, avoidGreyWithSimpleTransparency);
 	ini.SetBool(k_szIgnoreAnimatedGifs, ignoreAnimatedGifs);
 	ini.SetBool(k_szKeepFileDate,       keepFileDate);
+	ini.SetBool(k_szDontOptimize,       dontOptimize);
 
 	ini.SetInt(k_szKeepBackgroundColor, bkgdOption);
 	uint8 r, g, b;
@@ -169,7 +173,7 @@ POChunkOption GetChunkOption(const ArgvParser& ap, const String& optionName)
 	if( ap.HasFlag(optionName) )
 	{
 		chunkOption = POChunk_Keep;
-		
+
 		String strKbcOption = ap.GetFlagString(optionName);
 		if( strKbcOption == "0" || strKbcOption == "R" )
 		{
@@ -193,6 +197,7 @@ void POEngineSettings::LoadFromArgv(const ArgvParser& ap)
 	avoidGreyWithSimpleTransparency = ap.HasFlag(k_szAvoidGreyWithSimpleTransparency);
 	ignoreAnimatedGifs = ap.HasFlag(k_szIgnoreAnimatedGifs);
 	keepFileDate = ap.HasFlag(k_szKeepFileDate);
+	dontOptimize = ap.HasFlag(k_szDontOptimize);
 
 	bkgdOption = GetChunkOption(ap, k_szKeepBackgroundColor);
 
@@ -211,7 +216,7 @@ void POEngineSettings::LoadFromArgv(const ArgvParser& ap)
 			bkgdColor.SetRgb(uint8(bkR), uint8(bkG), uint8(bkB));
 		}
 	}
-	
+
 	///////////////////////////////////////////
 	textOption = GetChunkOption(ap, k_szKeepTextualData);
 	textKeyword = ap.GetFlagString(k_szForcedTextKeyword);
