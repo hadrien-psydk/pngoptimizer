@@ -1891,9 +1891,12 @@ bool POEngine::OptimizeSingleFileNoBackup(IFile& fileImage, OptiTarget& target)
 		dd.textInfos[0] = text;
 	}
 
-	if (m_settings.keepPixels) {
+	if (m_settings.keepPixels)
+  {
 		return DumpBestResultToFile(target);
-	} else {
+	}
+  else
+  {
 		if (img.IsAnimated())
 		{
 			return OptimizeAnimated(img, dd, target);
