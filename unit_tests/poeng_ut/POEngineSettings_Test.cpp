@@ -29,7 +29,7 @@ const String k_iniSection = "PoeSettings";
 void ToIni(const POEngineSettings& settings)
 {
 	File::Delete(k_iniFilePath);
-	
+
 	MemIniFile iniSave;
 	iniSave.SetSection(k_iniSection);
 	settings.SaveToIni(iniSave);
@@ -54,7 +54,7 @@ TEST(POEngineSettings, EmptyArgv)
 
 	POEngineSettings settings;
 	settings.LoadFromArgv(ap);
-	
+
 	POEngineSettings exp;
 	exp.backupOldPngFiles = false; // The only difference with INI loading
 	ASSERT_TRUE(settings == exp);
@@ -71,19 +71,21 @@ TEST(POEngineSettings, AllArgv)
 		"-KeepFileDate",
 		"-KeepBackgroundColor",
 		"-KeepTextualData",
-		"-KeepPhysicalPixelDimensions"
+		"-KeepPhysicalPixelDimensions",
+		"-KeepPixels"
 	};
 	ArgvParser ap(ARRAY_SIZE(argv), argv);
 
 	POEngineSettings settings;
 	settings.LoadFromArgv(ap);
-	
+
 	POEngineSettings exp;
 	exp.backupOldPngFiles = true;
 	exp.keepInterlacing = true;
 	exp.avoidGreyWithSimpleTransparency = true;
 	exp.ignoreAnimatedGifs = true;
 	exp.keepFileDate = true;
+	exp.keepPixels = true;
 	exp.bkgdOption = POChunk_Keep;
 	exp.textOption = POChunk_Keep;
 	exp.physOption = POChunk_Keep;
@@ -107,7 +109,7 @@ TEST(POEngineSettings, RemoveChunkArgv)
 
 	POEngineSettings settings;
 	settings.LoadFromArgv(ap);
-	
+
 	POEngineSettings exp;
 	exp.backupOldPngFiles = false;
 	exp.bkgdOption = POChunk_Remove;
@@ -139,7 +141,7 @@ TEST(POEngineSettings, KeepChunkArgv)
 
 	POEngineSettings settings;
 	settings.LoadFromArgv(ap);
-	
+
 	POEngineSettings exp;
 	exp.backupOldPngFiles = false;
 	exp.bkgdOption = POChunk_Keep;
@@ -166,14 +168,14 @@ TEST(POEngineSettings, ForceChunkArgv)
 {
 	const char* argv[] = {
 		"app.exe",
-		
+
 		"-KeepBackgroundColor:2",
 		"-ForcedBackgroundColor:a1b2c3",
 
 		"-KeepTextualData:2",
 		"-ForcedTextKeyword:" UTF8_CAPITAL_E_WITH_ACUTE "toffe",
 		"-ForcedTextData:Soie brod" UTF8_SMALL_E_WITH_ACUTE "e",
-		
+
 		"-KeepPhysicalPixelDimensions:2",
 		"-ForcedPixelsPerMeter:2000x1000"
 	};
@@ -181,7 +183,7 @@ TEST(POEngineSettings, ForceChunkArgv)
 
 	POEngineSettings settings;
 	settings.LoadFromArgv(ap);
-	
+
 	POEngineSettings exp;
 	exp.backupOldPngFiles = false;
 	exp.bkgdOption = POChunk_Force;
@@ -196,14 +198,14 @@ TEST(POEngineSettings, ForceChunkArgv)
 
 	const char* argvAlt[] = {
 		"app.exe",
-		
+
 		"-KeepBackgroundColor:F",
 		"-ForcedBackgroundColor:a1b2c3",
 
 		"-KeepTextualData:F",
 		"-ForcedTextKeyword:" UTF8_CAPITAL_E_WITH_ACUTE "toffe",
 		"-ForcedTextData:Soie brod" UTF8_SMALL_E_WITH_ACUTE "e",
-		
+
 		"-KeepPhysicalPixelDimensions:F",
 		"-ForcedPixelsPerMeter:2000x1000"
 	};
@@ -230,7 +232,7 @@ TEST(POEngineSettings, ForcePixelsPerInchArgv)
 
 	POEngineSettings settings;
 	settings.LoadFromArgv(ap);
-	
+
 	POEngineSettings exp;
 	exp.backupOldPngFiles = false;
 	exp.physOption = POChunk_Force;

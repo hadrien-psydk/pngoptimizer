@@ -25,6 +25,7 @@ struct POEngineSettings
 	bool avoidGreyWithSimpleTransparency;
 	bool ignoreAnimatedGifs;
 	bool keepFileDate;
+	bool keepPixels;
 
 	POChunkOption  bkgdOption;
 	chustd::Color  bkgdColor; // Forced color
@@ -47,7 +48,7 @@ struct POEngineSettings
 	void SaveToIni(chustd::MemIniFile& ini) const;
 
 	static void WriteArgvUsage(const chustd::String& indent);
-	
+
 	// Sometimes it easier for the user to enter values in PPI, so we offer
 	// some conversion functions
 	static int PpiFromPpm(int ppm);

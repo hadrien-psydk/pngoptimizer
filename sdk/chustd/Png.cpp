@@ -86,7 +86,7 @@ bool Png::IsPng(IFile& file)
 {
 	const int32 signSize = sizeof(k_PngSignature);
 	uint8 aRead[signSize];
-	
+
 	if( file.Read(aRead, signSize) != signSize )
 	{
 		return false;
@@ -209,11 +209,11 @@ bool Png::LoadFromFile(IFile& file)
 	{
 		// End of stream with no damaged chunk but IEND not found
 		m_lastError = errNoIENDFound;
-		
+
 		// We set bOkHandled to false so we perform the needed on-error cleanup
 		bOkHandled = false;
 	}
-	
+
 	if( !bOkHandled )
 	{
 		// An error occurred, we clean the object except the lasterror field
@@ -319,7 +319,7 @@ int Png::Read_IHDR(IFile& file, int32 dataSizeof, PngChunk_IHDR& out)
 	{
 		return uncompleteFile;
 	}
-	
+
 	if( file.ShouldSwapBytes() )
 	{
 		out.SwapBytes();
@@ -428,7 +428,7 @@ bool Png::Handle_gAMA(IFile& file, int32 dataSizeof)
 		m_lastError = errNotEnoughDataInChunk;
 		return false;
 	}
-	
+
 	if( !file.Read32(m_gamma) )
 	{
 		m_lastError = uncompleteFile;
@@ -479,7 +479,7 @@ bool Png::Handle_bKGD(IFile& file, int32 dataSizeof)
 		}
 		return true;
 	}
-	
+
 	if( m_IHDR.colorType == 0x00 || m_IHDR.colorType == 0x04 )
 	{
 		// Grey or Grey+Alpha
@@ -504,7 +504,7 @@ bool Png::Handle_bKGD(IFile& file, int32 dataSizeof)
 			m_lastError = errNotEnoughDataInChunk;
 			return false;
 		}
-		
+
 		// TrueColor or TrueColor+Alpha
 		if( !(file.Read16(m_bkGD.red) && file.Read16(m_bkGD.green) && file.Read16(m_bkGD.blue)) )
 		{
@@ -651,7 +651,7 @@ bool Png::BeginImageDataProcessing()
 	{
 		// Uncompressing a frame
 		ApngFrame* pFrame = m_apFrames.GetLast();
-		
+
 		m_idiCurrent.pPixels = &(pFrame->m_pixels);
 		m_idiCurrent.width = pFrame->m_fctl.width;
 		m_idiCurrent.height = pFrame->m_fctl.height;
@@ -671,7 +671,7 @@ bool Png::BeginImageDataProcessing()
 
 	// The first time we meet an IDAT chunk, we initialize the zstream structure
 	m_deflateUncompressor.SetBuffers(nullptr, 0, nullptr, 0);
-	
+
 	const int nZErr = m_deflateUncompressor.Init();
 	if( nZErr != DF_RET_OK )
 	{
@@ -719,22 +719,22 @@ bool Png::ProcessImageData(IFile& file, int32 dataSizeof)
 		m_lastError = uncompleteFile;
 		return false;
 	}
-	
+
 	const uint32 availableOut = m_idiCurrent.uncompressedDataSize - m_outputOffset;
 
 	uint8* pIn  = m_compressedBuffer.GetPtr();
 	uint8* pOut = m_idiCurrent.pPixels->GetWritePtr() + m_outputOffset;
 	m_deflateUncompressor.SetBuffers(pIn, compressedSize, pOut, availableOut);
-	
+
 	int nZRet2 = m_deflateUncompressor.Uncompress(DF_FLUSH_SYNC);
-	
+
 	if( nZRet2 == DF_RET_OK )
 	{
-	
+
 	}
 	else if( nZRet2 == DF_RET_STREAM_END )
 	{
-	
+
 	}
 	else
 	{
@@ -762,19 +762,19 @@ bool Png::Handle_acTL(IFile& file, int32 dataSizeof)
 		m_lastError = errIDATFoundBeforeacTL;
 		return false;
 	}
-	
+
 	if( dataSizeof < 8 )
 	{
 		m_lastError = errNotEnoughDataInChunk;
 		return false;
 	}
-	
+
 	if( !(file.Read32(m_acTL.frameCount) && file.Read32(m_acTL.loopCount)) )
 	{
 		m_lastError = uncompleteFile;
-		return false;	
+		return false;
 	}
-	
+
 	if( m_acTL.frameCount == 0 )
 	{
 		// Not valid
@@ -808,14 +808,14 @@ bool Png::Handle_fcTL(IFile& file, int32 dataSizeof)
 	if( dataSizeof < wantedSizeof )
 	{
 		m_lastError = errNotEnoughDataInChunk;
-		return false;	
+		return false;
 	}
 
 	PngChunk_fcTL fctl;
 	if( file.Read(&fctl, wantedSizeof) != wantedSizeof )
 	{
 		m_lastError = uncompleteFile;
-		return false;	
+		return false;
 	}
 
 	if( file.ShouldSwapBytes() )
@@ -894,7 +894,7 @@ PixelFormat Png::GetPixelFormat(const PngChunk_IHDR& pngIHDR)
 
 PixelFormat Png::GetPixelFormat(uint8 colorType, uint8 bitDepth)
 {
-	// To the bottom : 
+	// To the bottom :
 	//   default: grey, flags: 0x1=palette used, 0x2=color used, 0x4=alpha used
 	// To the left :
 	//   Bit depth
@@ -936,7 +936,7 @@ const Buffer& Png::GetPixels() const
 		const int32 frameCount = m_apFrames.GetSize();
 		if( frameCount >= 0 )
 		{
-			// Yes, return the first frame, whose size and offset 
+			// Yes, return the first frame, whose size and offset
 			// must be compatible with what is stored in the IHDR
 			return m_apFrames[0]->GetPixels();
 		}
@@ -973,7 +973,7 @@ bool Png::EndImageDataProcessing()
 	else
 	{
 		// No interlacing, just unfilter
-		processingOk = UnfilterBlock(m_idiCurrent.pPixels->GetWritePtr(), 
+		processingOk = UnfilterBlock(m_idiCurrent.pPixels->GetWritePtr(),
 		                             m_idiCurrent.height, m_idiCurrent.byteWidth, m_sizeofPixel);
 		if( !processingOk )
 		{
@@ -996,7 +996,7 @@ uint8 Png::PaethPredictor(uint8 a, uint8 b, uint8 c)
 	int pa = b - c;
 	int pb = a - c;
 	int pc = pa + pb;
-	
+
 	if( pa < 0 ) { pa = -pa; }
 	if( pb < 0 ) { pb = -pb; }
 	if( pc < 0 ) { pc = -pc; }
@@ -1018,7 +1018,7 @@ bool Png::UnfilterAndUninterlace()
 	// Keep the previous data to be used as input in the unfiltering process
 	Buffer oldBuffer = *m_idiCurrent.pPixels;
 	m_idiCurrent.pPixels->SetSize(0);
-	
+
 	// *pPixels is now empty, we reallocate it as it will be used as output in the unfiltering process
 	// m_nUncompressedDataSize is modified too
 	if( !AllocateImageBuffer(false) )
@@ -1048,7 +1048,7 @@ bool Png::UnfilterAndUninterlace()
 
 	static const uint8 masks1[8] = { 0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01 };
 	static const uint8 shifts1[8] = { 7, 6, 5, 4, 3, 2, 1, 0 };
-	
+
 	const uint8* paMask = nullptr;
 	const uint8* paShift = nullptr;
 	int32 dstShift = 0;
@@ -1082,11 +1082,11 @@ bool Png::UnfilterAndUninterlace()
 
 	// Current byte position in the interlaced buffer
 	int32 srcIndex = 0;
-	
+
 	// Sub index for pixel < 8 bits
 	int32 srcSubIndex = 0;
 	int32 maxSrcSubIndex = (8 / m_sizeofPixelInBits) - 1;
-	
+
 	for(int8 iPass = 0; iPass < 7; ++iPass)
 	{
 		//////////////////////////////////////////////////////////////////////////////
@@ -1144,7 +1144,7 @@ bool Png::UnfilterAndUninterlace()
 					byte &= paMask[srcSubIndex];
 					byte >>= paShift[srcSubIndex];
 					////////////////////////////////////
-					
+
 					////////////////////////////////////
 					int32 dstOffset = dstRowOffset + (col >> dstShift);
 					int32 dstSubIndex = col & maxSrcSubIndex;
@@ -1161,7 +1161,7 @@ bool Png::UnfilterAndUninterlace()
 						srcSubIndex = 0;
 					}
 				}
-				
+
 				col += aColIncrement[iPass];
 			}
 			while(col < width);
@@ -1213,7 +1213,7 @@ void Png::GetPassSize(int8 iPass, int32& rowCount, int32& pixelBytesPerRow,
 
 	int32 pixelsPerRow = (width + anAdders[iPass + 1]) / anDividers[iPass + 1];
 	int32 pixelBitsPerRow = pixelsPerRow * sizeofPixelInBits;
-	
+
 	pixelBytesPerRow = pixelBitsPerRow / 8 + ((pixelBitsPerRow % 8) > 0 ? 1 : 0);
 
 	rowCount = (height + anAdders[iPass]) / anDividers[iPass];
@@ -1273,7 +1273,7 @@ bool Png::UnfilterBlock(uint8* pBlock, int32 rowCount, int32 pixelBytesPerRow, i
 		tmpLine += 2;
 		tmpLine[2] = 0;
 		file.Write(line, (tmpLine-line)*2);
-		
+
 	}
 	file.Close();
 	*/
@@ -1293,13 +1293,13 @@ bool Png::UnfilterBlock(uint8* pBlock, int32 rowCount, int32 pixelBytesPerRow, i
 	{
 		// Initialize the index (iByte) of the current byte in the row
 		int32 iByte = 0;
-		
+
 		// Get the filtering method used for this row
 		const uint8 method = pRow[0];
-				
+
 		// Jump over the filtering method byte
 		pRow++;
-		
+
 		switch(method)
 		{
 		case 0:
@@ -1310,10 +1310,10 @@ bool Png::UnfilterBlock(uint8* pBlock, int32 rowCount, int32 pixelBytesPerRow, i
 				{
 					const uint8 pixel = pRow[0];
 					pRow++;
-					
+
 					pUnfilteredRow[0] = pixel;
 					pUnfilteredRow++;
-					
+
 				}
 				while(--counter > 0);
 			}
@@ -1491,7 +1491,7 @@ String Png::GetLastErrorString() const
 
 	case Png::errBadHeaderSize:
 		return "Invalid header size";
-		
+
 	case Png::errBadBitDepth:
 		return "Invalid bit depth";
 
@@ -1506,7 +1506,7 @@ String Png::GetLastErrorString() const
 
 	case Png::errBadFilterMethod:
 		return "Invalid or unsupported filtering method";
-		
+
 	case Png::errBadFilterType:
 		return "Bad filtering type";
 
@@ -1515,7 +1515,7 @@ String Png::GetLastErrorString() const
 
 	case Png::errBadPicSize:
 		return "Invalid image size";
-	
+
 	case Png::errNoIENDFound:
 		return "No IEND chunk found at the end of the file data (file corrupted)";
 
@@ -1548,13 +1548,13 @@ String Png::GetLastErrorString() const
 
 	case Png::erracTLRepeated:
 		return "acTL chunk repeated";
-	
+
 	case Png::errMissingfcTLBeforefdAT:
 		return "fcTL chunk missing before fdAT";
 
 	case Png::errUnexpectedChunk:
 		return "Unexpected chunk: " + StringFromChunkType(m_currentChunkType);
-		
+
 	case Png::errFrameCountMismatch:
 		return "Frame count mismatch with acTL";
 	case Png::errFrameCountOutsideRange:
