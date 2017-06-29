@@ -25,7 +25,7 @@ struct POEngineSettings
 	bool avoidGreyWithSimpleTransparency;
 	bool ignoreAnimatedGifs;
 	bool keepFileDate;
-	bool dontOptimize;
+	bool keepPixels;
 
 	POChunkOption  bkgdOption;
 	chustd::Color  bkgdColor; // Forced color
