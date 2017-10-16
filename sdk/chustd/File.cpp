@@ -85,7 +85,7 @@ bool File::Open(const String& filePath, uint32 mode/*=modeRead*/)
 		disposition = OPEN_ALWAYS;
 	}
 
-	HANDLE handle = CreateFileW(filePath.GetBuffer(), 
+	HANDLE handle = CreateFileW(filePath.GetBuffer(),
 		access, shareMode, nullptr, disposition, FILE_ATTRIBUTE_NORMAL, nullptr);
 	if( handle == INVALID_HANDLE_VALUE )
 	{
@@ -133,7 +133,7 @@ bool File::Open(const String& filePath, uint32 mode/*=modeRead*/)
 		// Do not set the size to 0 (omit O_TRUNC)
 		if( openRead )
 		{
-			flags = O_RDWR|O_CREAT;	
+			flags = O_RDWR|O_CREAT;
 		}
 		else
 		{
@@ -194,6 +194,8 @@ ByteOrder File::GetByteOrder() const
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// Sets the byte order when reading values greater than 8bits to automatically
+// swap bytes.
 void File::SetByteOrder(ByteOrder byteOrder)
 {
 	if( !m_impl.IsValid() )
@@ -205,11 +207,11 @@ void File::SetByteOrder(ByteOrder byteOrder)
 	}
 	else if( byteOrder == boBigEndian )
 	{
-		m_openMode &= !modeLittleEndian;
+		m_openMode &= (~modeLittleEndian);
 	}
 	else
 	{
-		ASSERT(0);	
+		ASSERT(0);
 	}
 }
 
@@ -288,7 +290,7 @@ bool File::SetPosition(int64 offset, Whence eWhence)
 		ASSERT(0); // Bad value for seek
 		break;
 	}
-	
+
 	LONG high = LONG(offset >> 32);
 	DWORD low = DWORD(offset & 0x00000000ffffffff);
 	DWORD ret = SetFilePointer(m_impl.handle, low, &high, nCFrom);
@@ -311,7 +313,7 @@ bool File::SetPosition(int64 offset, Whence eWhence)
 		ASSERT(0); // Bad value for seek
 		break;
 	}
-	
+
 	const int ret = lseek(m_impl.fd, offset, whence);
 	return (ret >= 0);
 #endif
@@ -400,7 +402,7 @@ String File::GetDrive(const String& filePath)
 	{
 		return String();
 	}
-	
+
 	uint16 c = 0;
 
 	int32 iSeparator = 0;
@@ -424,7 +426,7 @@ String File::GetDrive(const String& filePath)
 		// Drive found
 		return filePath.Left(iSeparator);
 	}
-	
+
 	return String();
 }
 
@@ -435,7 +437,7 @@ String File::GetDrive(const String& filePath)
 String File::CutToParent(const String& filePath)
 {
 	int32 length = filePath.GetLength();
-	
+
 	const wchar* pszPath = filePath.GetBuffer();
 
 	// Is last character a separator ?
@@ -452,7 +454,7 @@ String File::CutToParent(const String& filePath)
 		if( pszPath[i] == L':' || pszPath[i] == L'\\' || pszPath[i] == L'/' )
 			break;
 	}
-	
+
 	return filePath.Left(i + 1);
 }
 
@@ -487,7 +489,7 @@ bool File::IsAbsolutePath(const String& filePath)
 			break;
 		}
 	}
-	
+
 	if( !bSeparatorFound )
 		return false;
 
@@ -507,17 +509,17 @@ ByteArray File::GetContent()
 {
 	const int64 currentPosition = GetPosition();
 	int64 fileLength = GetSize();
-	
+
 	if( fileLength > 0x000000007fffffff )
 	{
 		fileLength = 0x000000007fffffff;
 	}
-	
+
 	ByteArray content;
 	content.SetSize( int(fileLength));
 
 	Read(content.GetPtr(), int(fileLength));
-	
+
 	SetPosition(currentPosition);
 	return content;
 }
@@ -769,7 +771,7 @@ bool File::Copy(const String& srcFilePath, const String& dstFilePath)
 
 	close(source);
 	close(dest);
-	return true;	
+	return true;
 #endif
 }
 

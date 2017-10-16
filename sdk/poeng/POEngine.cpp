@@ -1490,6 +1490,7 @@ bool POEngine::InsertCleanOriginalPngAsResult(IFile& file)
 			{
 			case PngChunk_IEND::Name:
 				bIENDFound = true;
+				// fallthrough
 			case PngChunk_IHDR::Name:
 			case PngChunk_PLTE::Name:
 			case PngChunk_IDAT::Name:
@@ -1892,11 +1893,11 @@ bool POEngine::OptimizeSingleFileNoBackup(IFile& fileImage, OptiTarget& target)
 	}
 
 	if (m_settings.keepPixels)
-  {
+	{
 		return DumpBestResultToFile(target);
 	}
-  else
-  {
+	else
+	{
 		if (img.IsAnimated())
 		{
 			return OptimizeAnimated(img, dd, target);

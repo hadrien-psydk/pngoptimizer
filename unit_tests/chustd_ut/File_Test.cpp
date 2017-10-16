@@ -23,7 +23,7 @@ TEST(File, Open)
 	String filePath = Process::GetCurrentDirectory();
 	filePath = FilePath::Combine(filePath, "testfile.bin");
 	File::Delete(filePath); // Ensure clean state
-	
+
 	// Write a new file
 	{
 	File file;
@@ -67,7 +67,7 @@ TEST(File, Append)
 {
 	String filePath = Process::GetCurrentDirectory();
 	filePath = FilePath::Combine(filePath, "testfile.txt");
-	
+
 	if( File::Exists(filePath) )
 	{
 		ASSERT_TRUE( File::Delete(filePath));
@@ -94,7 +94,7 @@ TEST(File, Append)
 	file0.Close();
 
 	ASSERT_TRUE( nContent == MAKE32('A','A','A','A') );
-	
+
 	ASSERT_TRUE( File::Delete(filePath) );
 }
 
@@ -131,4 +131,40 @@ TEST(File, Rename)
 	ASSERT_TRUE( File::WriteTextUtf8("test-file.txt", "rename") );
 	ASSERT_TRUE( File::Rename("test-file.txt", "test-file-renamed.txt") );
 	ASSERT_TRUE( File::Delete("test-file-renamed.txt") );
+}
+
+TEST(File, SetByteOrder)
+{
+	String filePath = "test-file.txt";
+
+	ByteArray bytes;
+	bytes.Add(0x01);
+	bytes.Add(0x02);
+	bytes.Add(0x03);
+	bytes.Add(0x04);
+	ASSERT_TRUE( File::SetContent(filePath, bytes) );
+
+	File file;
+	ASSERT_TRUE( file.Open(filePath, File::modeRead) );
+	uint32 val = 0;
+
+	// By default, a file reads in big endian
+	val = 0;
+	ASSERT_TRUE( file.Read32(val) );
+	ASSERT_EQ( 0x01020304u, val );
+
+	ASSERT_TRUE( file.SetPosition(0) );
+	file.SetByteOrder(boLittleEndian);
+	val = 0;
+	ASSERT_TRUE( file.Read32(val) );
+	ASSERT_EQ( 0x04030201u, val );
+
+	// Back to big endian
+	ASSERT_TRUE( file.SetPosition(0) );
+	file.SetByteOrder(boBigEndian);
+	val = 0;
+	ASSERT_TRUE( file.Read32(val) );
+	ASSERT_EQ( 0x01020304u, val );
+
+	file.Close();
 }
