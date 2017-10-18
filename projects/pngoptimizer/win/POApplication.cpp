@@ -50,7 +50,7 @@ int POApplication::ThreadProcStatic(void* pParameter)
 
 void POApplication::ThreadProc()
 {
-	m_engine.OptimizeFiles(m_filePaths);
+	m_engine.OptimizeMultiFilesDisk(m_filePaths);
 
 	// Notify the main window that the job is finished
 
@@ -127,10 +127,10 @@ void POApplication::ChangeRectBecauseOfOverlap(RECT& rcWnd)
 {
 	// We divide the desktop screen into 4 zones, in order to decide
 	// the direction of the offset to apply to the new rectangle
-	
+
 	int nScreenWidth = GetDeviceCaps(NULL, HORZRES);
 	int nScreenHeight = GetDeviceCaps(NULL, VERTRES);
-	
+
 	const int nOffset = 16;
 	if( rcWnd.left < nScreenWidth / 2 )
 	{
@@ -192,7 +192,7 @@ void POApplication::OnMainWndDestroying()
 		AppSettings appSettings;
 		appSettings.Write(m_engine.m_settings, &m_bmpcd.m_settings, &mws);
 	}
-	
+
 	// Suspend the thread so the application won't crash if resources allocated by the main
 	// thread are deallocated while still in use by the working thread
 	// For allocations made by the working thread, we let Windows do the job
@@ -223,7 +223,7 @@ void POApplication::DumpScreenshot()
 	String strCreating = m_bmpcd.m_settings.maximizeCompression ? k_szCreatingAndOptimizing : k_szCreating;
 
 	String strScreenshotPath = m_bmpcd.GetFilePath();
-	
+
 	// Replace slashs with backslashs because some applications are lost when using something else than backslashs
 	strScreenshotPath = strScreenshotPath.ReplaceAll(L"/", L"\\");
 
@@ -274,7 +274,7 @@ void POApplication::OnBmpcdStateChanged(BmpClipboardDumper::DumpState eDumpState
 			}
 		}
 		break;
-	
+
 	case BmpClipboardDumper::DS_Creating:
 		m_mainwnd.Write(strCreating, CrFromTc(POEngine::TT_ActionVerb));
 		m_mainwnd.Write(m_bmpcd.GetFileName(), CrFromTc(POEngine::TT_FilePath));
@@ -414,8 +414,8 @@ bool POApplication::Initialize(HINSTANCE hInstance)
 	if( bOneInstanceAlreadyRunning )
 	{
 		ChangeRectBecauseOfOverlap(rcWnd);
-		
-		// Write back the settings so the new window rectangle 
+
+		// Write back the settings so the new window rectangle
 		// for the N+1-th instance will be updated
 		appSettings.Write(m_engine.m_settings, &m_bmpcd.m_settings, &mws);
 	}
@@ -445,7 +445,7 @@ bool POApplication::Initialize(HINSTANCE hInstance)
 	}
 
 	DoConnections();
-	
+
 	// Perform some early resources creation to speedup first optimization
 	if( !m_engine.WarmUp() )
 	{
@@ -501,14 +501,14 @@ POApplication::~POApplication()
 // Main application loop
 
 int POApplication::Run()
-{	
+{
 	HWND hMainWnd = m_mainwnd.GetHandle();
-	
+
 	MSG msg;
-	while( GetMessage(&msg, NULL, 0, 0)) 
+	while( GetMessage(&msg, NULL, 0, 0))
 	{
 		// Keyboard shortcuts are targeted to the main window, so the main window handle is given
-		// to TranslateAccelerator 
+		// to TranslateAccelerator
 		if( !TranslateAccelerator(hMainWnd, m_hAccel, &msg) )
 		{
 			// Ok, no keyboard shortcut, process the message

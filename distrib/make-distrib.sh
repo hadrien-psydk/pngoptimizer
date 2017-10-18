@@ -1,5 +1,5 @@
 #!/bin/bash
-POVER=2.5
+POVER=2.6-beta
 
 # Set current directory to the one containing this script
 cd "$(dirname "$0")"
@@ -24,7 +24,7 @@ function HandleSuccess
 	echo "=   SUCCESS"
 	echo "="
 	tput sgr0
-	exit 0	
+	exit 0
 }
 
 ###############################################################################

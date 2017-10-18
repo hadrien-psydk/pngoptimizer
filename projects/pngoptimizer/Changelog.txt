@@ -84,9 +84,9 @@
 
 - fixed: bad % reported for large files
 - fixed: hangs at startup when loading an empty configuration file (PngOptimizer.ini)
-- fixed: could not load GIFs containing non-Netscape application extensions blocks 
+- fixed: could not load GIFs containing non-Netscape application extensions blocks
          (like XMP data from Photoshop CS)
-- fixed: could not load GIFs with a compressed block ending with a terminator 
+- fixed: could not load GIFs with a compressed block ending with a terminator
          instead of an end-of-information code
 
 -----------------
@@ -167,16 +167,16 @@ Private release by Paul Higginbottom
   Checking size without filtering : slower optimization but improves file size (no more +50% increase)
 
 - Further compression for 32 bits images :
-   
+
    Checking size without filtering (same method than for 24 bits images).
 
    A 32 bits image which could be converted to a 24 bits image was then stored to the disk.
    Now PngOptimizer feeds the 24 bits image to the 24 bits optimizer (which can lead to a palette image).
 
 - Improved general compression by changing the ZLib compression strategy :
-   
+
    Filtered images are stored with the Z_FILTERED strategy, otherwise Z_DEFAULT_STRATEGY is used.
-   
+
    For 32 bits images, both strategy are used and compared, as Z_FILTERED does not always give
    the best results for 32 bits filtered pictures.
 
@@ -215,7 +215,7 @@ Private release by Paul Higginbottom
   3) PngOptimizer creates a PNG file from your screenshot, and prints the filename in its window.
   4) You can drag the file name out of the PngOptimizer window in any application which accepts
      dragged files.
-  5) You can also double-click on the file name to display your picture in your favorite picture 
+  5) You can also double-click on the file name to display your picture in your favorite picture
      viewer.
 
   By default, those files are stored in your Temp directory in your Windows profile. For example :
@@ -226,27 +226,27 @@ Private release by Paul Higginbottom
 
   C:\WINDOWS\TEMP
 
-  You can change the storage location : Right click in PngOptimizer and 
-  select "Change screenshots directory". A dialog box will allow you to select 
+  You can change the storage location : Right click in PngOptimizer and
+  select "Change screenshots directory". A dialog box will allow you to select
   the screenshots location.
 
   You can view the content of the screenshots directory by right-clicking in the PngOptimizer window
   and choose "Show screenshots directory".
 
-  Those PNG files are compressed with a medium ratio (zlib compression 6), in order to reduce 
-  the creation time. If you want to reduce the size a bit more, you can drag them from a file 
+  Those PNG files are compressed with a medium ratio (zlib compression 6), in order to reduce
+  the creation time. If you want to reduce the size a bit more, you can drag them from a file
   explorer to the PngOptimizer window.
 
   .:: Even More Info
 
   About dragging operations.
-  
+
   The dragging result can be either a move or a copy of the screenshot file.
 
   The dragging behaviour is the same you are used to in Windows. For example, if you drag the file out
   of PngOptimizer to a file manager window, in the same partition than the screenshot directory, this
   will result in a move.
-  
+
   To force a copy, press the Control key during the dragging.
   To force a move, press the Shift key during the dragging.
 
@@ -260,7 +260,7 @@ Private release by Paul Higginbottom
 
   .:: More Info
 
-  It means you can select several files in the file explorer and drag them to the PngOptimizer 
+  It means you can select several files in the file explorer and drag them to the PngOptimizer
   executable file. You can also create a PngOptimizer shortcut into your � SendTo � folder. Then you
   select several files in the file explorer and send them to PngOptimizer.
 
@@ -268,7 +268,7 @@ Private release by Paul Higginbottom
 
 -----------------
 2004-07-12 (1.4)
-- Unicode support (for filenames and the log window). 
+- Unicode support (for filenames and the log window).
 
   .:: More Info
 
@@ -286,9 +286,9 @@ Private release by Paul Higginbottom
   according to the number of color occurrences. It also checks the compression result with
   and without adaptive filtering. The optimization can be now a little more slower but the
   compression should be better.
-  
+
   .:: More Info
-  
+
   Adaptive filtering is a way of reordering byte values in PNGs in order to improve
   the compression. But sometimes the compression library performs better without
   this reordering.
@@ -337,7 +337,7 @@ Private release by Paul Higginbottom
   For palettized images, the palette is now sorted according to color luminances.
   This sometimes increases compression, like for fadings. In some cases this could decrease
   compression of some bytes in comparison with the older version.
- 
+
   In some cases, PngOptimizer will now perform the conversion with several parameters
   to get the best compression method. This may slow down the optimization in somes cases
   but will lead to better results.
@@ -346,7 +346,7 @@ Private release by Paul Higginbottom
 -----------------
 2003-03-21 (1.2)
 - Gif transparency was not correctly detected when color 0 was used for transparency
-- Optimization for 32 bits png : 
+- Optimization for 32 bits png :
 	* if all alpha values are 100%, the alpha channel is discarded
 	* if all alpha values are 100%, but one color has an alpha of 0%, the alpha channel is
 	  discarded and the image is saved as RGB + simple transparency
@@ -362,23 +362,23 @@ Private release by Paul Higginbottom
 - Improved support for black & white pictures
 - The settings are now read and stored in the registry
 - Added new option : "Avoid grey + simple transparency (IE Bug)"
-  
+
   .:: Explanation :
 
   Internet Explorer does not support greyscaled images with simple transparency, but it supports
   palettized images with simple transparency. This option tells PngOptimizer to avoid conversion
   from palettized images into greyscale ones if simple transparency is used.
 
-  .:: More Info : 
- 
+  .:: More Info :
+
   * for greyscale images, simple transparency means one grey index has an alpha value of 0%
     (completely transparent), while the other indexes have an alpha of 100% (fully opaque).
   * for palettized images, it means that for each palette entry an alpha value is assigned.
-  * for true color images it means one color value has an alpha of 0%, while the others have an 
+  * for true color images it means one color value has an alpha of 0%, while the others have an
     alpha of 100%.
 
   .:: Even More Info :
- 
+
   Simple transparency is managed through a PNG chunk called tRNS
 
 

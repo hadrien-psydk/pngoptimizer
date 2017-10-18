@@ -6,16 +6,16 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // Foobar is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with Foobar; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-// 
+//
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
@@ -67,10 +67,10 @@ public:
 
 static void WriteVersion()
 {
-	String version = "PngOptimizerCL 2.5";
+	String version = "PngOptimizerCL 2.6-beta";
 #if defined(_M_X64)
 	version = version + String(" (x64)");
-#elif defined(_M_IX86)  
+#elif defined(_M_IX86)
 	version = version + String(" (x86)");
 #endif
 	Console::WriteLine(version);
@@ -172,7 +172,7 @@ int main(int argc, char** argv)
 	if( !argFilePaths.IsEmpty() )
 	{
 		// Explicit file paths
-		if( !engine.OptimizeFiles(argFilePaths) )
+		if( !engine.OptimizeMultiFilesDisk(argFilePaths) )
 		{
 			Console::Stderr().WriteLine(engine.GetLastErrorString());
 			return 1;
@@ -205,7 +205,7 @@ int main(int argc, char** argv)
 			}
 		}
 
-		if( !engine.OptimizeFiles(filePaths, joker) )
+		if( !engine.OptimizeMultiFilesDisk(filePaths, joker) )
 		{
 			Console::Stderr().WriteLine(engine.GetLastErrorString());
 			return 1;
@@ -216,7 +216,7 @@ int main(int argc, char** argv)
 		ASSERT(stdioFlag);
 		g_stdioMode = true;
 
-		if( !engine.OptimizeStdio() )
+		if( !engine.OptimizeFileStdio() )
 		{
 			Console::Stderr().WriteLine(engine.GetLastErrorString());
 			return 1;

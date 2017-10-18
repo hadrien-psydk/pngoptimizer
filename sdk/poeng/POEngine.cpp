@@ -184,6 +184,8 @@ bool POEngine::IsGreyPalette(const Palette& pal)
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // Creates resources to avoid too much burden on first file
+// To be called before any optimization function to avoid making the first call
+// slower than other calls (first call will do the warmup if it is not done).
 /////////////////////////////////////////////////////////////////////////////////////////////
 bool POEngine::WarmUp()
 {
@@ -436,12 +438,12 @@ bool POEngine::TryToConvertIndexedToGreyscale(PngDumpData& dd)
 /////////////////////////////////////////////////////////////////////////////////////////////
 // Dumps either to file or to memory the best optmization result.
 //
-// [in,out] target  in:  Structure containing the file or the memory buffer information to use for the dump
-//                  out: size receives the size of the file dumped
+// [in]  target    Structure containing the file or the memory buffer information to use for the dump
+// [out] optiInfo  Receives the size of the dumped file
 //
 // Returns true upon success
 /////////////////////////////////////////////////////////////////////////////////////////////
-bool POEngine::DumpBestResultToFile(OptiTarget& target)
+bool POEngine::DumpBestResultToFile(const OptiTarget& target, OptiInfo& optiInfo)
 {
 	DynamicMemoryFile& dmf = m_resultmgr.GetSmallest();
 	int sizeToDump = static_cast<int>(dmf.GetPosition());
@@ -455,7 +457,7 @@ bool POEngine::DumpBestResultToFile(OptiTarget& target)
 			AddError(k_szCannotWriteUncomplete);
 			return false;
 		}
-		target.size = sizeToDump;
+		optiInfo.sizeAfter = sizeToDump;
 	}
 	else if( target.type == OptiTarget::Type::File )
 	{
@@ -474,6 +476,7 @@ bool POEngine::DumpBestResultToFile(OptiTarget& target)
 			AddError(k_szCannotWriteUncomplete);
 			return false;
 		}
+		optiInfo.sizeAfter = sizeToDump;
 
 		// Write the same modification date than the original file.
 		// This should be done just before closing, because Write()
@@ -499,7 +502,7 @@ bool POEngine::DumpBestResultToFile(OptiTarget& target)
 			return false;
 		}
 		memcpy(target.buf, dmf.GetContent().GetReadPtr(), sizeToDump);
-		target.size = sizeToDump;
+		optiInfo.sizeAfter = sizeToDump;
 	}
 	return true;
 }
@@ -1326,11 +1329,12 @@ bool POEngine::OptimizeExternalBuffer(const PngDumpData& dd, const String& newFi
 	m_originalFileWriteTime = DateTime();
 	PngDumpData dd2 = dd; // Create modifiable version
 	OptiTarget target(newFileName);
-	return Optimize(dd2, target);
+	OptiInfo optiInfo;
+	return Optimize(dd2, target, optiInfo);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-bool POEngine::Optimize(PngDumpData& dd, OptiTarget& target)
+bool POEngine::Optimize(PngDumpData& dd, const OptiTarget& target, OptiInfo& optiInfo)
 {
 	if( dd.pixelFormat == PF_32bppBgra )
 	{
@@ -1392,7 +1396,7 @@ bool POEngine::Optimize(PngDumpData& dd, OptiTarget& target)
 		return false;
 	}
 
-	return DumpBestResultToFile(target);
+	return DumpBestResultToFile(target, optiInfo);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1602,24 +1606,33 @@ bool POEngine::InsertCleanOriginalPngAsResult(IFile& file)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-// Optimizes/Converts a single file and outputs the result as a png file.
+// Optimizes/Converts a file from disk and outputs the result as a png file.
 // This function ignores m_settings.backupOldPngFiles.
 //
-// [in] filePath      File path of the file to optimize
-// [in] newFilePath   File path of the optimized/converted file
+// [in]  filePath      File path of the file to optimize
+// [in]  newFilePath   File path of the optimized/converted file
+// [out] optiInfo
 //
 // Returns true upon success
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-bool POEngine::OptimizeFileNoBackup(const String& filePath, const String& newFilePath)
+bool POEngine::OptimizeFileDiskNoBackup(const String& filePath, const String& newFilePath, OptiInfo& optiInfo)
 {
 	m_astrErrors.SetSize(0);
 	m_resultmgr.Reset();
 	m_originalFileWriteTime = DateTime();
 
+	optiInfo.Clear();
+
 	File fileImage;
 	if( !fileImage.Open(filePath, File::modeRead) )
 	{
 		AddError(k_szCannotLoadFile);
+		return false;
+	}
+	int64 srcFileSize = fileImage.GetSize();
+	if( srcFileSize > 0xffffffffu )
+	{
+		AddError(k_szFileTooLarge);
 		return false;
 	}
 
@@ -1629,11 +1642,15 @@ bool POEngine::OptimizeFileNoBackup(const String& filePath, const String& newFil
 	}
 
 	OptiTarget target(newFilePath);
-	return OptimizeSingleFileNoBackup(fileImage, target);
+	if( !OptimizeFileStreamNoBackup(fileImage, target, optiInfo) )
+	{
+		return false;
+	}
+	return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-// Optimizes/Converts a single file and output the result to a memory buffer.
+// Optimizes/Converts a file and output the result to a memory buffer.
 //
 // [in]  imgBuf        Buffer containing the image to optimize
 // [in]  imgSize       Size of imgBuf buffer
@@ -1643,7 +1660,7 @@ bool POEngine::OptimizeFileNoBackup(const String& filePath, const String& newFil
 //
 // Returns true upon success
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-bool POEngine::OptimizeSingleFileMem(const uint8* imgBuf, int imgSize, uint8* dst, int dstCapacity, int* pDstSize)
+bool POEngine::OptimizeFileMem(const uint8* imgBuf, int imgSize, uint8* dst, int dstCapacity, int* pDstSize)
 {
 	m_astrErrors.SetSize(0);
 	m_resultmgr.Reset();
@@ -1661,17 +1678,18 @@ bool POEngine::OptimizeSingleFileMem(const uint8* imgBuf, int imgSize, uint8* ds
 		return false;
 	}
 	OptiTarget target(dst, dstCapacity);
-	bool ret = OptimizeSingleFileNoBackup(fileImage, target);
-	*pDstSize = target.size;
+	OptiInfo optiInfo;
+	bool ret = OptimizeFileStreamNoBackup(fileImage, target, optiInfo);
+	*pDstSize = optiInfo.sizeAfter;
 	return ret;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-// Optimizes/Converts a single file from stdin and output the result to stdout.
+// Optimizes/Converts a file from stdin and output the result to stdout.
 //
 // Returns true upon success
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-bool POEngine::OptimizeStdio()
+bool POEngine::OptimizeFileStdio()
 {
 	m_astrErrors.SetSize(0);
 	m_resultmgr.Reset();
@@ -1679,7 +1697,8 @@ bool POEngine::OptimizeStdio()
 
 	StdFile fileImage(StdFileType::Stdin);
 	OptiTarget target; // No argument means stdout
-	bool ret = OptimizeSingleFileNoBackup(fileImage, target);
+	OptiInfo optiInfo;
+	bool ret = OptimizeFileStreamNoBackup(fileImage, target, optiInfo);
 	return ret;
 }
 
@@ -1724,7 +1743,14 @@ static bool LoadFileToMem(IFile& fileImage, DynamicMemoryFile& dmfAsIs)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-bool POEngine::OptimizeSingleFileNoBackup(IFile& fileImage, OptiTarget& target)
+// Optimizes a file stored in a representation of a file, which can be on disk, in memory or from
+// stdio.
+//
+// [in,out] fileImage   File stream
+// [in]     target      Kind of wanted destination
+// [out]    singleOpti  Result size written in sizeAfter
+///////////////////////////////////////////////////////////////////////////////////////////////////
+bool POEngine::OptimizeFileStreamNoBackup(IFile& fileImage, const OptiTarget& target, OptiInfo& optiInfo)
 {
 	m_astrErrors.Clear();
 
@@ -1894,15 +1920,15 @@ bool POEngine::OptimizeSingleFileNoBackup(IFile& fileImage, OptiTarget& target)
 
 	if (m_settings.keepPixels)
 	{
-		return DumpBestResultToFile(target);
+		return DumpBestResultToFile(target, optiInfo);
 	}
 	else
 	{
 		if (img.IsAnimated())
 		{
-			return OptimizeAnimated(img, dd, target);
+			return OptimizeAnimated(img, dd, target, optiInfo);
 		}
-		return Optimize(dd, target);
+		return Optimize(dd, target, optiInfo);
 	}
 }
 
@@ -1959,13 +1985,13 @@ void POEngine::PrintSizeChange(int64 sizeBefore, int64 sizeAfter)
 //
 // [in]   filePath
 // [in]   displayDir
-// [out]  singleOptiInfo
+// [out]  optiInfo
 //
 // Returns true upon success
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-bool POEngine::OptimizeSingleFile(const String& filePath, const String& displayDir, SingleOptiInfo& singleOptiInfo)
+bool POEngine::OptimizeFileDisk(const String& filePath, const String& displayDir, OptiInfo& optiInfo)
 {
-	singleOptiInfo.Clear();
+	optiInfo.Clear();
 	m_astrErrors.Clear();
 
 	bool srcIsDir = false;
@@ -2014,9 +2040,6 @@ bool POEngine::OptimizeSingleFile(const String& filePath, const String& displayD
 	}
 	PrintText(strNameOnly, TT_FilePath);
 	PrintText(" ", TT_RegularInfo);
-
-	// Get the source file size
-	uint32 sizeBefore = (uint32) File::GetSize(filePath);
 
 	strDirOnly = FilePath::AddSeparator(strDirOnly);
 
@@ -2077,29 +2100,26 @@ bool POEngine::OptimizeSingleFile(const String& filePath, const String& displayD
 	// TMP DEBUG : to compare size before and after, uncomment the line above
 	//newFilePath = File::AddFileNamePrefix(newFilePath, "optimized-");
 
-	if( !OptimizeFileNoBackup(oldFilePath, newFilePath) )
+	if( !OptimizeFileDiskNoBackup(oldFilePath, newFilePath, optiInfo) )
 	{
 		return false;
 	}
 	PrintText(" (OK) ", TT_ActionOk);
-	uint32 sizeAfter = (uint32) File::GetSize(newFilePath);
-	singleOptiInfo.sizeBefore = sizeBefore;
-	singleOptiInfo.sizeAfter = sizeAfter;
-	PrintSizeChange(sizeBefore, sizeAfter);
+	PrintSizeChange(optiInfo.sizeBefore, optiInfo.sizeAfter);
 	return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Optimizes multiple files and directories (private)
 //
-// [in] baseDir       Directory name containing the files
-// [in] fileNames     File path relative to base dir
-// [in] displayDir    Directory name to display
-// [in] joker         Type of files managed
-// [in,out] optiInfo  Optimization information
+// [in] baseDir            Directory name containing the files
+// [in] fileNames          File path relative to base dir
+// [in] displayDir         Directory name to display
+// [in] joker              Type of files managed
+// [in,out] multiOptiInfo  Optimization information
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void POEngine::OptimizeFilesInternal(const String& baseDir, const StringArray& fileNames, const String& displayDir,
-                                     const String& joker, OptiInfo& optiInfo)
+                                     const String& joker, MultiOptiInfo& multiOptiInfo)
 {
 	const int32 fileCount = fileNames.GetSize();
 	for(int32 iFile = 0; iFile < fileCount; ++iFile)
@@ -2130,7 +2150,7 @@ void POEngine::OptimizeFilesInternal(const String& baseDir, const StringArray& f
 					newDisplayDir = displayDir + "/";
 				}
 				newDisplayDir = newDisplayDir + strNameOnly;
-				OptimizeFilesInternal(filePath, astrSubFileNames, newDisplayDir, joker, optiInfo);
+				OptimizeFilesInternal(filePath, astrSubFileNames, newDisplayDir, joker, multiOptiInfo);
 			}
 			else
 			{
@@ -2138,20 +2158,20 @@ void POEngine::OptimizeFilesInternal(const String& baseDir, const StringArray& f
 				if( IsFileExtensionSupported(FilePath::GetExtension(filePath), joker) )
 				{
 					// Call the single file optimization function
-					SingleOptiInfo soi;
-					optiInfo.optiCount++;
+					OptiInfo soi;
+					multiOptiInfo.optiCount++;
 					m_astrErrors.Clear();
-					if( !OptimizeSingleFile(filePath, displayDir, soi) )
+					if( !OptimizeFileDisk(filePath, displayDir, soi) )
 					{
-						optiInfo.errorCount++;
+						multiOptiInfo.errorCount++;
 						String strLastError = GetLastErrorString();
 						PrintText(" (KO) ", TT_ActionFail);
 						PrintText(strLastError + "\n", TT_ErrorMsg);
 					}
 					else
 					{
-						optiInfo.sizeBefore += soi.sizeBefore;
-						optiInfo.sizeAfter += soi.sizeAfter;
+						multiOptiInfo.sizeBefore += soi.sizeBefore;
+						multiOptiInfo.sizeAfter += soi.sizeAfter;
 					}
 					m_astrErrors.Clear();
 				}
@@ -2161,7 +2181,7 @@ void POEngine::OptimizeFilesInternal(const String& baseDir, const StringArray& f
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-// Optimize several files or directories from their paths (public)
+// Optimize several files or directories on disk from their paths (public)
 //
 // [in] filePaths  Absolute file paths of files or directories to optimize
 // [in] joker      File types handled. ex: "*.png" or "*.gif|*.bmp"
@@ -2169,14 +2189,14 @@ void POEngine::OptimizeFilesInternal(const String& baseDir, const StringArray& f
 // Returns true if all filtered files could be optimized or converted,
 //         false if at least one error was raised during the call.
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-bool POEngine::OptimizeFiles(const StringArray& filePaths, const String& joker)
+bool POEngine::OptimizeMultiFilesDisk(const StringArray& filePaths, const String& joker)
 {
 	uint32 startTime = System::GetTime();
-	OptiInfo optiInfo;
-	OptimizeFilesInternal("", filePaths, "", joker, optiInfo);
+	MultiOptiInfo multiOptiInfo;
+	OptimizeFilesInternal("", filePaths, "", joker, multiOptiInfo);
 
-	bool success = (optiInfo.errorCount == 0);
-	if( optiInfo.optiCount > 1 )
+	bool success = (multiOptiInfo.errorCount == 0);
+	if( multiOptiInfo.optiCount > 1 )
 	{
 		// Several files, write a summary of the batch optimization
 		String doneMsg;
@@ -2185,14 +2205,14 @@ bool POEngine::OptimizeFiles(const StringArray& filePaths, const String& joker)
 		uint32 stopTime = System::GetTime();
 
 		PrintText("-- Done --  " + String::FromInt(stopTime - startTime) + " ms ", tt); // \x2014
-		PrintSizeChange(optiInfo.sizeBefore, optiInfo.sizeAfter);
+		PrintSizeChange(multiOptiInfo.sizeBefore, multiOptiInfo.sizeAfter);
 	}
 	else
 	{
 		// OptimizeFilesInternal will silently filter out files that are not supported.
 		// However, for a public function, when no file at all is optimized, this is
 		// considered as an error.
-		if( optiInfo.optiCount == 0 && optiInfo.errorCount == 0
+		if( multiOptiInfo.optiCount == 0 && multiOptiInfo.errorCount == 0
 		 && filePaths.GetSize() == 1 && File::Exists(filePaths[0]) )
 		{
 			PrintText(String(k_szUnsupportedFileType) + ": " + FilePath::GetName(filePaths[0]) + "\n", TT_ErrorMsg);
@@ -2215,6 +2235,7 @@ void POEngine::AddError(const String& str)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+// Gets error explanation when an optimization function fails
 String POEngine::GetLastErrorString() const
 {
 	const int32 errCount = m_astrErrors.GetSize();
@@ -2633,23 +2654,26 @@ void MergePalettes(const ImageFormat& img, PngDumpData& dd)
 //
 // Returns true upon success.
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-bool POEngine::OptimizeAnimated(const ImageFormat& img, PngDumpData& dd, const String& filePath)
+bool POEngine::OptimizeAnimated(const ImageFormat& img, PngDumpData& dd, const String& filePath,
+                                OptiInfo& optiInfo)
 {
 	OptiTarget target(filePath);
-	return OptimizeAnimated(img, dd, target);
+	return OptimizeAnimated(img, dd, target, optiInfo);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Converts a loaded animated GIF into an APNG file or convert an existing APNG.
 // As GIF has no concept of default image, the IDAT is included in the animation.
 //
-// [in]     img     Loaded image
-// [out]    dd      PNG data ready to be dumped
-// [in,out] target  Target information: file path or destination buffer
+// [in]  img      Loaded image
+// [out] dd       PNG data ready to be dumped
+// [in]  target   Target information: file path or destination buffer
+// [out] optiInfo To get the result size
 //
 // Returns true upon success.
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-bool POEngine::OptimizeAnimated(const ImageFormat& img, PngDumpData& dd, OptiTarget& target)
+bool POEngine::OptimizeAnimated(const ImageFormat& img, PngDumpData& dd, const OptiTarget& target,
+                                OptiInfo& optiInfo)
 {
 	if( !img.IsAnimated() )
 	{
@@ -2697,7 +2721,7 @@ bool POEngine::OptimizeAnimated(const ImageFormat& img, PngDumpData& dd, OptiTar
 	bool dumpOk = false;
 	if( optiOk )
 	{
-		dumpOk = DumpBestResultToFile(target);
+		dumpOk = DumpBestResultToFile(target, optiInfo);
 	}
 	m_resultmgr.Reset();
 	return optiOk && dumpOk;

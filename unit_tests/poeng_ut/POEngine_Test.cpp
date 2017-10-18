@@ -84,7 +84,8 @@ TEST(POEngine, OptimizeAnimated_BigTransparentFrame)
 	Png png;
 
 	File::Delete(resultFilePath);
-	ASSERT_TRUE( engine.OptimizeAnimated(img, dd, resultFilePath) );
+	POEngine::OptiInfo optiInfo;
+	ASSERT_TRUE( engine.OptimizeAnimated(img, dd, resultFilePath, optiInfo) );
 
 	// We should get a APNG image with the same palette
 	// A default image of 7x7, containing the first 3x3 frame, with transparent color (index 0) around
@@ -125,7 +126,7 @@ TEST(POEngine, OptimizeAnimated_BigTransparentFrame)
 	img.m_animFrames.Add(frame1);
 
 	File::Delete(resultFilePath);
-	ASSERT_TRUE( engine.OptimizeAnimated(img, dd, resultFilePath) );
+	ASSERT_TRUE( engine.OptimizeAnimated(img, dd, resultFilePath, optiInfo) );
 
 	// We should get a APNG image with the same palette
 	// A default image of 7x7, containing the first 3x3 frame, with transparent color (index 0) around
@@ -195,7 +196,8 @@ TEST(POEngine, OptimizeAnimated_BigTransparentFrame_MultiPalette)
 	Png png;
 
 	File::Delete(resultFilePath);
-	ASSERT_TRUE( engine.OptimizeAnimated(img, dd, resultFilePath) );
+	POEngine::OptiInfo optiInfo;
+	ASSERT_TRUE( engine.OptimizeAnimated(img, dd, resultFilePath, optiInfo) );
 
 	// We should get a APNG image with the same palette
 	// A default image of 7x7, containing the first 3x3 frame, with transparent color (index 0) around
@@ -263,7 +265,8 @@ void Helper_OptimizeAnimated_MultiPalette_Saturated(int w, int h, PixelFormat ex
 	Png png;
 
 	File::Delete(resultFilePath);
-	ASSERT_TRUE( engine.OptimizeAnimated(img, dd, resultFilePath) );
+	POEngine::OptiInfo optiInfo;
+	ASSERT_TRUE( engine.OptimizeAnimated(img, dd, resultFilePath, optiInfo) );
 
 	// We should get a APNG image with the same palette
 	// A default image of 7x7, containing the first 3x3 frame, with transparent color (index 0) around
@@ -350,7 +353,8 @@ TEST(POEngine, OptimizeAnimated_UnusedColors)
 	Png png;
 
 	File::Delete(resultFilePath);
-	ASSERT_TRUE( engine.OptimizeAnimated(img, dd, resultFilePath) );
+	POEngine::OptiInfo optiInfo;
+	ASSERT_TRUE( engine.OptimizeAnimated(img, dd, resultFilePath, optiInfo) );
 	ASSERT_TRUE( png.Load(resultFilePath) );
 	ASSERT_TRUE( png.IsAnimated() );
 	ASSERT_TRUE( png.HasDefaultImage() );
@@ -391,7 +395,7 @@ TEST(POEngine, OptimizeAnimated_Loops)
 	img.m_palette.m_count = 2;
 	img.m_palette[0].SetRgb(255, 0, 0);
 	img.m_palette[1].SetRgb(0, 255, 0);
-	
+
 	//////////////////////////////////////////////////////////////////
 	// Dump
 	POEngine engine;
@@ -400,7 +404,8 @@ TEST(POEngine, OptimizeAnimated_Loops)
 	Png png;
 
 	File::Delete(resultFilePath);
-	ASSERT_TRUE( engine.OptimizeAnimated(img, dd, resultFilePath) );
+	POEngine::OptiInfo optiInfo;
+	ASSERT_TRUE( engine.OptimizeAnimated(img, dd, resultFilePath, optiInfo) );
 	ASSERT_TRUE( png.Load(resultFilePath) );
 	ASSERT_TRUE( png.IsAnimated() );
 	ASSERT_TRUE( png.GetLoopCount() == 0 ); // 0 = infinite
@@ -408,7 +413,7 @@ TEST(POEngine, OptimizeAnimated_Loops)
 	img.m_loopCount = 1;
 
 	File::Delete(resultFilePath);
-	ASSERT_TRUE( engine.OptimizeAnimated(img, dd, resultFilePath) );
+	ASSERT_TRUE( engine.OptimizeAnimated(img, dd, resultFilePath, optiInfo) );
 	ASSERT_TRUE( png.Load(resultFilePath) );
 	ASSERT_TRUE( png.IsAnimated() );
 	ASSERT_TRUE( png.GetLoopCount() == 1 );
@@ -416,7 +421,7 @@ TEST(POEngine, OptimizeAnimated_Loops)
 	img.m_loopCount = 347;
 
 	File::Delete(resultFilePath);
-	ASSERT_TRUE( engine.OptimizeAnimated(img, dd, resultFilePath) );
+	ASSERT_TRUE( engine.OptimizeAnimated(img, dd, resultFilePath, optiInfo) );
 	ASSERT_TRUE( png.Load(resultFilePath) );
 	ASSERT_TRUE( png.IsAnimated() );
 	ASSERT_TRUE( png.GetLoopCount() == 347 );
@@ -444,7 +449,8 @@ TEST(POEngine, pHYs_Remove)
 
 	// Remove is default options
 	POEngine engine;
-	ASSERT_TRUE( engine.OptimizeFileNoBackup(resultFilePath, resultFilePath) );
+	POEngine::OptiInfo optiInfo;
+	ASSERT_TRUE( engine.OptimizeFileDiskNoBackup(resultFilePath, resultFilePath, optiInfo) );
 
 	// Reload
 	Png png;
@@ -478,7 +484,8 @@ TEST(POEngine, pHYs_Keep)
 	// Remove is default options
 	POEngine engine;
 	engine.m_settings.physOption = POChunk_Keep;
-	ASSERT_TRUE( engine.OptimizeFileNoBackup(resultFilePath, resultFilePath) );
+	POEngine::OptiInfo optiInfo;
+	ASSERT_TRUE( engine.OptimizeFileDiskNoBackup(resultFilePath, resultFilePath, optiInfo) );
 
 	// Reload
 	Png png;
@@ -510,7 +517,8 @@ TEST(POEngine, pHYs_Force)
 	engine.m_settings.physOption = POChunk_Force;
 	engine.m_settings.physPpmX = 7000;
 	engine.m_settings.physPpmY = 6000;
-	ASSERT_TRUE( engine.OptimizeFileNoBackup(resultFilePath, resultFilePath) );
+	POEngine::OptiInfo optiInfo;
+	ASSERT_TRUE( engine.OptimizeFileDiskNoBackup(resultFilePath, resultFilePath, optiInfo) );
 
 	// Reload
 	Png png;
@@ -579,18 +587,18 @@ TEST(POEngine, OptimizeSingleFileMem)
 
 	// Test invalid arg
 	engine.ClearLastError();
-	ASSERT_FALSE( engine.OptimizeSingleFileMem(inBuf.GetReadPtr(), 0, pOpti, optiCapacity, &optiSize) );
+	ASSERT_FALSE( engine.OptimizeFileMem(inBuf.GetReadPtr(), 0, pOpti, optiCapacity, &optiSize) );
 	ASSERT_FALSE( engine.GetLastErrorString().IsEmpty() );
 
 	// Test destination capacity too small
 	optiSize = 5;
 	engine.ClearLastError();
-	ASSERT_FALSE( engine.OptimizeSingleFileMem(inBuf.GetReadPtr(), inBuf.GetSize(), pOpti, 1, &optiSize) );
+	ASSERT_FALSE( engine.OptimizeFileMem(inBuf.GetReadPtr(), inBuf.GetSize(), pOpti, 1, &optiSize) );
 	ASSERT_FALSE( engine.GetLastErrorString().IsEmpty() );
 	ASSERT_EQ( 0, optiSize );
 
 	// Test legit optimization
-	ASSERT_TRUE( engine.OptimizeSingleFileMem(inBuf.GetReadPtr(), inBuf.GetSize(), pOpti, optiCapacity, &optiSize) );
+	ASSERT_TRUE( engine.OptimizeFileMem(inBuf.GetReadPtr(), inBuf.GetSize(), pOpti, optiCapacity, &optiSize) );
 	ASSERT_TRUE( optiSize > (8+12) );
 	// Check that we ends with an IEND chunk to ensure dstSize is correctly set
 	ASSERT_EQ( 'I', pOpti[optiSize - 8] );
@@ -640,7 +648,7 @@ TEST(POEngine, OptimizeSingleFileMem_ColorToGrey_NoAlpha)
 	int optiSize = 0;
 
 	POEngine engine;
-	ASSERT_TRUE( engine.OptimizeSingleFileMem(inBuf.GetReadPtr(), inBuf.GetSize(), pOpti, optiCapacity, &optiSize) );
+	ASSERT_TRUE( engine.OptimizeFileMem(inBuf.GetReadPtr(), inBuf.GetSize(), pOpti, optiCapacity, &optiSize) );
 
 	StaticMemoryFile pngFile;
 	pngFile.OpenRead(pOpti, optiSize);

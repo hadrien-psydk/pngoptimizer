@@ -50,20 +50,12 @@ public:
 	POEngineSettings m_settings;
 
 public:
-	bool OptimizeFiles(const chustd::StringArray& filePaths, const chustd::String& joker = "");
-	bool OptimizeExternalBuffer(const chustd::PngDumpData& ds, const chustd::String& filePath);
-	bool OptimizeFileNoBackup(const chustd::String& filePath, const chustd::String& newFilePath);
-
-	// Gets error explanation when an optimization function fails
-	chustd::String GetLastErrorString() const;
-	void ClearLastError();
-
-	struct SingleOptiInfo
+	struct OptiInfo
 	{
 		uint32 sizeBefore;
 		uint32 sizeAfter;
 
-		SingleOptiInfo() { Clear(); }
+		OptiInfo() { Clear(); }
 		void Clear()
 		{
 			sizeBefore = 0;
@@ -71,22 +63,20 @@ public:
 		}
 	};
 
-	// Optimizes or converts one single file.
-	bool OptimizeSingleFile(const chustd::String& filePath, const chustd::String& displayDir, SingleOptiInfo& singleOptiInfo);
+	bool OptimizeMultiFilesDisk(const chustd::StringArray& filePaths, const chustd::String& joker = "");
+	bool OptimizeFileDisk(const chustd::String& filePath, const chustd::String& displayDir, OptiInfo& optiInfo);
+	bool OptimizeFileDiskNoBackup(const chustd::String& filePath, const chustd::String& newFilePath, OptiInfo& optiInfo);
+	bool OptimizeExternalBuffer(const chustd::PngDumpData& ds, const chustd::String& filePath);
+	bool OptimizeFileMem(const uint8* imgBuf, int imgSize, uint8* dst, int dstCapacity, int* pDstSize);
+	bool OptimizeFileStdio();
 
-	// Optimizes or converts one single file loaded in memory.
-	bool OptimizeSingleFileMem(const uint8* imgBuf, int imgSize, uint8* dst, int dstCapacity, int* pDstSize);
+	chustd::String GetLastErrorString() const;
+	void ClearLastError();
 
-	// Optimizes or converts a file coming from stdin and write result to stdout
-	bool OptimizeStdio();
+	bool WarmUp();
+	void EnableUnicodeArrow();
 
 	static chustd::Color ColorFromTextType(TextType tt);
-
-	// Initializes some structures. To be called before any optimization function to avoid making the first call
-	// slower than other calls (first call will do the warmup if it is not done).
-	bool WarmUp();
-
-	void EnableUnicodeArrow();
 
 	POEngine();
 	virtual ~POEngine();
@@ -99,16 +89,16 @@ private:
 	public:
 		DynamicMemoryFile& GetCandidate(); // Gets the slot to test a new compression flavour
 		DynamicMemoryFile& GetSmallest();  // Gets the best slot of all
-		
+
 		void Reset();
 
 	private:
 		DynamicMemoryFile m_dmf0;
 		DynamicMemoryFile m_dmf1;
 	};
-	
+
 	ResultManager m_resultmgr;
-	
+
 	// Last errors
 	StringArray m_astrErrors;
 	DateTime m_originalFileWriteTime;
@@ -125,36 +115,33 @@ private:
 		String filePath;
 		void*  buf;
 		int    bufCapacity;
-		int    size;
 
 		OptiTarget() : type(Type::Stdout)
 		{
 			buf = nullptr;
 			bufCapacity = 0;
-			size = 0;
 		}
 
-		OptiTarget(const String& filePathArg) 
+		OptiTarget(const String& filePathArg)
 			: type(Type::File), filePath(filePathArg)
 		{
 			buf = nullptr;
 			bufCapacity = 0;
-			size = 0;
 		}
 
-		OptiTarget(void* bufArg, int bufCapacityArg) 
-			: type(Type::Memory), buf(bufArg), bufCapacity(bufCapacityArg), size(0) {}
+		OptiTarget(void* bufArg, int bufCapacityArg)
+			: type(Type::Memory), buf(bufArg), bufCapacity(bufCapacityArg) {}
 	};
 
 private:
-	struct OptiInfo
+	struct MultiOptiInfo
 	{
 		int optiCount;
 		int errorCount;
 		int64 sizeBefore;
 		int64 sizeAfter;
 
-		OptiInfo()
+		MultiOptiInfo()
 		{
 			optiCount = 0;
 			errorCount = 0;
@@ -162,11 +149,11 @@ private:
 			sizeAfter = 0;
 		}
 	};
-	void OptimizeFilesInternal(const String& baseDir, const StringArray& filePaths, const String& displayDir, 
-	                   const String& joker, OptiInfo& optiInfo);
+	void OptimizeFilesInternal(const String& baseDir, const StringArray& filePaths, const String& displayDir,
+	                   const String& joker, MultiOptiInfo& optiInfo);
 
-	bool Optimize(PngDumpData& dd, OptiTarget& target);
-	bool OptimizeSingleFileNoBackup(IFile& fileImage, OptiTarget& target);
+	bool Optimize(PngDumpData& dd, const OptiTarget& target, OptiInfo&);
+	bool OptimizeFileStreamNoBackup(IFile& fileImage, const OptiTarget& target, OptiInfo&);
 
 	// Those functions fill the DynamicMemoryFiles of m_resultmgr
 	bool OptimizePaletteMode(PngDumpData& dd);
@@ -182,7 +169,7 @@ private:
 	bool TryToConvertIndexedToGreyscale(PngDumpData& dd);
 	bool FindUnusedColor(const Buffer& aRgb, uint8& nRed, uint8& nGreen, uint8& nBlue);
 	bool FindUnusedColorHardcoreMethod(const uint8* pRgba, int32 nPixelCount, uint8& nRed, uint8& nGreen, uint8& nBlue);
-	bool DumpBestResultToFile(OptiTarget& target);
+	bool DumpBestResultToFile(const OptiTarget& target, OptiInfo&);
 
 	bool InsertCleanOriginalPngAsResult(IFile& file);
 
@@ -190,22 +177,22 @@ private:
 
 	void PrintSizeChange(int64 sizeBefore, int64 sizeAfter);
 	void PrintText(const String& text, TextType textType);
-	
+
 	static void BgrToRgb(PngDumpData& dd);
 	static void BgraToRgba(PngDumpData& dd);
 	static bool Rgb16ToRgb24(PngDumpData& dd);
 
 public:
 	// public for unit testing
-	bool OptimizeAnimated(const ImageFormat& img, PngDumpData& dd, const String& filePath);
+	bool OptimizeAnimated(const ImageFormat& img, PngDumpData& dd, const String& filePath, OptiInfo&);
 private:
-	bool OptimizeAnimated(const ImageFormat& img, PngDumpData& dd, OptiTarget& target);
+	bool OptimizeAnimated(const ImageFormat& img, PngDumpData& dd, const OptiTarget& target, OptiInfo&);
 	bool PerformDumpTries(PngDumpData& ds);
 
 	static void UnpackPixelFrames(PngDumpData& dd);
 	static void PackPixelFrames(PngDumpData& dd);
 	static bool IsFileExtensionSupported(const String& ext, const String& joker="");
-		
+
 	friend class POEngine_IsFileExtensionSupported_Test;
 };
 

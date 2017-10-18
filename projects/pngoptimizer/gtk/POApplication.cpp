@@ -114,7 +114,7 @@ int POApplication::ThreadProc()
 		// Start consuming m_filePaths
 		StringArray filePaths = m_filePaths;
 		m_filePaths.Clear();
-		m_engine.OptimizeFiles(filePaths);
+		m_engine.OptimizeMultiFilesDisk(filePaths);
 	}
 	return 0;
 }
@@ -196,7 +196,7 @@ bool POApplication::Init(int argc, char** argv)
 
 /////////////////////////////////////////////////////////////
 int POApplication::Run()
-{	
+{
 	gtk_main();
 
 	m_exitNow = true;
