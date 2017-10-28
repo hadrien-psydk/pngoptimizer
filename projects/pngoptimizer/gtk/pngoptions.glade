@@ -9,6 +9,7 @@
     <property name="type_hint">dialog</property>
     <property name="use-header-bar">1</property>
     <property name="title">Options</property>
+    <property name="default-height">0</property>
 
     <child type="action">
       <object class="GtkButton" id="button_cancel">
