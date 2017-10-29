@@ -22,8 +22,8 @@
     </child>
 
     <child type="action">
-      <object class="GtkButton" id="button_ok">
-        <property name="label">gtk-ok</property>
+      <object class="GtkButton" id="button_apply">
+        <property name="label">gtk-apply</property>
         <property name="visible">True</property>
         <property name="can_focus">True</property>
         <property name="can_default">True</property>
@@ -33,7 +33,7 @@
     </child>
 
     <action-widgets>
-      <action-widget response="ok" default="true">button_ok</action-widget>
+      <action-widget response="apply" default="true">button_apply</action-widget>
       <action-widget response="cancel">button_cancel</action-widget>
     </action-widgets>
 
