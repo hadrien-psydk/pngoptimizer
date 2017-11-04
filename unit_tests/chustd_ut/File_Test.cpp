@@ -168,3 +168,31 @@ TEST(File, SetByteOrder)
 
 	file.Close();
 }
+
+TEST(File, Attributes)
+{
+	String filePath = "a.txt";
+	File::Delete(filePath);
+
+	ASSERT_TRUE( File::WriteTextUtf8(filePath, "blah") );
+
+	bool isDir = false;
+	bool readOnly = false;
+	ASSERT_TRUE( File::GetFileAttributes(filePath, isDir, readOnly) );
+	ASSERT_FALSE( isDir );
+	ASSERT_FALSE( readOnly );
+
+	ASSERT_TRUE( File::SetReadOnly(filePath) );
+
+	ASSERT_TRUE( File::GetFileAttributes(filePath, isDir, readOnly) );
+	ASSERT_FALSE( isDir );
+	ASSERT_TRUE( readOnly );
+
+	ASSERT_TRUE( File::SetReadOnly(filePath, false) );
+
+	ASSERT_TRUE( File::GetFileAttributes(filePath, isDir, readOnly) );
+	ASSERT_FALSE( isDir );
+	ASSERT_FALSE( readOnly );
+
+	File::Delete(filePath);
+}

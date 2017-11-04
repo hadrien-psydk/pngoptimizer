@@ -779,12 +779,12 @@ bool File::Copy(const String& srcFilePath, const String& dstFilePath)
 bool File::GetFileAttributes(const String& filePath, bool& isDirectory, bool& readOnly)
 {
 #if defined(_WIN32)
-	DWORD dwAttributs = ::GetFileAttributesW(filePath.GetBuffer());
-	if( dwAttributs == INVALID_FILE_ATTRIBUTES )
+	DWORD dwAttributes = ::GetFileAttributesW(filePath.GetBuffer());
+	if( dwAttributes == INVALID_FILE_ATTRIBUTES )
 		return false;
 
-	isDirectory = (dwAttributs & FILE_ATTRIBUTE_DIRECTORY) != 0;
-	readOnly = (dwAttributs & FILE_ATTRIBUTE_READONLY) != 0;
+	isDirectory = (dwAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
+	readOnly = (dwAttributes & FILE_ATTRIBUTE_READONLY) != 0;
 
 	return true;
 
@@ -800,7 +800,7 @@ bool File::GetFileAttributes(const String& filePath, bool& isDirectory, bool& re
 		return false;
 	}
 	isDirectory = S_ISDIR(st.st_mode);
-	readOnly = false; // or S_IWUSR ?
+	readOnly = !bool(st.st_mode & S_IWUSR);
 	return true;
 #endif
 }
@@ -842,10 +842,49 @@ bool File::WriteTextUtf8(const String& filePath, const String& content)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+bool File::SetReadOnly(const String& filePath, bool readOnly)
+{
+#if defined(_WIN32)
+	DWORD dwAttributes = ::GetFileAttributesW(filePath.GetBuffer());
+	if( dwAttributes == INVALID_FILE_ATTRIBUTES )
+		return false;
+
+	if( readOnly )
+	{
+		dwAttributes |= FILE_ATTRIBUTES_READONLY;
+	}
+	else
+	{
+		dwAttributes &= ~FILE_ATTRIBUTES_READONLY;
+	}
+	return ::SetFileAttributesW(filePath.GetBuffer(), dwAttributes) != FALSE;
+
+#elif defined(__linux__)
+	char path8[400];
+	if( !filePath.ToUtf8Z(path8) )
+	{
+		return false;
+	}
+	struct stat st;
+	if( stat(path8, &st) != 0 )
+	{
+		return false;
+	}
+
+	if( readOnly )
+	{
+		st.st_mode &= ~S_IWUSR;
+	}
+	else
+	{
+		st.st_mode |= S_IWUSR;
+	}
+
+	return chmod(path8, st.st_mode) == 0;
+#endif
+
 }
 
-
-
-
-
+///////////////////////////////////////////////////////////////////////////////
+}
 
