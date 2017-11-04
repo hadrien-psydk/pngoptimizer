@@ -13,7 +13,7 @@ using namespace chustd;
 ChunkedFile::ChunkedFile(IFile& file)
 {
 	m_pFile = &file;
-	
+
 	m_chunkName = 0;
 	m_chunkSize = 0;
 	m_crc = 0;
@@ -41,7 +41,7 @@ bool ChunkedFile::BeginChunkWrite(uint32 chunkName)
 		// A call to EndChunk is missing
 		return false;
 	}
-	
+
 	// Checker flag
 	m_insideChunk = true;
 
@@ -79,7 +79,7 @@ bool ChunkedFile::EndChunkWrite()
 	// Chunk sizeof computation
 
 	const int64 curPos = GetPosition();
-	
+
 	// The sizeof dos not include the chunkname nor the sizeof nor the crc
 	// The crc has not been written yet, so - 8 instead of - 12
 	const uint32 chunkSizeof = uint32( (curPos - m_startAt) - 8);
@@ -93,7 +93,7 @@ bool ChunkedFile::EndChunkWrite()
 	{
 		return false;
 	}
-	
+
 	if( !Write32(m_crc) )
 	{
 		return false;
@@ -101,7 +101,7 @@ bool ChunkedFile::EndChunkWrite()
 
 	// Go to the position where the sizeof must be written
 	SetPosition(m_startAt);
-			
+
 	// Write sizeof
 	if( !Write32(chunkSizeof) )
 	{
@@ -110,7 +110,7 @@ bool ChunkedFile::EndChunkWrite()
 
 	// Jump at the end
 	SetPosition(curPos + 4);
-	
+
 	// Checker flag
 	m_insideChunk = false;
 	return true;
@@ -120,7 +120,7 @@ bool ChunkedFile::EndChunkWrite()
 bool ChunkedFile::BeginChunkRead()
 {
 	m_startAt = (uint32) GetPosition();
-	
+
 	m_chunkSize = 0;
 	m_chunkName = 0;
 
@@ -146,6 +146,25 @@ bool ChunkedFile::EndChunkRead()
 		return false;
 	}
 
+	// Get the number of bytes read so far
+	const uint32 offset = uint32(GetPosition() - m_startAt);
+
+	// m_chunkSize does not includes the chunkname nor the sizeof nor the crc
+	const uint32 expectedOffset = 8 + m_chunkSize;
+
+	if( offset > expectedOffset )
+	{
+		// The application has read too much data
+		return false;
+	}
+
+	// The application is allowed to read less bytes than the number contained in the chunk
+	// We need to set the position to in front of the CRC word
+	if( offset < expectedOffset )
+	{
+		SetPosition(m_startAt + expectedOffset);
+	}
+
 	// Read the CRC of the chunk
 	uint32 chunkCrc = 0;
 	if( !Read32(chunkCrc) )
@@ -153,24 +172,6 @@ bool ChunkedFile::EndChunkRead()
 		return false;
 	}
 
-	// Get the number of bytes read so far
-	const uint32 read = uint32( GetPosition() - m_startAt);
-	
-	// m_chunkSize does not includes the chunkname nor the sizeof nor the crc
-	const uint32 chunkSizeof = m_chunkSize + 12;
-
-	if( read > chunkSizeof )
-	{
-		// The application has read too much data
-		return false;
-	}
-	
-	if( read < chunkSizeof )
-	{
-		// The application is allowed to read less bytes than the number contained in the chunk
-		SetPosition(m_startAt + chunkSizeof);
-	}
-	
 	// Reset begin chunk info
 	m_chunkSize = 0;
 	m_chunkName = 0;
@@ -218,7 +219,7 @@ void ChunkedFile::UpdateCrc(uint32& pendingCrc, const void* pBuffer, int32 buffe
 	//		else
 	//			c = c >> 1;
 	//	}
-	//	lut[n] = c;	
+	//	lut[n] = c;
 	//}
 
 	static const uint32 lut[256] = {
