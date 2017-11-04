@@ -5,4 +5,4 @@ PROJECT_FILES += gtk/logo48.png gtk/pngoptions.glade
 SDK_DEPS := poeng chustd
 EXT_DEPS := gtk
 
-include ../../sdk/chulib.mki
+include ../../sdk/chulib.mk
