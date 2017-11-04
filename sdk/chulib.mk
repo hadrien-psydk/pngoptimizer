@@ -154,7 +154,7 @@ $(OUTDIR)/%.glade.o: %.glade
 rebuild: clean all
 
 run: all
-	$(OUTPATH)
+	$(OUTPATH) $(ARGS)
 
 install: all
 # We only create the directory tree if we are installing for a package
