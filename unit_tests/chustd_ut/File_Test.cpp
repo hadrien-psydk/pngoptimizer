@@ -167,6 +167,7 @@ TEST(File, SetByteOrder)
 	ASSERT_EQ( 0x01020304u, val );
 
 	file.Close();
+	File::Delete(filePath);
 }
 
 TEST(File, Attributes)

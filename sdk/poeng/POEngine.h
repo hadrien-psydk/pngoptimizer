@@ -46,20 +46,32 @@ public:
 
 	chustd::Event1<const ProgressingArg&> Progressing; // Fired during the optimization process
 
-public:
+	// General settings, freely accessible and used during optimization/conversion
 	POEngineSettings m_settings;
 
 public:
+	// A PNG file signature is just the list of all its chunk CRCs
+	typedef chustd::Array<uint32> PngSignature;
+
 	struct OptiInfo
 	{
-		uint32 sizeBefore;
-		uint32 sizeAfter;
+		int sizeBefore;
+		int sizeAfter;
+
+		// Computed when inserting a clean version of the source file
+		PngSignature srcSignature;
+
+		// If sizes are the same and the content too, this
+		// value will be true
+		bool sameContent;
 
 		OptiInfo() { Clear(); }
 		void Clear()
 		{
 			sizeBefore = 0;
 			sizeAfter = 0;
+			srcSignature.Clear();
+			sameContent = false;
 		}
 	};
 
@@ -107,6 +119,15 @@ private:
 
 	bool m_unicodeArrowEnabled; // To have a nice arrow for ->
 
+	// Holds source information
+	struct SrcInfo
+	{
+		String filePath; // Input file to be optimized
+		int    fileSize; // Input file size
+
+		SrcInfo() : fileSize(0) {}
+	};
+
 	// Holds target information: stdout, a file path or a memory buffer
 	struct OptiTarget
 	{
@@ -115,6 +136,8 @@ private:
 		String filePath;
 		void*  buf;
 		int    bufCapacity;
+
+		SrcInfo srcInfo;
 
 		OptiTarget() : type(Type::Stdout)
 		{
@@ -171,11 +194,11 @@ private:
 	bool FindUnusedColorHardcoreMethod(const uint8* pRgba, int32 nPixelCount, uint8& nRed, uint8& nGreen, uint8& nBlue);
 	bool DumpBestResultToFile(const OptiTarget& target, OptiInfo&);
 
-	bool InsertCleanOriginalPngAsResult(IFile& file);
+	bool InsertCleanOriginalPngAsResult(IFile& file, PngSignature& oriSign);
 
 	void AddError(const String& str);
 
-	void PrintSizeChange(int64 sizeBefore, int64 sizeAfter);
+	void PrintSizeChange(int64 sizeBefore, int64 sizeAfter, bool sameContent);
 	void PrintText(const String& text, TextType textType);
 
 	static void BgrToRgb(PngDumpData& dd);

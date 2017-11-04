@@ -37,6 +37,7 @@ const char k_szPathIsNotAFile[] = "Not a file";
 const char k_szUnsupportedFileType[] = "Unsupported file type";
 const char k_szInvalidArgument[] = "Invalid argument";
 const char k_szCannotSetFilePosition[] = "Cannot set file position";
+const char k_szInternalError[] = "Internal error";
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -60,7 +61,10 @@ DynamicMemoryFile& POEngine::ResultManager::GetCandidate()
 		return m_dmf1;
 	}
 
-	DynamicMemoryFile& dmf = (size1 > size0) ? m_dmf1 : m_dmf0;
+	// Favor slot 1 in case we have the same sizes.
+	// The idea is to keep the original clean copy unmodified in slot 0
+	// until we can do better
+	DynamicMemoryFile& dmf = (size1 >= size0) ? m_dmf1 : m_dmf0;
 
 	// Open the dynamic memory file with allocation performed
 
@@ -88,7 +92,10 @@ DynamicMemoryFile& POEngine::ResultManager::GetSmallest()
 	{
 		return m_dmf0;
 	}
-	DynamicMemoryFile& dmf = (size0 < size1) ? m_dmf0 : m_dmf1;
+	// Favor slot 0 in case we get the same sizes.
+	// The idea is to keep the original clean copy unmodified in slot 0
+	// until we can do better
+	DynamicMemoryFile& dmf = (size0 <= size1) ? m_dmf0 : m_dmf1;
 	return dmf;
 }
 
@@ -436,6 +443,56 @@ bool POEngine::TryToConvertIndexedToGreyscale(PngDumpData& dd)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
+// Computes the signature of a PNG. This function is called for the result of the engine, and
+// thus any error in the PNG decoding is actually a programming error.
+static bool ComputePngSignature(IFile& file, POEngine::PngSignature& sign)
+{
+	sign.Clear();
+
+	if( !Png::IsPng(file) )
+	{
+		// Not a PNG
+		ASSERT(0); // Programming error
+		return false;
+	}
+
+	ChunkedFile chfIn(file);
+
+	bool bIENDFound = false;
+
+	while( !bIENDFound)
+	{
+		bool chunkPresent = chfIn.BeginChunkRead();
+		if( !chunkPresent )
+		{
+			break;
+		}
+
+		switch( chfIn.m_chunkName )
+		{
+		case PngChunk_IEND::Name:
+			bIENDFound = true;
+			break;
+		default:
+			break;
+		}
+
+		if( !chfIn.EndChunkRead() )
+		{
+			// Unexpected end of stream, CRC not present or chunk mishandled (read too much)
+			return false;
+		}
+		sign.Add(chfIn.m_crc);
+	}
+
+	if( !bIENDFound )
+	{
+		return false;
+	}
+	return true;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
 // Dumps either to file or to memory the best optmization result.
 //
 // [in]  target    Structure containing the file or the memory buffer information to use for the dump
@@ -461,8 +518,41 @@ bool POEngine::DumpBestResultToFile(const OptiTarget& target, OptiInfo& optiInfo
 	}
 	else if( target.type == OptiTarget::Type::File )
 	{
-		ASSERT(!target.filePath.IsEmpty());
 		// Target is a file
+		ASSERT(!target.filePath.IsEmpty());
+
+		// Check if overwritting is necessary. This is the case only for PNG files,
+		// as a clean version was inserted and its signature was computed.
+		//
+		// We cannot just check the size because a clean version of the PNG file may
+		// add data depending on the engine settings (for example, forcing a specifc chunk).
+		//
+		// Thus we need to compare the content, which is done by looking at the signatures.
+
+		if( target.filePath == target.srcInfo.filePath
+			&& target.srcInfo.fileSize == sizeToDump
+		 	&& !optiInfo.srcSignature.IsEmpty() )
+		{
+			// Theses are the same path, and the source file is a PNG
+			// So now verify the contents
+			dmf.SetPosition(0);
+			PngSignature newSignature;
+			if( !ComputePngSignature(dmf, newSignature) )
+			{
+				// If it happens, it means there is a bug in the engine
+				AddError(k_szInternalError);
+				return false;
+			}
+			dmf.SetPosition(sizeToDump);
+
+			if( newSignature == optiInfo.srcSignature )
+			{
+				optiInfo.sizeAfter = sizeToDump;
+				optiInfo.sameContent = true;
+				return true;
+			}
+		}
+
 		File file;
 		if( !file.Open(target.filePath, File::modeWrite) )
 		{
@@ -1409,13 +1499,15 @@ void POEngine::PrintText(const String& text, TextType tt)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-// Builds a new PNG from another one (given by file) excluding unwanted chunks
+// Builds a new PNG from another one (given by file) excluding unwanted chunks.
 //
-// file: Original file
+// [in]  file     Original file
+// [out] oriSign  Signature of the original file. This is helpful to know if overwriting
+//                the original file is really needed.
 //
 // Returns true upon success
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-bool POEngine::InsertCleanOriginalPngAsResult(IFile& file)
+bool POEngine::InsertCleanOriginalPngAsResult(IFile& file, PngSignature& oriSign)
 {
 	if( !Png::IsPng(file) )
 	{
@@ -1423,6 +1515,7 @@ bool POEngine::InsertCleanOriginalPngAsResult(IFile& file)
 		ASSERT(0); // Programming error
 		return false;
 	}
+	oriSign.Clear();
 
 	const int64 fileSize = file.GetSize();
 	const int32 fileSize32 = int32(fileSize);
@@ -1565,36 +1658,30 @@ bool POEngine::InsertCleanOriginalPngAsResult(IFile& file)
 		if( keepChunk )
 		{
 			// We keep that chunk
-			dmf.Write32( chfIn.m_chunkSize);
-			dmf.Write32( chfIn.m_chunkName);
+			dmf.Write32(chfIn.m_chunkSize);
+			dmf.Write32(chfIn.m_chunkName);
 			if( dmf.WriteFromFile(chfIn, chfIn.m_chunkSize) != chfIn.m_chunkSize )
 			{
 				// The source file is invalid
 				bOkHandled = false;
 				break;
 			}
+		}
 
-			if( !chfIn.EndChunkRead() )
-			{
-				// The source file is invalid
-				bOkHandled = false;
-				break;
-			}
-			else
-			{
-				// We bypassed the CRC computation, so we just write the one we read
-				dmf.Write32(chfIn.m_crc);
-			}
-		}
-		else
+		if( !chfIn.EndChunkRead() )
 		{
-			if( !chfIn.EndChunkRead() )
-			{
-				// Unexpected end of stream, CRC not present or chunk mishandled (read too much)
-				bOkHandled = false;
-				break;
-			}
+			// The source file is invalid
+			bOkHandled = false;
+			break;
 		}
+
+		if( keepChunk )
+		{
+			// We bypassed the CRC computation, so we just write the one we read
+			// chfIn.m_crc is valid only after a call to EndChunkRead()
+			dmf.Write32(chfIn.m_crc);
+		}
+		oriSign.Add(chfIn.m_crc);
 	}
 
 	if( !(bOkHandled && bIENDFound) )
@@ -1630,7 +1717,7 @@ bool POEngine::OptimizeFileDiskNoBackup(const String& filePath, const String& ne
 		return false;
 	}
 	int64 srcFileSize = fileImage.GetSize();
-	if( srcFileSize > 0xffffffffu )
+	if( srcFileSize > MAX_INT32 )
 	{
 		AddError(k_szFileTooLarge);
 		return false;
@@ -1642,6 +1729,11 @@ bool POEngine::OptimizeFileDiskNoBackup(const String& filePath, const String& ne
 	}
 
 	OptiTarget target(newFilePath);
+
+	// The source data is a file, set the source information field of the target struct
+	target.srcInfo.filePath = filePath;
+	target.srcInfo.fileSize = static_cast<int>(srcFileSize);
+
 	if( !OptimizeFileStreamNoBackup(fileImage, target, optiInfo) )
 	{
 		return false;
@@ -1652,7 +1744,7 @@ bool POEngine::OptimizeFileDiskNoBackup(const String& filePath, const String& ne
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Optimizes/Converts a file and output the result to a memory buffer.
 //
-// [in]  imgBuf        Buffer containing the image to optimize
+// [in]  imgBuf        Buffer containing the image file to optimize
 // [in]  imgSize       Size of imgBuf buffer
 // [out] dst           Destination buffer receiving the optimized/converted PNG file
 // [in]  dstCapacity   Capacity in bytes of the destination buffer
@@ -1763,6 +1855,9 @@ bool POEngine::OptimizeFileStreamNoBackup(IFile& fileImage, const OptiTarget& ta
 		return false;
 	}
 
+	// Needed for display
+	optiInfo.sizeBefore = static_cast<int>(dmfAsIs.GetSize());
+
 	/////////////////////////////////////////////
 	ImageLoader imgloader;
 	if( !imgloader.InstanciateLosslessFormat(dmfAsIs) )
@@ -1784,7 +1879,7 @@ bool POEngine::OptimizeFileStreamNoBackup(IFile& fileImage, const OptiTarget& ta
 		// As we insert a copy of the source file, the source file becomes a candidate for the best result,
 		// thus if we cannot achieve a better compression than the original file, we just dump the original file
 		dmfAsIs.SetPosition(0);
-		if( !InsertCleanOriginalPngAsResult(dmfAsIs) )
+		if( !InsertCleanOriginalPngAsResult(dmfAsIs, optiInfo.srcSignature) )
 		{
 			return false;
 		}
@@ -1933,7 +2028,7 @@ bool POEngine::OptimizeFileStreamNoBackup(IFile& fileImage, const OptiTarget& ta
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void POEngine::PrintSizeChange(int64 sizeBefore, int64 sizeAfter)
+void POEngine::PrintSizeChange(int64 sizeBefore, int64 sizeAfter, bool sameContent)
 {
 	if( !(sizeBefore > 0 && sizeAfter > 0) )
 	{
@@ -1963,8 +2058,16 @@ void POEngine::PrintSizeChange(int64 sizeBefore, int64 sizeAfter)
 	sb.Empty();
 
 	sb += " (";
-	sb += String::FromInt(uint32(ratio));
-	sb += "% of the original size)\n"; // End of line here
+	if( !sameContent )
+	{
+		sb += String::FromInt(uint32(ratio));
+		sb += "% of the original size";
+	}
+	else
+	{
+		sb += "unmodified";
+	}
+	sb += ")\n"; // End of line here
 
 	if( sizeAfter > sizeBefore )
 	{
@@ -2105,7 +2208,7 @@ bool POEngine::OptimizeFileDisk(const String& filePath, const String& displayDir
 		return false;
 	}
 	PrintText(" (OK) ", TT_ActionOk);
-	PrintSizeChange(optiInfo.sizeBefore, optiInfo.sizeAfter);
+	PrintSizeChange(optiInfo.sizeBefore, optiInfo.sizeAfter, optiInfo.sameContent);
 	return true;
 }
 
@@ -2205,7 +2308,7 @@ bool POEngine::OptimizeMultiFilesDisk(const StringArray& filePaths, const String
 		uint32 stopTime = System::GetTime();
 
 		PrintText("-- Done --  " + String::FromInt(stopTime - startTime) + " ms ", tt); // \x2014
-		PrintSizeChange(multiOptiInfo.sizeBefore, multiOptiInfo.sizeAfter);
+		PrintSizeChange(multiOptiInfo.sizeBefore, multiOptiInfo.sizeAfter, false);
 	}
 	else
 	{

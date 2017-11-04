@@ -569,7 +569,7 @@ bool BuildTestImage(IFile& dstFile)
 	return PngDumper::Dump(dstFile, dd, PngDumpSettings());
 }
 
-TEST(POEngine, OptimizeSingleFileMem)
+TEST(POEngine, OptimizeFileMem)
 {
 	DynamicMemoryFile dstFile;
 	dstFile.Open(65536);
@@ -634,7 +634,7 @@ bool BuildTestImage_ColorToGrey(IFile& dstFile)
 }
 
 // Convert a RGBA imge, with RGB always grey and A always 0 or 255
-TEST(POEngine, OptimizeSingleFileMem_ColorToGrey_NoAlpha)
+TEST(POEngine, OptimizeFileMem_ColorToGrey_NoAlpha)
 {
 	DynamicMemoryFile dstFile;
 	dstFile.Open(65536);
@@ -656,4 +656,37 @@ TEST(POEngine, OptimizeSingleFileMem_ColorToGrey_NoAlpha)
 	Png png;
 	ASSERT_TRUE( png.LoadFromFile(pngFile) );
 	ASSERT_TRUE( png.GetPixelFormat() == PF_8bppGrayScale );
+}
+
+// Test that a PNG that cannot be improved is not overwritten
+TEST(POEngine, NoNeedlessOverwrite)
+{
+	static const String filePath = "onepix.png";
+	File::Delete(filePath);
+
+	// Build test image. This image cannot be compressed more.
+	// However the IDAT content can change. We want PngOptimizer to keep
+	// the original version.
+	PngDumpData dd;
+	dd.pixelFormat = PF_24bppRgb;
+	dd.width = 1; // 2 + 3 + 2
+	dd.height = 1;
+	dd.pixels.SetSize(dd.width * dd.height * 3);
+	dd.pixels.GetWritePtr()[0] = 0xff;
+	dd.pixels.GetWritePtr()[1] = 0x7f;
+	dd.pixels.GetWritePtr()[2] = 0x3f;
+
+	PngDumpSettings ds;
+	ASSERT_TRUE( PngDumper::Dump(filePath, dd, ds) );
+
+	// To detect an attempt of overwrite
+	ASSERT_TRUE( File::SetReadOnly(filePath) );
+
+	POEngine engine;
+	POEngine::OptiInfo optiInfo;
+	ASSERT_TRUE( engine.OptimizeFileDiskNoBackup(filePath, filePath, optiInfo) );
+	ASSERT_TRUE( optiInfo.sameContent );
+
+	ASSERT_TRUE( File::SetReadOnly(filePath, false) );
+	ASSERT_TRUE( File::Delete(filePath) );
 }
