@@ -19,11 +19,11 @@
 
 Platform  : Windows/Linux - x86/x64
 Licence   : GNU GPL 2
-Version   : 2.5.1
+Version   : 2.6-beta
 Home page : http://psydk.org/pngoptimizer
 Contact   : pngoptimizer@psydk.org
 
-Contributions : 
+Contributions :
 - PngOptimizer icon by Guillaume Schaeffer
 - Beta testing, bug reports : many friends & contributors, thanks for all!
 
@@ -45,13 +45,13 @@ The goals of PngOptimizer are :
 == Usage ==
 
 To clean, convert and optimize image files :
- Drop files from the file explorer into PngOptimizer main window. The files 
+ Drop files from the file explorer into PngOptimizer main window. The files
  are converted and optimized immediately. If the compression of a PNG cannot
  be improved, the file will be just cleaned.
 
 To paste a screenshot :
- Press PrintScreen or Alt+PrintScreen, then press Ctrl+V or Shift+Insert in 
- PngOptimizer main window. You can then double-click on the created link to 
+ Press PrintScreen or Alt+PrintScreen, then press Ctrl+V or Shift+Insert in
+ PngOptimizer main window. You can then double-click on the created link to
  view the result, and drag the link to another application.
 
 For advanced PNG options, perform a right click to display a context menu.
@@ -59,12 +59,12 @@ For advanced PNG options, perform a right click to display a context menu.
 == PNG options ==
 
 * Backup old PNG files *
- If you are not confident enough with PngOptimizer, this option lets you 
- rename your old PNG files with an underscore ( _ ) at the beginning of their 
+ If you are not confident enough with PngOptimizer, this option lets you
+ rename your old PNG files with an underscore ( _ ) at the beginning of their
  name. Otherwise the previous file is replaced by the optimized one.
 
 * Keep interlacing *
- Use this option if you do not want PngOptimizer to remove interlacing in 
+ Use this option if you do not want PngOptimizer to remove interlacing in
  your PNG file. Interlacing is nice but it increases file size.
 
 * Avoid grey with simple transparency *
@@ -90,11 +90,11 @@ For advanced PNG options, perform a right click to display a context menu.
  for the new file.
 
 * Background color (bkGD chunk) *
- 
+
  This is intended for Web developers dealing with Internet Explorer 6.
- 
+
  In Internet Explorer 6, PNG images with an alpha channel are blended by
- default with a grey background color, or if provided, by a background 
+ default with a grey background color, or if provided, by a background
  color specified in the PNG.
 
  You can choose to remove, keep, or force a background color. Note that
@@ -103,7 +103,7 @@ For advanced PNG options, perform a right click to display a context menu.
 * Textual data (tEXt chunk) *
 
  This option lets you remove all, keep all or force one textual data.
- 
+
 * Physical pixel dimensions (pHYs chunk) *
 
  This option lets you remove all, keep all or force information related to the
@@ -124,13 +124,13 @@ For advanced PNG options, perform a right click to display a context menu.
 
  Opens a dialog box to set screenshots options :
 
-  - the screenshots location : the temporary directory in your profile 
+  - the screenshots location : the temporary directory in your profile
     directory or a specific location.
 
   - an option to feed the optimization engine with the screenshots you make.
     When set, you will get smaller files, but you will have to wait longer.
 
-  - an option to ask for a screenshot file name when you paste it into 
+  - an option to ask for a screenshot file name when you paste it into
     PngOptimizer. By default, the screenshot file name contains the date and
     time it was taken. If PngOptimizer finds some kind of index, it will propose
     a new file name with an incremented index. For example: file 1.png, file 2.png...
@@ -156,7 +156,7 @@ deleting the key HKEY_CURRENT_USER\Software\Darken Utilities.
 
 When optimzing, PngOptimizer tries to decrease the number of bits per pixel.
 It means that a 32 bits image may become a 24 bits image, a 24 bits image
-may become a 8 bits indexed image, a 8 bits indexed image may become a 
+may become a 8 bits indexed image, a 8 bits indexed image may become a
 4 bits indexed image...
 
 What PngOptimizer specifically avoids is increasing the number of bits per

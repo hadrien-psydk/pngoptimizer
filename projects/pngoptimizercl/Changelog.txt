@@ -1,6 +1,11 @@
 == PngOptimizerCL Changelog ==
 
-Note: for engine optimization, see PngOptimizer Changelog instead.
+-----------------
+2017 (2.6-beta)
+
+- new: added "-KeepPixels" option to just clean a PNG
+
+- change: do not overwrite a file if the content stays the same
 
 -----------------
 2016-10-09 (2.5)
