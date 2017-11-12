@@ -2,9 +2,9 @@
 
 A graphics and command line tools to optimize PNGs and convert other lossless formats (GIF, BMP, TGA) into optimized PNGs.
 
- * The PngOptimizer application in the "projects" directory 
+ * The PngOptimizer application in the "projects" directory
   is distributed under the terms of the GNU General Public Licence.
- * The PngOptimizerCL application in the "projects" directory 
+ * The PngOptimizerCL application in the "projects" directory
   is distributed under the terms of the GNU General Public Licence.
  * The poeng library in the "sdk" directory
   is distributed under the terms of the GNU Lesser General Public Licence.
@@ -12,11 +12,11 @@ A graphics and command line tools to optimize PNGs and convert other lossless fo
   is distributed under the terms of the Zlib licence.
  * The chustd library in the "sdk" directory
   is distributed under the terms of the Zlib licence.
- * The chustd uses the Zlib library, distributed under the terms of the 
+ * The chustd uses the Zlib library, distributed under the terms of the
   ZLib licence.
  * The unit_tests directory uses the Google Test framework, distributed under
   the terms of the new BSD license.
-  
+
 --------------------------------------------------------------------------
 How to build PngOptimizer?
 
@@ -25,7 +25,7 @@ For Windows:
  1. Use Microsoft Visual Studio 2015 and open projects/pngoptimizer/PngOptimizer.sln
  2. Build the solution, in either Debug or Release mode, and for Win32 (x86) or x64.
 
-The final build result, PngOptimizer.exe, is located into the Win32-Debug, Win32-Release, 
+The final build result, PngOptimizer.exe, is located into the Win32-Debug, Win32-Release,
 x64-Debug or x64-Release sub-directory of the PngOptimizer directory.
 
 For Linux:
@@ -36,11 +36,11 @@ For Linux:
  3. Ensure you have GTK+ development package: `sudo apt-get install libgtk-3-dev`
  3. Change directory to projects/pngoptimizer/
  4. Execute command: `make` or `make CONFIG=release`
-   
+
     These commands build in debug and release configuration respectively.
     The build results are located in the linux-debug/ or linux-release/ directories.
 
-On Linux, `make` accept other targets: clean, run, install, uninstall, cov. Open sdk/chulib.mki for a description at the top of the file.
+On Linux, `make` accept other targets: clean, run, install, uninstall, cov. Open sdk/chulib.mk for a description at the top of the file.
 
 The SDK libraries have subdirectories where build files are stored:
 

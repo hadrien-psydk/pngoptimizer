@@ -1,3 +1,8 @@
 linux-debug/
 linux-release/
 linux-coverage/
+.vscode
+distrib/deb
+distrib/tgz
+distrib/snap
+distrib/download

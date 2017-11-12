@@ -32,7 +32,7 @@ public:
 	// Open a file. Default flags are :
 	// Read mode + Binary mode + Big Endian mode
 	bool Open(const String& filePath, uint32 mode = modeRead);
-	
+
 	// Copy the whole file content to a buffer
 	ByteArray GetContent();
 
@@ -68,10 +68,10 @@ public:
 
 	// Deletes a file
 	static bool Delete(const String& filePath);
-	
+
 	// Renames a file, returns true if the rename occured
 	static bool Rename(const String& strOldName, const String& strNewName);
-	
+
 	// Performs a file copy, returns true if the copy occured
 	static bool Copy(const String& srcFilePath, const String& dstFilePath);
 
@@ -93,6 +93,8 @@ public:
 	static bool GetFileAttributes(const String& filePath, bool& isDirectory, bool& readOnly);
 
 	static bool WriteTextUtf8(const String& filePath, const String& content);
+
+	static bool SetReadOnly(const String& filePath, bool readOnly = true);
 
 private:
 	union FileImpl

@@ -1,6 +1,11 @@
 == PngOptimizer Changelog ==
 
 -----------------
+2017 (2.6-beta)
+
+- change: do not overwrite a file if the content stays the same
+
+-----------------
 2017-02-12 (2.5.1)
 
 - fixed: window position would be always centered instead of being restored to the previous position (Windows only)

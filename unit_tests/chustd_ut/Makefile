@@ -4,4 +4,4 @@ PROJECT_FILES := *.cpp
 SDK_DEPS = chustd gtest
 INCDIRS += ../../sdk/gtest/include
 
-include ../../sdk/chulib.mki
+include ../../sdk/chulib.mk
