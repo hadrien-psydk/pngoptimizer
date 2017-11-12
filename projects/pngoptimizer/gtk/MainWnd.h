@@ -16,12 +16,14 @@ class MainWnd : public Window
 {
 public:
 	Event1<const StringArray&> FilesDropped; // [filePaths]
-	
+
 public:
 	bool Create(const char* welcomeMsg);
 	void AddText(const chustd::String& text, Color cr = Color::Black);
-	
+
 private:
+	Button m_btPrefs;
+	Button m_btClear;
 	ContextMenu m_ctm;
 	TraceCtl m_traceCtl;
 

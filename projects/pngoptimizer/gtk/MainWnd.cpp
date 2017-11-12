@@ -35,7 +35,7 @@ static void OnDragDataReceived(GtkWidget*, GdkDragContext* context,
 				g_free(path);
 			}
 			i++;
-		}	
+		}
 	 	g_strfreev(uris);
 	}
 	bool success = !arg.IsEmpty();
@@ -44,7 +44,7 @@ static void OnDragDataReceived(GtkWidget*, GdkDragContext* context,
 
 	if( arg.IsEmpty() )
 		return;
- 
+
 	MainWnd* that = reinterpret_cast<MainWnd*>(userData);
 	that->FilesDropped.Fire(arg);
 }
@@ -117,7 +117,31 @@ bool MainWnd::Create(const char* welcomeMsg)
 	gtk_window_set_default_size(GTK_WINDOW(window), 580, 300);
 	gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
 
-	GtkTargetEntry targets[] = {
+	////////////////////////////
+	// Header bar
+	auto headerBar = gtk_header_bar_new();
+	gtk_header_bar_set_title(GTK_HEADER_BAR(headerBar), "PngOptimizer");
+	gtk_header_bar_set_show_close_button(GTK_HEADER_BAR(headerBar), true);
+
+	auto prefsButton = gtk_button_new_from_icon_name("preferences-system-symbolic",
+		GTK_ICON_SIZE_SMALL_TOOLBAR);
+	gtk_header_bar_pack_start(GTK_HEADER_BAR(headerBar), prefsButton);
+
+	auto clearButton = gtk_button_new_from_icon_name("edit-clear-all-symbolic",
+		GTK_ICON_SIZE_SMALL_TOOLBAR);
+	gtk_header_bar_pack_end(GTK_HEADER_BAR(headerBar), clearButton);
+
+	m_btPrefs = prefsButton;
+	m_btClear = clearButton;
+
+	gtk_window_set_titlebar(GTK_WINDOW(window), headerBar);
+
+	m_btPrefs.Clicked.Connect(this, &MainWnd::OnOptions);
+	m_btClear.Clicked.Connect(this, &MainWnd::OnClear);
+
+	////////////////////////////
+	// Drag and drop
+	const GtkTargetEntry targets[] = {
 		{ const_cast<char*>("text/uri-list"), GTK_TARGET_OTHER_APP, 0xb00b00 }
 	};
 
@@ -127,7 +151,7 @@ bool MainWnd::Create(const char* welcomeMsg)
 	g_signal_connect(window, "drag-data-received",
         G_CALLBACK(OnDragDataReceived), this);
 
-	g_signal_connect(window, "window-state-event", 
+	g_signal_connect(window, "window-state-event",
 		G_CALLBACK(OnWindowStateEvent), this);
 
 	////////////////////////////
@@ -143,12 +167,11 @@ bool MainWnd::Create(const char* welcomeMsg)
 	mi0->Activate.Connect(this, &MainWnd::OnOptions);
 	mi1->Activate.Connect(this, &MainWnd::OnClear);
 	mi2->Activate.Connect(this, &MainWnd::OnAbout);
-	
+
 	//////////////////////////
 	m_traceCtl.Create(this, welcomeMsg);
 
 	g_signal_connect(window, "delete-event", G_CALLBACK(OnDeleteEvent), this);
-
 	g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), this);
 	gtk_widget_show_all(window);
 
