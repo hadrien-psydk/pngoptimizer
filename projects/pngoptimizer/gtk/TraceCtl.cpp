@@ -39,7 +39,7 @@ bool TraceCtl::Create(Window* parent, const String& welcomeMsg)
 
 	g_signal_connect(vadj, "changed", G_CALLBACK(OnVAdjChangedStatic), this);
 	g_signal_connect(m_drawingArea, "draw", G_CALLBACK(OnDrawStatic), this);
-    
+
 	m_handle = scrolledWindow;
 	return true;
 }
@@ -162,7 +162,7 @@ struct LineDrawingSettings
 	int fontSize;
 	int lineSpacing;
 };
-// Gets the cairo compatible font size from the GTK current style font size. 
+// Gets the cairo compatible font size from the GTK current style font size.
 // An official GTK function would be nice instead of doing this manually.
 static LineDrawingSettings GetLineDrawingSettings(GtkWidget* widget)
 {
@@ -199,7 +199,7 @@ bool TraceCtl::OnDraw(GtkWidget* widget, cairo_t* cr)
 		// Look up the default text color in the theme
 		GtkStyleContext* styleContext = gtk_widget_get_style_context(widget);
 		gtk_style_context_get_color(styleContext, GTK_STATE_FLAG_NORMAL, &styleColor);
-		
+
 		// Make the color blueish
 		styleColor.red -= 0.1;
 		styleColor.green -= 0.1;
@@ -232,7 +232,7 @@ bool TraceCtl::OnDraw(GtkWidget* widget, cairo_t* cr)
 
 	// Without line spacing the text is too compact
 	int lineHeight = cfe.height + lds.lineSpacing;
-	
+
 	// For debugging
 	//auto vadj = gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(m_handle));
 	//double val = gtk_adjustment_get_value(vadj);

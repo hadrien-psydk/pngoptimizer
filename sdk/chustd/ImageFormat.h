@@ -16,7 +16,7 @@ namespace chustd {
 enum PixelFormat
 {
 	PF_Unknown,
-	
+
 	PF_1bppGrayScale,
 	PF_2bppGrayScale,
 	PF_4bppGrayScale,
@@ -104,6 +104,11 @@ public:
 	Color()
 	{
 		value32 = 0xff000000;
+	}
+
+	Color(const int(&v)[3])
+	{
+		value32 = (255 << 24) | (v[0] << 16) | (v[1] << 8) | v[2];
 	}
 
 	Color(uint32 rx, uint32 gx, uint32 bx, uint32 ax = 255)
@@ -252,7 +257,7 @@ public:
 	virtual const Palette& GetPalette() const = 0;
 	virtual const Buffer& GetPixels() const = 0;
 	virtual ~IImage() {}
-	
+
 	///////////////////////////////////////////////////////
 	// Implemented if needed in the derived class
 	//
@@ -275,7 +280,7 @@ public:
 		DispNone = 0,              // Same as APNG_DISPOSE_OP_NONE
 		DispClearToTransBlack = 1, // Same as APNG_DISPOSE_OP_BACKGROUND
 		DispRestoreToPrevious = 2, // Same as APNG_DISPOSE_OP_PREVIOUS
-		
+
 		DispClearToBkColor, // (GIF) May become deprecated as browsers interpret that as DispClearToTransBlack
 	};
 
@@ -374,16 +379,16 @@ public:
 	virtual int32 GetFrameCount() const;
 	virtual const AnimFrame* GetAnimFrame(int index) const;
 	virtual int32 GetLoopCount() const; // 0 = infinite
-	
+
 	///////////////////////////////////////////////////////
-	
+
 protected:
 	int32 m_width;
 	int32 m_height;
 	int32 m_lastError; // Last error number
 
 	Buffer m_pixels;
-	
+
 protected:
 	void FlipVertical();
 	void SetAlphaFullOpaque();

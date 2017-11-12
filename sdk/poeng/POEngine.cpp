@@ -2870,64 +2870,37 @@ bool POEngine::IsFileExtensionSupported(const String& ext, const String& joker)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Gets a color related to a text type.
-Color POEngine::ColorFromTextType(TextType tt)
+Color POEngine::ColorFromTextType(TextType tt, bool darkTheme)
 {
-	Color col;
-	if( tt == POEngine::TT_FilePath )
+	// Light theme / Dark theme
+	static const Color colors[][2] = {
+		{ {  0,   0,   0}, {230, 230, 230} }, // FilePath
+		{ {100, 100, 100}, {120, 120, 120} }, // RegularInfo
+		{ {100, 100, 100}, {120, 120, 120} }, // ActionVerb (Creating, Converting, Optimizing...)
+		{ {100, 100, 100}, {120, 120, 120} }, // SizeInfo (xxx bytes -> yyy bytes)
+		{ {100, 100, 100}, {120, 120, 120} }, // SizeInfoNum (xxx bytes -> yyy bytes)
+		{ {200, 100,   0}, {220, 120,  20} }, // FileEnlarged (103% of the original size)
+		{ {100, 100, 100}, {120, 120, 120} }, // FileSizeSame (100% of the original size)
+		{ {  0, 120,   0}, { 20, 200,  20} }, // FileReduced (80% of the original size)
+		{ {  0, 100,   0}, { 20, 170,  20} }, // ActionOk
+		{ {200,   0,   0}, {200,  20,  20} }, // ActionFail
+		{ {255,   0,   0}, {255,  20,  20} }, // ErrorMsg
+		{ {  0,  50, 200}, { 50, 100, 230} }, // Animated [APNG] [Animated GIF : converting to APNG]
+		{ {  0, 100,   0}, { 20, 170,  20} }, // BatchDoneOk
+		{ {200,   0,   0}, {200,  20,  20} }, // BatchDoneFail
+		{ {  0,   0,   0}, {  0,   0,   0} }, // Last
+	};
+	static const int colorCount = sizeof(colors) / (sizeof(Color) * 2);
+	static_assert(colorCount == (TT_Last + 1), "Color count mismatch");
+	const int index0 = static_cast<int>(tt);
+	if( !(0 <= index0 && index0 < colorCount) )
 	{
-		// Color for file paths
-		col = Color(0, 0, 0);
+		return Color::Red;
 	}
-	else if( tt == POEngine::TT_RegularInfo )
+	const int index1 = static_cast<int>(darkTheme);
+	if( !(0 <= index1 && index1 < 2) )
 	{
-		col = Color(100, 100, 100);
+		return Color::Red;
 	}
-	else if( tt == POEngine::TT_ActionVerb )
-	{
-		// Creating, Converting, Optimizing...
-		col = Color(100, 100, 100);
-	}
-	else if( tt == POEngine::TT_SizeInfo || tt == POEngine::TT_SizeInfoNum )
-	{
-		// xxx bytes -> yyy bytes
-		col = Color(100, 100, 100);
-	}
-	else if( tt == POEngine::TT_FileEnlarged )
-	{
-		// (103% of the original size)
-		col = Color(200, 100, 0);
-	}
-	else if( tt == POEngine::TT_FileSizeSame )
-	{
-		// (100% of the original size)
-		col = Color(100, 100, 100);
-	}
-	else if( tt == POEngine::TT_FileReduced )
-	{
-		// (80% of the original size)
-		col = Color(0, 120, 0);
-	}
-	else if( tt == POEngine::TT_ActionOk || tt == POEngine::TT_BatchDoneOk )
-	{
-		// (OK) :-)
-		col = Color(0, 100, 0);
-	}
-	else if( tt == POEngine::TT_ActionFail || tt == POEngine::TT_BatchDoneFail )
-	{
-		// (KO) :-(
-		col = Color(200, 0, 0);
-	}
-	else if( tt == POEngine::TT_ErrorMsg )
-	{
-		// could not load bla
-		col = Color(255, 0, 0);
-	}
-	else if( tt == POEngine::TT_Animated )
-	{
-		// [Animated GIF : converting to APNG]
-		// [Animated GIF : ignoring]
-		// [APNG]
-		col = Color(0, 50, 200);
-	}
-	return col;
+	return colors[index0][index1];
 }

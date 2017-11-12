@@ -22,13 +22,6 @@ POApplication::POApplication()
 ///////////////////////////////////////////////////////////////////////////////
 void POApplication::OnFilesDropped(const StringArray& filePaths)
 {
-	/*
-	Console::WriteLine("po drop");
-	foreach(filePaths, i)
-	{
-		Console::WriteLine(filePaths[i]);
-	}
-	*/
 	m_lock.Enter();
 	m_filePaths = filePaths;
 	m_lock.Leave();
@@ -56,8 +49,8 @@ void POApplication::DoEngineProgressing()
 	}
 	m_lock.Leave();
 
-	Color cr = POEngine::ColorFromTextType(progArg.textType);
-
+	ThemeInfo themeInfo = m_mainwnd.GetThemeInfo();
+	Color cr = POEngine::ColorFromTextType(progArg.textType, themeInfo.darkThemeUsed);
 	// This is a test to pretty format file sizes
 	/*
 	int minWidthEx = 0;
@@ -141,6 +134,26 @@ void POApplication::StartJob()
 	m_semStart.Increment();
 }
 
+#if 0
+#define WANTS_TRACECTL_TEST
+///////////////////////////////////////////////////////////////////////////////
+static void TestTraceCtl(MainWnd& mainwnd)
+{
+	gtk_window_resize(GTK_WINDOW(mainwnd.GetHandle()), 600, 600);
+	for(int i = 0; i < POEngine::TT_Last + 1; ++i)
+	{
+		Color col = POEngine::ColorFromTextType(static_cast<POEngine::TextType>(i), false);
+		mainwnd.AddText("This is a test line with light theme\n", col);
+	}
+	mainwnd.AddText("---------------------------------------------------\n", Color::Black);
+	for(int i = 0; i < POEngine::TT_Last + 1; ++i)
+	{
+		Color col = POEngine::ColorFromTextType(static_cast<POEngine::TextType>(i), true);
+		mainwnd.AddText("This is a test line with dark theme\n", col);
+	}
+}
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 bool POApplication::Init(int argc, char** argv)
 {
@@ -172,20 +185,9 @@ bool POApplication::Init(int argc, char** argv)
 	m_mainwnd.FilesDropped.Connect(this, &POApplication::OnFilesDropped);
 	m_engine.Progressing.Connect(this, &POApplication::OnEngineProgressing);
 
-	// Test TraceCtl
-	/*
-	for(int i = 0; i < 10; ++i)
-	{
-		m_mainwnd.AddText(String::FromInt(i) + " onk", Color::Black);
-		m_mainwnd.AddText("plop", Color::Red);
-		m_mainwnd.AddText("chabada", Color::Green);
-		m_mainwnd.AddText("chabadaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", Color::Magenta);
-		//wchar x = 0x2192;
-		wchar x = '.';
-		m_mainwnd.AddText( String(&x, 1), Color(50, 50, 50) );
-		m_mainwnd.AddText("(OK) lorem ipsum doloret truc\n", Color(100, 100, 100));
-	}
-	*/
+#ifdef WANTS_TRACECTL_TEST
+	TestTraceCtl(m_mainwnd);
+#endif
 
 	ProcessCmdLineArgs(argc, argv);
 

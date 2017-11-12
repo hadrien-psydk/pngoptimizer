@@ -12,6 +12,14 @@
 #include "PngOptionsDlg.h"
 #include "AboutDlg.h"
 
+struct ThemeInfo
+{
+	bool darkThemeUsed;
+	Color normalColor;
+
+	ThemeInfo() : darkThemeUsed(false) {}
+};
+
 class MainWnd : public Window
 {
 public:
@@ -20,6 +28,7 @@ public:
 public:
 	bool Create(const char* welcomeMsg);
 	void AddText(const chustd::String& text, Color cr = Color::Black);
+	ThemeInfo GetThemeInfo() const;
 
 private:
 	Button m_btPrefs;

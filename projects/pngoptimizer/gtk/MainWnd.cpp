@@ -182,3 +182,20 @@ void MainWnd::AddText(const chustd::String& text, Color cr)
 {
 	m_traceCtl.AddText(text, cr);
 }
+
+ThemeInfo MainWnd::GetThemeInfo() const
+{
+	ThemeInfo ti;
+
+	GdkRGBA col;
+	// Look up the default text color in the theme
+	GtkStyleContext* styleContext = gtk_widget_get_style_context(GetHandle());
+	gtk_style_context_get_color(styleContext, GTK_STATE_FLAG_NORMAL, &col);
+	double lum = 0.2 * col.red + 0.7 * col.green + 0.1 * col.blue;
+	ti.darkThemeUsed = bool(lum > 0.3);
+	uint8 r = static_cast<uint8>(col.red * 255);
+	uint8 g = static_cast<uint8>(col.green * 255);
+	uint8 b = static_cast<uint8>(col.blue * 255);
+	ti.normalColor = Color(r, g, b);
+	return ti;
+}
