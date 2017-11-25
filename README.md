@@ -67,3 +67,12 @@ To build all and create the packages to be downloaded, call from a terminal:
  * On Linux: `distrib/make-distrib.sh`
 
 Packages will be created in the distrib/download directory.
+
+--------------------------------------------------------------------------
+To build the Docker image for PngOptimizerCL, call from a Docker command line:
+
+ * `docker build -f docker/Dockerfile -t pngoptimizercl .`
+
+You can then invoke PngOptimizerCL directly using Docker:
+
+ * `docker run --rm -ti -v "$(pwd):$(pwd)" pngoptimizercl "$(pwd)/my_file.png"`

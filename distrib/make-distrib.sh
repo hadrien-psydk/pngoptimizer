@@ -85,5 +85,4 @@ tar -pczvf "$TGZFILE" "pngoptimizercl" || HandleFail
 cd ..
 mv -v tgz/$TGZFILE ./download
 tput sgr0
-
-
+true
