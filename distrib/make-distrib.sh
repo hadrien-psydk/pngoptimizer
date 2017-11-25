@@ -81,9 +81,7 @@ TGZFILE="pngoptimizercl-$POVER-linux-x64.tgz"
 tput setaf 3
 cd tgz
 echo "Creating $TGZFILE..."
-tar -pczvf "$TGZFILE" "pngoptimizercl" || HandleFail
+tar -pczvf "$TGZFILE" "pngoptimizercl" || HandleFail
 cd ..
 mv -v tgz/$TGZFILE ./download
 tput sgr0
-
-
