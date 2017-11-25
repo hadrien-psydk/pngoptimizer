@@ -71,7 +71,7 @@ Packages will be created in the distrib/download directory.
 --------------------------------------------------------------------------
 To build the Docker image for PngOptimizerCL, call from a Docker command line:
 
- * `docker build -f docker/Dockerfile -t pngoptimizercl .`
+ * `docker build -t pngoptimizercl .`
 
 You can then invoke PngOptimizerCL directly using Docker:
 
