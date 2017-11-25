@@ -75,4 +75,8 @@ To build the Docker image for PngOptimizerCL, call from a Docker command line:
 
 You can then invoke PngOptimizerCL directly using Docker:
 
- * `docker run --rm -ti -v "$(pwd):$(pwd)" pngoptimizercl "$(pwd)/my_file.png"`
+ * `docker run --rm -v "$(pwd):$(pwd)" pngoptimizercl "$(pwd)/my_file.png"`
+
+You can also directly use my prebuild image and skip the first step:
+
+ * `docker run --rm -v "$(pwd):$(pwd)" genezys/pngoptimizercl "$(pwd)/my_file.png"`
