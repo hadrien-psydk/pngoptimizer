@@ -73,13 +73,9 @@ static void OnWindowStateEvent(GtkWidget*, GdkEvent* event, gpointer /*userData*
 	}*/
 }
 
-static void OnDeleteEvent(GtkWidget* /*widget*/, GdkEvent*, gpointer)
+MainWnd::MainWnd()
 {
-	//GdkWindow* gw = gtk_widget_get_window(widget);
-	//GdkWindowState state = gdk_window_get_state(gw);
-	//printf("delete-event %08x\n", (unsigned int)(state));
-
-	gtk_main_quit();
+	m_pGtkApp = nullptr;
 }
 
 void MainWnd::OnOptions()
@@ -105,9 +101,10 @@ void MainWnd::OnAbout()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-bool MainWnd::Create(const char* welcomeMsg)
+bool MainWnd::Create(GtkApplication* pGtkApp, const char* welcomeMsg)
 {
-	auto window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	auto window = gtk_application_window_new(pGtkApp);
+	//auto window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	m_handle = window;
 
 	//const MainWndSettings& mwsettings = AppSettings::GetInstance().GetMWSettings();
@@ -171,10 +168,7 @@ bool MainWnd::Create(const char* welcomeMsg)
 	//////////////////////////
 	m_traceCtl.Create(this, welcomeMsg);
 
-	g_signal_connect(window, "delete-event", G_CALLBACK(OnDeleteEvent), this);
-	g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), this);
-	gtk_widget_show_all(window);
-
+	gtk_widget_show(window);
 	return true;
 }
 

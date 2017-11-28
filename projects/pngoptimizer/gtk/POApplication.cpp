@@ -17,6 +17,7 @@
 POApplication::POApplication()
 {
 	m_exitNow = false;
+	m_pGtkApp = nullptr;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -115,10 +116,6 @@ int POApplication::ThreadProc()
 ///////////////////////////////////////////////////////////////////////////////
 void POApplication::ProcessCmdLineArgs(int argc, char** argv)
 {
-	StringArray args = Process::CommandLineToArgv( Process::GetCommandLine());
-	if( argc <= 1 )
-		return;
-
 	m_filePaths.SetSize(0);
 	m_filePaths.EnsureCapacity(argc - 1);
 	for(int i = 1; i < argc; ++i)
@@ -155,14 +152,18 @@ static void TestTraceCtl(MainWnd& mainwnd)
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-bool POApplication::Init(int argc, char** argv)
+bool POApplication::Init()
 {
-	gtk_init(&argc, &argv);
+	m_pGtkApp = gtk_application_new("org.psydk.pngoptimizer",
+		G_APPLICATION_HANDLES_COMMAND_LINE
+		//G_APPLICATION_HANDLES_OPEN
+		//G_APPLICATION_FLAGS_NONE
+		);
 
-	if( !m_mainwnd.Create(WELCOME_MESSAGE) )
-	{
-		return false;
-	}
+	g_signal_connect(m_pGtkApp, "startup", G_CALLBACK(&POApplication::OnStartupStatic), this);
+	g_signal_connect(m_pGtkApp, "activate", G_CALLBACK(&POApplication::OnActivateStatic), this);
+	g_signal_connect(m_pGtkApp, "command-line", G_CALLBACK(&POApplication::OnCommandLineStatic), this);
+	g_signal_connect(m_pGtkApp, "open", G_CALLBACK(&POApplication::OnOpenStatic), this);
 
 	AppSettings::GetInstance().Read();
 	m_engine.m_settings = AppSettings::GetInstance().GetPOSettings();
@@ -182,29 +183,132 @@ bool POApplication::Init(int argc, char** argv)
 	m_semStart.Create();
 	m_thread.Start(&POApplication::ThreadProcStatic, this);
 
-	m_mainwnd.FilesDropped.Connect(this, &POApplication::OnFilesDropped);
 	m_engine.Progressing.Connect(this, &POApplication::OnEngineProgressing);
+
+	return true;
+}
+
+
+void POApplication::OnAppMenuPreferencesStatic(GSimpleAction*,
+	                             GVariant*,
+	                             gpointer userData)
+{
+	POApplication* that = (POApplication*)userData;
+	that->m_mainwnd.OnOptions();
+}
+
+void POApplication::OnAppMenuAboutStatic(GSimpleAction*,
+                           GVariant*,
+                           gpointer  userData)
+{
+	POApplication* that = (POApplication*)userData;
+	that->m_mainwnd.OnAbout();
+}
+
+
+void POApplication::OnAppMenuQuitStatic(GSimpleAction*,
+                          GVariant*,
+                          gpointer userData)
+{
+	POApplication* that = (POApplication*)userData;
+	g_application_quit(G_APPLICATION(that->m_pGtkApp));
+}
+
+
+void POApplication::CreateAppMenu()
+{
+	static GActionEntry appActions[3];
+	memset(appActions, 0, sizeof(appActions));
+
+	appActions[0].name = "preferences";
+	appActions[0].activate = &POApplication::OnAppMenuPreferencesStatic;
+
+	appActions[1].name = "about";
+	appActions[1].activate = &POApplication::OnAppMenuAboutStatic;
+
+	appActions[2].name = "quit";
+	appActions[2].activate = &POApplication::OnAppMenuQuitStatic;
+
+	auto app = m_pGtkApp;
+	g_action_map_add_action_entries(G_ACTION_MAP(app), appActions,
+		G_N_ELEMENTS(appActions), this);
+	GMenu* menu = g_menu_new();
+	g_menu_append(menu, _("Preferences"), "app.preferences");
+	g_menu_append(menu, _("About"), "app.about");
+	g_menu_append(menu, _("Quit"), "app.quit");
+
+	gtk_application_set_app_menu(app, G_MENU_MODEL(menu));
+	g_object_unref(menu);
+}
+
+void POApplication::OnStartupStatic(GtkApplication*, gpointer userData)
+{
+	POApplication* that = (POApplication*)userData;
+	that->OnStartup();
+}
+
+void POApplication::OnActivateStatic(GtkApplication*, gpointer userData)
+{
+	POApplication* that = (POApplication*)userData;
+	that->OnActivate();
+}
+
+int POApplication::OnCommandLineStatic(GtkApplication*,
+	GApplicationCommandLine* commandLine, gpointer userData)
+{
+	POApplication* that = (POApplication*)userData;
+	return that->OnCommandLine(commandLine);
+}
+
+void POApplication::OnOpenStatic(GApplication* app, gpointer, gint /*fileCount*/, gchar*, gpointer)
+{
+	//printf("on open static\n");
+	g_application_activate(app);
+}
+
+void POApplication::OnStartup()
+{
+	CreateAppMenu();
+
+	if( !m_mainwnd.Create(m_pGtkApp, WELCOME_MESSAGE) )
+	{
+		//return false;
+	}
+	m_mainwnd.FilesDropped.Connect(this, &POApplication::OnFilesDropped);
 
 #ifdef WANTS_TRACECTL_TEST
 	TestTraceCtl(m_mainwnd);
 #endif
+}
 
+void POApplication::OnActivate()
+{
+	//printf("on activate\n");
+	gtk_widget_show_all(GTK_WIDGET(m_mainwnd.GetHandle()));
+}
+
+int POApplication::OnCommandLine(GApplicationCommandLine* commandLine)
+{
+	//printf("on command line\n");
+	int argc = 0;
+	gchar** argv = g_application_command_line_get_arguments(commandLine, &argc);
 	ProcessCmdLineArgs(argc, argv);
-
-	/////////////////////////////////////////////////////////////
-	// Create application shortcuts
-	return true;
+	g_application_activate((GApplication*)m_pGtkApp);
+	return 0;
 }
 
 /////////////////////////////////////////////////////////////
-int POApplication::Run()
+int POApplication::Run(int argc, char** argv)
 {
-	gtk_main();
+	int status = g_application_run(G_APPLICATION(m_pGtkApp), argc, argv);
+
+	g_object_unref(m_pGtkApp);
+	m_pGtkApp = nullptr;
 
 	m_exitNow = true;
 	m_semStart.Increment();
 	m_thread.WaitForExit();
 
 	m_semStart.Close();
-	return 0;
+	return status;
 }

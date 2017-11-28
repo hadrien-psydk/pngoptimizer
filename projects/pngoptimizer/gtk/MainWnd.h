@@ -26,20 +26,23 @@ public:
 	Event1<const StringArray&> FilesDropped; // [filePaths]
 
 public:
-	bool Create(const char* welcomeMsg);
+	MainWnd();
+	bool Create(GtkApplication* pGtkApp, const char* welcomeMsg);
 	void AddText(const chustd::String& text, Color cr = Color::Black);
 	ThemeInfo GetThemeInfo() const;
+
+	void OnOptions();
+	void OnAbout();
 
 private:
 	Button m_btPrefs;
 	Button m_btClear;
 	ContextMenu m_ctm;
 	TraceCtl m_traceCtl;
+	GtkApplication* m_pGtkApp;
 
 private:
-	void OnOptions();
 	void OnClear();
-	void OnAbout();
 };
 
 #endif
