@@ -1,10 +1,10 @@
 # This the Makefile fragment to be included by SDK, Projects and UnitTests Makefiles
 #
 # Makefile inputs:
-# PROJECT_NAME    same as directory name
-# PROJECT_TYPE    lib or app
-# PROJECT_FILES   all files or wildcard like *.cpp
-# SDK_DEPS        needed library names in sdk/
+# PROJECT_NAME    same as directory name
+# PROJECT_TYPE    lib or app
+# PROJECT_FILES   all files or wildcard like *.cpp
+# SDK_DEPS        needed library names in sdk/
 # EXT_DEPS        external libraries, like gtk got GTK+
 # INCDIRS         additional include directories
 # DESTDIR         optional directory when installing/uninstalling
@@ -16,7 +16,7 @@
 # clean           cleans current project and its dependencies
 # rebuild         cleans then builds
 # run             runs the application
-# cov             creates coverage files. make CONFIG=coverage should have been called
+# cov             creates coverage files. make CONFIG=coverage should have been called
 # install         install the application
 # uninstall       uninstall the application
 
@@ -50,7 +50,7 @@ $(error Bad CONFIG value)
 endif
 
 CPPFLAGS := $(CFLAGS) -Wextra -Wshadow
-# Uncomment for tests. gtk and gtest make it difficult
+# Uncomment for tests. gtk and gtest make it difficult
 # CPPFLAGS +=-Wzero-as-null-pointer-constant
 CPPFLAGS += -Wlogical-op -Woverloaded-virtual
 CPPFLAGS += -std=c++0x $(addprefix -I,$(INCDIRS))
