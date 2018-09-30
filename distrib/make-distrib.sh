@@ -28,40 +28,6 @@ function HandleSuccess
 }
 
 ###############################################################################
-# PngOptimizer
-echo -e "\e[36m========== Packaging PngOptimizer ==========\e[0m"
-make -C ../projects/pngoptimizer/ CONFIG=release
-
-PODEBDIR=deb/pngoptimizer_$POVER-1_amd64
-rm -rf $PODEBDIR
-mkdir -p $PODEBDIR
-mkdir -p $PODEBDIR/DEBIAN
-
-make -C ../projects/pngoptimizer/ CONFIG=release DESTDIR=../../distrib/$PODEBDIR install
-
-SIZE=$(du -sk $PODEBDIR | cut -f 1)
-
-cat > "$PODEBDIR/DEBIAN/control" <<EOL
-Package: pngoptimizer
-Version: $POVER-1
-Architecture: amd64
-Maintainer: Hadrien Nilsson <pngoptimizer@psydk.org>
-Section: graphics
-Priority: optional
-Installed-Size: $SIZE
-Homepage: http://psydk.org/pngoptimizer
-Description: PngOptimizer
- Optimize PNGs and convert other lossless formats to PNG
-EOL
-
-tput setaf 3
-echo "Creating $PODEBDIR.deb..."
-dpkg-deb --build $PODEBDIR
-# Move the .deb in the parent directory
-mv -v $PODEBDIR.deb ./download
-tput sgr0
-
-###############################################################################
 # PngOptimizerCL
 echo ""
 echo -e "\e[36m========== Packaging PngOptimizerCL ==========\e[0m"
@@ -85,3 +51,42 @@ tar -pczvf "$TGZFILE" "pngoptimizercl" || HandleFail
 cd ..
 mv -v tgz/$TGZFILE ./download
 tput sgr0
+
+###############################################################################
+# PngOptimizer
+echo -e "\e[36m========== Packaging PngOptimizer ==========\e[0m"
+make -C ../projects/pngoptimizer/ CONFIG=release
+
+PODEBDIR=deb/pngoptimizer_$POVER-1_amd64
+rm -rf $PODEBDIR
+mkdir -p $PODEBDIR
+mkdir -p $PODEBDIR/DEBIAN
+
+echo -e "Create PngOptimizer deb files"
+make -C ../projects/pngoptimizer/ CONFIG=release DESTDIR=../../distrib/$PODEBDIR install
+
+echo -e "Create PngOptimizerCL deb files"
+make -C ../projects/pngoptimizercl/ CONFIG=release DESTDIR=../../distrib/$PODEBDIR install
+
+SIZE=$(du -sk $PODEBDIR | cut -f 1)
+
+cat > "$PODEBDIR/DEBIAN/control" <<EOL
+Package: pngoptimizer
+Version: $POVER-1
+Architecture: amd64
+Maintainer: Hadrien Nilsson <pngoptimizer@psydk.org>
+Section: graphics
+Priority: optional
+Installed-Size: $SIZE
+Homepage: http://psydk.org/pngoptimizer
+Description: PngOptimizer
+ Optimize PNGs and convert other lossless formats to PNG
+EOL
+
+tput setaf 3
+echo "Creating $PODEBDIR.deb..."
+dpkg-deb --build $PODEBDIR
+# Move the .deb in the parent directory
+mv -v $PODEBDIR.deb ./download
+tput sgr0
+
