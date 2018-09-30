@@ -193,16 +193,16 @@ void POApplication::OnAppMenuPreferencesStatic(GSimpleAction*,
 	                             GVariant*,
 	                             gpointer userData)
 {
-	POApplication* that = (POApplication*)userData;
-	that->m_mainwnd.OnOptions();
+	//POApplication* that = (POApplication*)userData;
+	//that->m_mainwnd.OnOptions();
 }
 
 void POApplication::OnAppMenuAboutStatic(GSimpleAction*,
                            GVariant*,
                            gpointer  userData)
 {
-	POApplication* that = (POApplication*)userData;
-	that->m_mainwnd.OnAbout();
+	//POApplication* that = (POApplication*)userData;
+	//that->m_mainwnd.OnAbout();
 }
 
 
@@ -217,6 +217,7 @@ void POApplication::OnAppMenuQuitStatic(GSimpleAction*,
 
 void POApplication::CreateAppMenu()
 {
+	/*
 	static GActionEntry appActions[3];
 	memset(appActions, 0, sizeof(appActions));
 
@@ -238,7 +239,7 @@ void POApplication::CreateAppMenu()
 	g_menu_append(menu, _("Quit"), "app.quit");
 
 	gtk_application_set_app_menu(app, G_MENU_MODEL(menu));
-	g_object_unref(menu);
+	g_object_unref(menu);*/
 }
 
 void POApplication::OnStartupStatic(GtkApplication*, gpointer userData)

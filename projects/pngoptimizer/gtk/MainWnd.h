@@ -7,7 +7,6 @@
 #ifndef PO_MAINWND_H
 #define PO_MAINWND_H
 
-#include "ContextMenu.h"
 #include "TraceCtl.h"
 #include "PngOptionsDlg.h"
 #include "AboutDlg.h"
@@ -18,6 +17,15 @@ struct ThemeInfo
 	Color normalColor;
 
 	ThemeInfo() : darkThemeUsed(false) {}
+};
+
+class WinAction
+{
+public:
+	Event0 Activate;
+
+public:
+	void Create(Window*, const char* id);
 };
 
 class MainWnd : public Window
@@ -31,18 +39,18 @@ public:
 	void AddText(const chustd::String& text, Color cr = Color::Black);
 	ThemeInfo GetThemeInfo() const;
 
-	void OnOptions();
-	void OnAbout();
-
 private:
-	Button m_btPrefs;
+	Button m_btHamburger;
 	Button m_btClear;
-	ContextMenu m_ctm;
+	WinAction m_actPreferences;
+	WinAction m_actAbout;
 	TraceCtl m_traceCtl;
 	GtkApplication* m_pGtkApp;
 
 private:
 	void OnClear();
+	void OnPreferences();
+	void OnAbout();
 };
 
 #endif
