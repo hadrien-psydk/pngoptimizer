@@ -188,60 +188,6 @@ bool POApplication::Init()
 	return true;
 }
 
-
-void POApplication::OnAppMenuPreferencesStatic(GSimpleAction*,
-	                             GVariant*,
-	                             gpointer userData)
-{
-	//POApplication* that = (POApplication*)userData;
-	//that->m_mainwnd.OnOptions();
-}
-
-void POApplication::OnAppMenuAboutStatic(GSimpleAction*,
-                           GVariant*,
-                           gpointer  userData)
-{
-	//POApplication* that = (POApplication*)userData;
-	//that->m_mainwnd.OnAbout();
-}
-
-
-void POApplication::OnAppMenuQuitStatic(GSimpleAction*,
-                          GVariant*,
-                          gpointer userData)
-{
-	POApplication* that = (POApplication*)userData;
-	g_application_quit(G_APPLICATION(that->m_pGtkApp));
-}
-
-
-void POApplication::CreateAppMenu()
-{
-	/*
-	static GActionEntry appActions[3];
-	memset(appActions, 0, sizeof(appActions));
-
-	appActions[0].name = "preferences";
-	appActions[0].activate = &POApplication::OnAppMenuPreferencesStatic;
-
-	appActions[1].name = "about";
-	appActions[1].activate = &POApplication::OnAppMenuAboutStatic;
-
-	appActions[2].name = "quit";
-	appActions[2].activate = &POApplication::OnAppMenuQuitStatic;
-
-	auto app = m_pGtkApp;
-	g_action_map_add_action_entries(G_ACTION_MAP(app), appActions,
-		G_N_ELEMENTS(appActions), this);
-	GMenu* menu = g_menu_new();
-	g_menu_append(menu, _("Preferences"), "app.preferences");
-	g_menu_append(menu, _("About"), "app.about");
-	g_menu_append(menu, _("Quit"), "app.quit");
-
-	gtk_application_set_app_menu(app, G_MENU_MODEL(menu));
-	g_object_unref(menu);*/
-}
-
 void POApplication::OnStartupStatic(GtkApplication*, gpointer userData)
 {
 	POApplication* that = (POApplication*)userData;
@@ -269,8 +215,6 @@ void POApplication::OnOpenStatic(GApplication* app, gpointer, gint /*fileCount*/
 
 void POApplication::OnStartup()
 {
-	CreateAppMenu();
-
 	if( !m_mainwnd.Create(m_pGtkApp, WELCOME_MESSAGE) )
 	{
 		//return false;

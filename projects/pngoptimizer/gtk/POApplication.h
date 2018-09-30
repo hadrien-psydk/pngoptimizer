@@ -65,10 +65,6 @@ private:
 	void ProcessCmdLineArgs(int argc, char** argv);
 	void StartJob();
 
-	static void OnAppMenuPreferencesStatic(GSimpleAction*, GVariant*, gpointer);
-	static void OnAppMenuAboutStatic(GSimpleAction*, GVariant*, gpointer);
-	static void OnAppMenuQuitStatic(GSimpleAction*, GVariant*, gpointer);
-
 	static void OnStartupStatic(GtkApplication*, gpointer);
 	static void OnActivateStatic(GtkApplication*, gpointer);
 	static int OnCommandLineStatic(GtkApplication*, GApplicationCommandLine*, gpointer);
@@ -77,8 +73,6 @@ private:
 	void OnStartup();
 	void OnActivate();
 	int OnCommandLine(GApplicationCommandLine*);
-
-	void CreateAppMenu();
 };
 
 #endif
