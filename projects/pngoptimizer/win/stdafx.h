@@ -7,4 +7,9 @@
 
 #include "../stdafx.h"
 
+#include <chuwin32/chuwin32.h>
+
+using namespace chustd;
+using namespace chuwin32;
+
 #endif
