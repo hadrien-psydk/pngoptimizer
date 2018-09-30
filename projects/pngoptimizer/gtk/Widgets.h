@@ -14,7 +14,7 @@ class Widget
 {
 public:
 	Widget() : m_handle(nullptr) {}
-	WIDGET_HANDLE GetHandle() { return m_handle; }
+	WIDGET_HANDLE GetHandle() const { return m_handle; }
 	void SetFocus();
 	void Enable(bool);
 protected:
