@@ -97,7 +97,7 @@ MainWnd::MainWnd()
 
 void MainWnd::OnPreferences()
 {
-	PngOptionsDlg dlg;
+	PreferencesDlg dlg;
 	dlg.m_settings = AppSettings::GetInstance().GetPOSettings();
 	if( dlg.DoModal(this) != DialogResp::Ok )
 		return;

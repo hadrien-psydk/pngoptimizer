@@ -8,7 +8,7 @@
 #define PO_MAINWND_H
 
 #include "TraceCtl.h"
-#include "PngOptionsDlg.h"
+#include "PreferencesDlg.h"
 #include "AboutDlg.h"
 
 struct ThemeInfo

@@ -135,11 +135,11 @@ $(PCHPATH): stdafx.h
 
 $(OUTDIR)/%.o: %.cpp $(PCHPATH)
 	$(info $<)
-	@$(GPP) $(CPPFLAGS) -c -MMD $< -o $@
+	@$(GPP) $(CPPFLAGS) -c -MMD -MP $< -o $@
 
 $(OUTDIR)/%.o: %.c
 	$(info $<)
-	@$(GCC) $(CFLAGS) -c -MMD $< -o $@
+	@$(GCC) $(CFLAGS) -c -MMD -MP $< -o $@
 
 $(OUTDIR)/%.png.o: %.png
 	$(info $< (resource))

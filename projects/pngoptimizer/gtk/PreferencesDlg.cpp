@@ -5,32 +5,33 @@
 /////////////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#include "PngOptionsDlg.h"
+#include "PreferencesDlg.h"
 
 #include "MsgDialog.h"
 
 // The Makefile will create logo48.o with those references from logo48.png
-extern "C" const char _binary_gtk_pngoptions_glade_start[];
-extern "C" const char _binary_gtk_pngoptions_glade_end[];
+extern "C" const char _binary_gtk_preferences_glade_start[];
+extern "C" const char _binary_gtk_preferences_glade_end[];
 
 ///////////////////////////////////////////////////////////////////////////////
-PngOptionsDlg::PngOptionsDlg()
+PreferencesDlg::PreferencesDlg()
 {
 	m_ppSyncInProgress = false;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-bool PngOptionsDlg::SetupUI()
+bool PreferencesDlg::SetupUI()
 {
-	if( !LoadTemplate(_binary_gtk_pngoptions_glade_start,
-        _binary_gtk_pngoptions_glade_end) )
+	if( !LoadTemplate(_binary_gtk_preferences_glade_start,
+        _binary_gtk_preferences_glade_end) )
 	{
 		return false;
 	}
 	/*
+	// Usefull when working on the glade file without rebuilding
 	auto builder = gtk_builder_new();
 	GError* err = nullptr;
-	if( gtk_builder_add_from_file(builder, "pngoptions.glade", &err) == 0 )
+	if( gtk_builder_add_from_file(builder, "preferences.glade", &err) == 0 )
 	{
 		g_error("gtk_builder_add_from_file failed: %s", err->message);
 		g_error_free(err);
@@ -70,30 +71,30 @@ bool PngOptionsDlg::SetupUI()
 
 
 ///////////////////////////////////////////////////////////////////////////////
-void PngOptionsDlg::SetupConnections()
+void PreferencesDlg::SetupConnections()
 {
-	m_radBkColorRemove.Toggled.Connect(this, &PngOptionsDlg::OnCheckBkColor);
-	m_radBkColorKeep.Toggled.Connect(this, &PngOptionsDlg::OnCheckBkColor);
-	m_radBkColorForce.Toggled.Connect(this, &PngOptionsDlg::OnCheckBkColor);
-	m_cbtBkColor.ColorSet.Connect(this, &PngOptionsDlg::OnSelectBkColor);
+	m_radBkColorRemove.Toggled.Connect(this, &PreferencesDlg::OnCheckBkColor);
+	m_radBkColorKeep.Toggled.Connect(this, &PreferencesDlg::OnCheckBkColor);
+	m_radBkColorForce.Toggled.Connect(this, &PreferencesDlg::OnCheckBkColor);
+	m_cbtBkColor.ColorSet.Connect(this, &PreferencesDlg::OnSelectBkColor);
 
-	m_radTextRemove.Toggled.Connect(this, &PngOptionsDlg::OnCheckText);
-	m_radTextKeep.Toggled.Connect(this, &PngOptionsDlg::OnCheckText);
-	m_radTextForce.Toggled.Connect(this, &PngOptionsDlg::OnCheckText);
+	m_radTextRemove.Toggled.Connect(this, &PreferencesDlg::OnCheckText);
+	m_radTextKeep.Toggled.Connect(this, &PreferencesDlg::OnCheckText);
+	m_radTextForce.Toggled.Connect(this, &PreferencesDlg::OnCheckText);
 
-	m_radPhysRemove.Toggled.Connect(this, &PngOptionsDlg::OnCheckPhys);
-	m_radPhysKeep.Toggled.Connect(this, &PngOptionsDlg::OnCheckPhys);
-	m_radPhysForce.Toggled.Connect(this, &PngOptionsDlg::OnCheckPhys);
+	m_radPhysRemove.Toggled.Connect(this, &PreferencesDlg::OnCheckPhys);
+	m_radPhysKeep.Toggled.Connect(this, &PreferencesDlg::OnCheckPhys);
+	m_radPhysForce.Toggled.Connect(this, &PreferencesDlg::OnCheckPhys);
 
-	m_editPpmX.Changed.Connect(this, &PngOptionsDlg::SyncPpiFromPpm);
-	m_editPpmY.Changed.Connect(this, &PngOptionsDlg::SyncPpiFromPpm);
-	m_editPpiX.Changed.Connect(this, &PngOptionsDlg::SyncPpmFromPpi);
-	m_editPpiY.Changed.Connect(this, &PngOptionsDlg::SyncPpmFromPpi);
+	m_editPpmX.Changed.Connect(this, &PreferencesDlg::SyncPpiFromPpm);
+	m_editPpmY.Changed.Connect(this, &PreferencesDlg::SyncPpiFromPpm);
+	m_editPpiX.Changed.Connect(this, &PreferencesDlg::SyncPpmFromPpi);
+	m_editPpiY.Changed.Connect(this, &PreferencesDlg::SyncPpmFromPpi);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Sets the control values from attributes
-void PngOptionsDlg::LoadValues()
+void PreferencesDlg::LoadValues()
 {
 	m_chkBackupOldPngFiles.Check(m_settings.backupOldPngFiles);
 	m_chkKeepInterlacing.Check(m_settings.keepInterlacing);
@@ -126,7 +127,7 @@ void PngOptionsDlg::LoadValues()
 
 ///////////////////////////////////////////////////////////////////////////////
 // Returns true upon success
-bool PngOptionsDlg::StoreValues()
+bool PreferencesDlg::StoreValues()
 {
 	m_settings.backupOldPngFiles = m_chkBackupOldPngFiles.IsChecked();
 	m_settings.keepInterlacing = m_chkKeepInterlacing.IsChecked();
@@ -190,43 +191,43 @@ bool PngOptionsDlg::StoreValues()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void PngOptionsDlg::OnCheckBkColor()
+void PreferencesDlg::OnCheckBkColor()
 {
 	SetColorControlStates();
 }
 
 // Enable/Disable color controls according to BackgroundColor chunk option
-void PngOptionsDlg::SetColorControlStates()
+void PreferencesDlg::SetColorControlStates()
 {
 	m_cbtBkColor.Enable( m_radBkColorForce.IsChecked() );
 	m_lblBkColorTxtDec.Enable( m_radBkColorForce.IsChecked() );
 	m_lblBkColorTxtHex.Enable( m_radBkColorForce.IsChecked() );
 }
 
-void PngOptionsDlg::OnSelectBkColor()
+void PreferencesDlg::OnSelectBkColor()
 {
 	SetColorControls(m_cbtBkColor.GetColor());
 }
 
 ///////////////////////////////////////////////////////
-void PngOptionsDlg::OnCheckText()
+void PreferencesDlg::OnCheckText()
 {
 	SetTextControlStates();
 }
 
-void PngOptionsDlg::SetTextControlStates()
+void PreferencesDlg::SetTextControlStates()
 {
 	m_comboTextKeyword.Enable( m_radTextForce.IsChecked() );
 	m_editTextData.Enable( m_radTextForce.IsChecked() );
 }
 
 ///////////////////////////////////////////////////////
-void PngOptionsDlg::OnCheckPhys()
+void PreferencesDlg::OnCheckPhys()
 {
 	SetPhysControlStates();
 }
 
-void PngOptionsDlg::SetPhysControlStates()
+void PreferencesDlg::SetPhysControlStates()
 {
 	m_editPpmX.Enable( m_radPhysForce.IsChecked() );
 	m_editPpmY.Enable( m_radPhysForce.IsChecked() );
@@ -234,7 +235,7 @@ void PngOptionsDlg::SetPhysControlStates()
 	m_editPpiY.Enable( m_radPhysForce.IsChecked() );
 }
 
-void PngOptionsDlg::SetColorControls(Color col)
+void PreferencesDlg::SetColorControls(Color col)
 {
 	m_cbtBkColor.SetColor(col);
 
@@ -251,7 +252,7 @@ void PngOptionsDlg::SetColorControls(Color col)
 }
 
 // Synchronize the PPI editboxes from the PPM editboxes
-void PngOptionsDlg::SyncPpiFromPpm()
+void PreferencesDlg::SyncPpiFromPpm()
 {
 	if( m_ppSyncInProgress )
 		return;
@@ -264,7 +265,7 @@ void PngOptionsDlg::SyncPpiFromPpm()
 }
 
 // Synchronize the PPM editboxes from the PPI editboxes
-void PngOptionsDlg::SyncPpmFromPpi()
+void PreferencesDlg::SyncPpmFromPpi()
 {
 	if( m_ppSyncInProgress )
 		return;

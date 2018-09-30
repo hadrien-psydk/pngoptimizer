@@ -4,20 +4,20 @@
 // For conditions of distribution and use, see copyright notice in PngOptimizer.h
 /////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef PO_PNGOPTIONSDLG_H
-#define PO_PNGOPTIONSDLG_H
+#ifndef PO_PREFERENCESDLG_H
+#define PO_PREFERENCESDLG_H
 
 #include "Dialog.h"
 #include "Widgets.h"
 
-class PngOptionsDlg : public Dialog
+class PreferencesDlg : public Dialog
 {
 public:
 	// Public settings [in,out]
 	POEngineSettings m_settings;
 
 public:
-	PngOptionsDlg();
+	PreferencesDlg();
 
 protected:
 	CheckButton m_chkBackupOldPngFiles;
