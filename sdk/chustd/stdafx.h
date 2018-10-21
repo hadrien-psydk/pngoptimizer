@@ -25,7 +25,6 @@
 //////////////////////////////////////////////////////////////////////
 // Avoid calls to undefined function
 
-#define _INC_STRING // string.h declares mem* functions, we do not want them
 #define _OLE32PRIV_
 #define _OLE32_
 #define _SYS_GUID_OPERATORS_
