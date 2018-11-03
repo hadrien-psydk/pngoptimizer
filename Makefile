@@ -13,6 +13,8 @@ all:
 
 clean:
 	$(MAKE) -C projects/pngoptimizer clean
+	$(MAKE) -C projects/pngoptimizercl clean
 
 install:
 	$(MAKE) -C projects/pngoptimizer install
+	$(MAKE) -C projects/pngoptimizercl install
