@@ -33,9 +33,9 @@ For Linux:
  1. Open a terminal
  2. Ensure you have build tools. To get the build tools on Ubuntu,
     open a terminal and execute this command: `sudo apt install build-essential`
- 3. Ensure you have GTK+ development package: `sudo apt-get install libgtk-3-dev`
- 3. Change directory to projects/pngoptimizer/
- 4. Execute command: `make` or `make CONFIG=release`
+ 3. Ensure you have GTK+ development package: `sudo apt install libgtk-3-dev`
+ 4. Change directory to projects/pngoptimizer/
+ 5. Execute command: `make` or `make CONFIG=release`
 
     These commands build in debug and release configuration respectively.
     The build results are located in the linux-debug/ or linux-release/ directories.
@@ -67,3 +67,7 @@ To build all and create the packages to be downloaded, call from a terminal:
  * On Linux: `distrib/make-distrib.sh`
 
 Packages will be created in the distrib/download directory.
+
+On Linux, to build all and install all you can also use the top level Makefile. This is usefull when creating a Debian package.
+
+
