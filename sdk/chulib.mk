@@ -91,34 +91,39 @@ OBJS := $(addprefix $(OUTDIR)/,$(OBJS))
 #$(info $(SDK_LIBPATHS))
 #$(info $(CFLAGS))
 
-all: build_deps build
+.PHONY: clean build_deps
 
-welcome_msg:
-	$(info ----------------------- $(PROJECT_NAME) $(CONFIG) -----------------------)
+all: build
 
-build_deps:
-ifneq ($(PROJECT_TYPE), lib)
-	@for dir in $(SDK_DIRS); do $(MAKE) --no-print-directory -C $$dir || exit; done
-endif
+$(info ----------------------- $(PROJECT_NAME) $(CONFIG) -----------------------)
 
-build: welcome_msg $(OUTDIR) $(SUBDIRS) $(OUTPATH)
+sdkdir = $(dir $(patsubst %/,%,$(dir $1)))
 
-clean: clean_deps welcome_msg
-	$(info cleaning...)
-	@rm -rf $(OUTDIR)
+$(SDK_LIBPATHS): %:
+	@$(MAKE) --no-print-directory -C $(call sdkdir,$@)
 
-clean_deps:
+build: $(OUTPATH)
+
+clean:
 ifneq ($(PROJECT_TYPE), lib)
 	@for dir in $(SDK_DIRS); do $(MAKE) --no-print-directory -C $$dir clean; done
 endif
+	$(info cleaning...)
+	@rm -rf $(OUTDIR)
 
 $(OUTDIR):
-	@mkdir $(OUTDIR)
+	@mkdir -p $(OUTDIR)
 
-$(SUBDIRS):
-	@mkdir $@
+$(SUBDIRS): $(OUTDIR)
+	@mkdir -p $@
 
-$(OUTPATH): $(SDK_LIBPATHS) $(PCHPATH) $(OBJS)
+$(PCHPATH): $(SDK_LIBPATHS) stdafx.h
+	$(info $(PROJECT_NAME) - stdafx.h (precompiled header))
+	@$(GPP) $(CPPFLAGS) -c stdafx.h -o $(PCHPATH)
+
+$(OBJS): $(PCHPATH)
+
+$(OUTPATH): $(OUTDIR) $(SUBDIRS) $(PCHPATH) $(OBJS)
 ifeq ($(PROJECT_TYPE), lib)
 	$(info creating library $(OUTPATH))
 	@ar rcs $(OUTPATH) $(OBJS)
@@ -127,27 +132,23 @@ else
 	@$(GPP) $(OBJS) $(SDK_LIBPATHS) -Wl,$(LDFLAGS) $(EXTLIBS) -o $(OUTPATH)
 endif
 
-$(PCHPATH): stdafx.h
-	$(info stdafx.h (precompiled header))
-	@$(GPP) $(CPPFLAGS) -c stdafx.h -o $(PCHPATH)
-
 -include $(subst .o,.d, $(OBJS))
 
 $(OUTDIR)/%.o: %.cpp $(PCHPATH)
-	$(info $<)
+	$(info $(PROJECT_NAME) - $<)
 	@$(GPP) $(CPPFLAGS) -c -MMD -MP $< -o $@
 
 $(OUTDIR)/%.o: %.c
-	$(info $<)
+	$(info $(PROJECT_NAME) - $<)
 	@$(GCC) $(CFLAGS) -c -MMD -MP $< -o $@
 
 $(OUTDIR)/%.png.o: %.png
-	$(info $< (resource))
+	$(info $(PROJECT_NAME) - $< (resource))
 	@$(LD) -r -o $@ -z noexecstack --format=binary $<
 	@$(OBJCOPY) --rename-section .data=.rodata,alloc,load,readonly,data,contents $@
 
 $(OUTDIR)/%.glade.o: %.glade
-	$(info $< (resource))
+	$(info $(PROJECT_NAME) - $< (resource))
 	@$(LD) -r -o $@ -z noexecstack --format=binary $<
 	@$(OBJCOPY) --rename-section .data=.rodata,alloc,load,readonly,data,contents $@
 
