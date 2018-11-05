@@ -13,6 +13,8 @@ namespace chustd {
 Thread::Thread()
 {
 	m_handle = nullptr;
+	m_startArg.pfn = nullptr;
+	m_startArg.userArg = nullptr;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -28,39 +30,36 @@ Thread::~Thread()
 
 ////////////////////////////////////////////////
 #if defined(_WIN32)
-struct StartArg
-{
-	int (*pfn)(void*);
-	void* userArg;
-};
-
 static DWORD WINAPI ThreadProc(LPVOID arg)
 {
-	StartArg* pStartArg = reinterpret_cast<StartArg*>(arg);
-	StartArg startArg = *pStartArg;
-	delete pStartArg;
-	int ret = startArg.pfn(startArg.userArg);
+	ThreadStartArg* pStartArg = reinterpret_cast<ThreadStartArg*>(arg);
+	int ret = pStartArg->pfn(pStartArg->userArg);
 	return static_cast<DWORD>(ret);
 }
-#endif
 
-typedef void* (*pthread_pfn)(void*);
+#elif defined(__linux__)
+void* ThreadProc(void* arg)
+{
+	ThreadStartArg* pStartArg = reinterpret_cast<ThreadStartArg*>(arg);
+	int ret = pStartArg->pfn(pStartArg->userArg);
+	return reinterpret_cast<void*>(static_cast<intptr_t>(ret));
+}
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 bool Thread::Start(int (*pfn)(void*), void* userArg)
 {
-#if defined(_WIN32)
-	StartArg* pStartArg = new StartArg;
-	pStartArg->pfn = pfn;
-	pStartArg->userArg = userArg;
+	m_startArg.pfn = pfn;
+	m_startArg.userArg = userArg;
 
+#if defined(_WIN32)
 	DWORD threadId = 0;
-	m_handle = ::CreateThread(nullptr, 0, &ThreadProc, pStartArg, 0, &threadId);
+	m_handle = ::CreateThread(nullptr, 0, &ThreadProc, &m_startArg, 0, &threadId);
 	return m_handle != nullptr;
 
 #elif defined(__linux__)
 	pthread_t th;
-	int ret = pthread_create(&th, nullptr, (pthread_pfn)pfn, userArg);
+	int ret = pthread_create(&th, nullptr, &ThreadProc, &m_startArg);
 	if( ret != 0 )
 	{
 		return false;
