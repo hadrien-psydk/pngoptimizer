@@ -63,6 +63,6 @@ replace_between("pngoptimizer/gtk/pngoptimizer.desktop", "Version=", "", version
 replace_between("pngoptimizercl/Readme.txt", r"Version\s*:\s*", "", version)
 replace_between("pngoptimizercl/Changelog.txt",
 	"^-----------------\n2[0-9][0-9][0-9].*(", ")",	version)
-replace_between("pngoptimizercl/main.cpp", r"#define PNGO_VERSION\s*", "", version)
+replace_between("pngoptimizercl/main.cpp", r'#define PNGO_VERSION\s*"', '"', version)
 
 print("success")
