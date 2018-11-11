@@ -22,6 +22,8 @@
 
 using namespace chustd;
 
+#define PNGO_VERSION 2.6~beta.2
+
 // Do not write to stdout at all except for the result file
 // when the -stdio flag is used
 bool g_stdioMode = false;
@@ -67,7 +69,7 @@ public:
 
 static void WriteVersion()
 {
-	String version = "PngOptimizerCL 2.6-beta";
+	String version = "PngOptimizerCL " PNGO_VERSION;
 #if defined(_M_X64)
 	version = version + String(" (x64)");
 #elif defined(_M_IX86)
@@ -79,7 +81,7 @@ static void WriteVersion()
 static void WriteHelp()
 {
 	WriteVersion();
-	Console::WriteLine("Copyright \xA9 2002/2016 Hadrien Nilsson - psydk.org");
+	Console::WriteLine("Copyright \xA9 2002/2018 Hadrien Nilsson - psydk.org");
 	Console::WriteLine("Converts GIF, BMP and TGA files to optimized PNG files.");
 	Console::WriteLine("Optimizes and cleans PNG files.");
 	Console::WriteLine("");
