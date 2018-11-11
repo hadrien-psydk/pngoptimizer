@@ -280,6 +280,11 @@ void TraceCtl::Clear()
 	m_maxLineWidthPx = 0;
 	m_maxLineWidthWhen = 0;
 	m_maxHeightPx = 0;
+
+	// Update scrollbars
+	gtk_widget_set_size_request(m_drawingArea, m_maxLineWidthPx, m_maxHeightPx);
+
+	// Redraw
 	gtk_widget_queue_draw(GTK_WIDGET(m_drawingArea));
 }
 
