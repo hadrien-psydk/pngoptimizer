@@ -245,6 +245,11 @@ int POApplication::OnCommandLine(GApplicationCommandLine* commandLine)
 /////////////////////////////////////////////////////////////
 int POApplication::Run(int argc, char** argv)
 {
+	if( argc > 1 && String(argv[1]) == "--version" )
+	{
+		Console::WriteLine(PNGO_APPNAME " " PNGO_VERSION);
+		return 0;
+	}
 	int status = g_application_run(G_APPLICATION(m_pGtkApp), argc, argv);
 
 	g_object_unref(m_pGtkApp);
