@@ -82,7 +82,7 @@ For advanced PNG options, perform a right click to display a context menu.
 * Ignore animated GIFs *
 
  If a GIF is animated, PngOptimizer will convert it to APNG (Animated PNG).
- If you enble this option, PngOptimzer will ignore the file.
+ If you enable this option, PngOptimzer will ignore the file.
 
 * Keep file date *
 
