@@ -2,7 +2,8 @@
 
 # This script updates the version inside many files of the repository
 
-import os, sys, re
+import os, sys, re, time
+import subprocess
 
 def cat(path):
 	with open(path) as f:
@@ -16,13 +17,20 @@ def replace_between(path, start, stop, new):
 	start = start.replace(")", "\\)");
 	start = start.replace("(", "\\(");
 
-	patt = "(" + start + ")" + ".*"
+	patt = "(" + start + ")"
 	repl = "\\g<1>" + new
+	any = '.*'
 	if stop:
 		stop = stop.replace(")", "\\)");
 		stop = stop.replace("(", "\\(");
+		if stop == ' ':
+			any = '[^ ]*'
+		stop = stop.replace(" ", "\\b");
+		patt += any
 		patt += "(" + stop + ")"
 		repl += "\\g<2>"
+	else:
+		patt += any
 
 	(data2, rc) = re.subn(patt, repl, data, 1, re.MULTILINE)
 	if rc != 1:
@@ -31,11 +39,15 @@ def replace_between(path, start, stop, new):
 
 	'''
 	# Regex testing
-	output = sys.stdout
-	output.write(data2)
-	return True
-	'''
+	print(patt)
+	with open('/tmp/xx.txt', 'wb') as output:
+		output.write(data2.encode('utf-8'))
+	output.close()
 
+	subprocess.call('diff ' + path + ' /tmp/xx.txt', shell=True)
+	return True
+
+	'''
 	with open(path, 'wb') as output:
 		output.write(data2.encode('utf-8'))
 	output.close()
@@ -47,7 +59,7 @@ dname = os.path.dirname(__file__)
 os.chdir(dname)
 
 # This is the version we will use
-version = cat("../VERSION")
+version = cat("../VERSION").strip()
 
 replace_between("make-distrib.sh", "POVER=", "", version)
 replace_between("make-distrib.bat", "POVER=", "", version)
@@ -64,5 +76,15 @@ replace_between("pngoptimizercl/Readme.txt", r"Version\s*:\s*", "", version)
 replace_between("pngoptimizercl/Changelog.txt",
 	"^-----------------\n2[0-9][0-9][0-9].*(", ")",	version)
 replace_between("pngoptimizercl/main.cpp", r'#define PNGO_VERSION\s*"', '"', version)
+
+# Update also the year
+ts = os.path.getmtime("../VERSION")
+year = time.strftime('%Y', time.gmtime(ts))
+
+replace_between("pngoptimizer/Readme.txt", '2002/', ' ', year)
+replace_between("pngoptimizer/msgtable.h", '2002/', ' ', year)
+
+replace_between("pngoptimizercl/Readme.txt", '2002/', ' ', year)
+replace_between("pngoptimizercl/main.cpp", '2002/', ' ', year)
 
 print("success")

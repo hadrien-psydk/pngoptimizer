@@ -1,5 +1,5 @@
 -----------------------------------------------------------------------------
-  PngOptimizer - Copyright (C) 2002/2018 Hadrien Nilsson - psydk.org
+  PngOptimizer - Copyright (C) 2002/2019 Hadrien Nilsson - psydk.org
 -----------------------------------------------------------------------------
 
   This program is free software; you can redistribute it and/or modify
