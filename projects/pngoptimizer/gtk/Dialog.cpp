@@ -36,11 +36,16 @@ DialogResp Dialog::DoModal(Window* parent)
 	}
 
 	auto button_ok = GetItem("button_ok");
+	auto button_apply = GetItem("button_apply");
 	auto button_cancel = GetItem("button_cancel");
 
 	if( button_ok )
 	{
 		g_signal_connect(button_ok, "clicked", G_CALLBACK(OnOkClicked), this);
+	}
+	if( button_apply )
+	{
+		g_signal_connect(button_apply, "clicked", G_CALLBACK(OnOkClicked), this);
 	}
 	if( button_cancel )
 	{
