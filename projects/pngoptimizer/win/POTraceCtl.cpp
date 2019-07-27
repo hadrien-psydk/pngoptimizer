@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////////////
 // This file is part of the PngOptimizer application
 // Copyright (C) Hadrien Nilsson - psydk.org
-// For conditions of distribution and use, see copyright notice in PngOptimizer.h
+// For conditions of distribution and use, see copyright notice in License.txt
 /////////////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
@@ -29,7 +29,7 @@ HGLOBAL POTraceCtl::CreateDropFilesW(const String& strUrl)
 	HGLOBAL hgDrop = GlobalAlloc( GHND | GMEM_SHARE, nBufferSize);
 	if( NULL == hgDrop )
 		return 0;
-	
+
 	DROPFILES* pDrop = (DROPFILES*) GlobalLock(hgDrop);
 	if( NULL == pDrop )
 	{
@@ -42,7 +42,7 @@ HGLOBAL POTraceCtl::CreateDropFilesW(const String& strUrl)
 
 	wchar* pszBuff = (wchar*) (LPBYTE(pDrop) + sizeof(DROPFILES));
 	chustd::Memory::Copy16(pszBuff, strUrl.GetBuffer(), strUrl.GetLength() + 1);
-	
+
 	GlobalUnlock(hgDrop);
 
 	return hgDrop;
@@ -75,8 +75,8 @@ int POTraceCtl::OnLinkDragBegin(const String& strUrl)
 	if( pDataObject )
 	{
 		pDataObject->SetData(&etc, &med, TRUE);
-		
-		IDropSource* pDropSource = new PlopDropSource; 
+
+		IDropSource* pDropSource = new PlopDropSource;
 		if( pDropSource )
 		{
 			// Forbid drag-and-drop on ourself
@@ -85,7 +85,7 @@ int POTraceCtl::OnLinkDragBegin(const String& strUrl)
 			// DoDragDrop will manage the rest of the action and will return when a drag-and-drop action is done
 			DWORD nEffect = 0;
 			HRESULT hr = ::DoDragDrop(pDataObject, pDropSource, DROPEFFECT_MOVE | DROPEFFECT_COPY | DROPEFFECT_LINK, &nEffect);
-		
+
 			// Unless an optimization is in progress, enable again drag-and-drop on ourself
 			if( !m_pApp->IsJobRunning() )
 			{
@@ -94,8 +94,8 @@ int POTraceCtl::OnLinkDragBegin(const String& strUrl)
 
 			if( hr == DRAGDROP_S_DROP )
 			{
-				// Testing proved that we cannot rely on the return code given by Windows to know the exact 
-				// operation that occurred during DoDragDrop. It depends on the target application, 
+				// Testing proved that we cannot rely on the return code given by Windows to know the exact
+				// operation that occurred during DoDragDrop. It depends on the target application,
 				// it depends on the Windows version and maybe the position of the stars in the sky
 
 				// So we check ourselves if DoDragDrop performed a copy or a move by testing if our file is still here

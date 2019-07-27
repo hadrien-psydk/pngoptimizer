@@ -1,7 +1,7 @@
 ﻿///////////////////////////////////////////////////////////////////////////////
 // This file is part of the PngOptimizer application
 // Copyright (C) Hadrien Nilsson - psydk.org
-// For conditions of distribution and use, see copyright notice in PngOptimizer.h
+// For conditions of distribution and use, see copyright notice in License.txt
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
@@ -31,11 +31,11 @@ bool MainWnd::Create(const String& title, RECT rcWnd, bool alwaysOnTop,
 
 	HINSTANCE hInstance = m_pApp->m_hInstance;
 	// Register window class
-	
+
 	static const wchar szClassName[] = L"PngOptimizer Main Window Class";
 
 	WNDCLASSEXW wcex;
-	wcex.cbSize         = sizeof(WNDCLASSEX); 
+	wcex.cbSize         = sizeof(WNDCLASSEX);
 	wcex.style          = CS_HREDRAW | CS_VREDRAW;
 	wcex.lpfnWndProc    = (WNDPROC)WndProcStatic;
 	wcex.cbClsExtra     = 0;
@@ -71,7 +71,7 @@ bool MainWnd::Create(const String& title, RECT rcWnd, bool alwaysOnTop,
 		m_strErr = L"CreateEx failed";
 		return false;
 	}
-	
+
 	Rect rect = GetClientRect();
 	const int clientWidth = rect.Width();
 	const int clientHeight = rect.Height();
@@ -107,7 +107,7 @@ void MainWnd::DoPngOptions()
 	dlg.m_settings = m_pApp->m_engine.m_settings;
 	if( dlg.DoModal(this) == DialogResp::Cancel )
 		return;
-	
+
 	m_pApp->m_engine.m_settings = dlg.m_settings;
 }
 
@@ -118,7 +118,7 @@ void MainWnd::DoScreenshotsOptions()
 	DialogResp ret = dlg.DoModal(this);
 	if( ret == DialogResp::Cancel )
 		return;
-	
+
 	m_pApp->m_bmpcd.m_settings = dlg.m_settings;
 }
 
@@ -221,13 +221,13 @@ LRESULT MainWnd::WndProc(UINT nMsg, WPARAM wParam, LPARAM lParam)
 	HDC hdc;
 	int cx, cy;
 
-	switch(nMsg) 
+	switch(nMsg)
 	{
 	case WM_PAINT:
 		hdc = BeginPaint(m_handle, &ps);
 		EndPaint(m_handle, &ps);
 		break;
-	
+
 	case WM_ERASEBKGND:
 		return 1;
 
@@ -260,7 +260,7 @@ LRESULT MainWnd::WndProc(UINT nMsg, WPARAM wParam, LPARAM lParam)
 			{
 				POINT point;
 				GetCursorPos(&point);
-				
+
 				HINSTANCE hInstance = m_pApp->m_hInstance;
 				HMENU hMenu = LoadMenu(hInstance, MAKEINTRESOURCE(IDR_MENU));
 				HMENU hSubMenu = GetSubMenu(hMenu, 0);
@@ -281,7 +281,7 @@ LRESULT MainWnd::WndProc(UINT nMsg, WPARAM wParam, LPARAM lParam)
 			int nId = LOWORD(wParam);
 			int nEvent = HIWORD(wParam);
 			nEvent;
-			
+
 			if( nId == IDM_PNGOPTIONS )
 			{
 				DoPngOptions();
@@ -295,7 +295,7 @@ LRESULT MainWnd::WndProc(UINT nMsg, WPARAM wParam, LPARAM lParam)
 			else if( nId == IDM_SHOWSCREENSHOTSDIRECTORY )
 			{
 				String strDir = m_pApp->m_bmpcd.GetDir();
-				
+
 				// The / is a valid path, but the Shell does not like it, so we convert it
 				// into something it likes, "D:\" "E:\" etc.
 				strDir = File::GetAbsolutePath(strDir);
@@ -342,7 +342,7 @@ LRESULT MainWnd::WndProc(UINT nMsg, WPARAM wParam, LPARAM lParam)
 			Destroying.Fire();
 		}
 		break;
-		
+
 	case WM_APP_THREADJOBDONE:
 		{
 			// The working thread notified us that its job is done

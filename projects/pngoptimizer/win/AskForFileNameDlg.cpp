@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////////////
 // This file is part of the PngOptimizer application
 // Copyright (C) Hadrien Nilsson - psydk.org
-// For conditions of distribution and use, see copyright notice in PngOptimizer.h
+// For conditions of distribution and use, see copyright notice in License.txt
 /////////////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
@@ -47,7 +47,7 @@ void AskForFileNameDlg::LoadValues()
 bool AskForFileNameDlg::StoreValues()
 {
 	String strPath = m_editFileName.GetText();
-	
+
 	// Maybe the user put a path in the file name. I wonder who may have the idea to do this,
 	// but we allow it anyway
 	// Example: blabla/myshot.png
@@ -70,7 +70,7 @@ bool AskForFileNameDlg::StoreValues()
 
 	//////////////////////////////////////////////////////////////////
 	// Automatically add a "png" extension to the file name
-	
+
 	const String strWantedExt = L"png";
 
 	String strExt = FilePath::GetExtension(strPath).ToLowerCase();
@@ -78,10 +78,10 @@ bool AskForFileNameDlg::StoreValues()
 	{
 		strPath = strPath + L"." + strWantedExt;
 	}
-	
+
 	//////////////////////////////////////////////////////////////////
 	// Verify file existence, warn the user if necessary
-	
+
 	String finalPath = FilePath::Combine(strDir, strPath);
 	if( File::Exists(finalPath) )
 	{
@@ -131,7 +131,7 @@ bool AskForFileNameDlg::GetDigitGroup(const String& str, int& nGroupStart, int& 
 		{
 			cPrev = str.GetAt(nPosPrev);
 		}
-		
+
 		if( !(cPrev == 0 || cPrev == ' ' || cPrev == '_' || cPrev == '-') )
 		{
 			// Continue in the string

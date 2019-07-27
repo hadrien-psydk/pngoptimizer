@@ -1,7 +1,7 @@
 ﻿/////////////////////////////////////////////////////////////////////////////////////
 // This file is part of the PngOptimizer application
 // Copyright (C) Hadrien Nilsson - psydk.org
-// For conditions of distribution and use, see copyright notice in PngOptimizer.h
+// For conditions of distribution and use, see copyright notice in License.txt
 /////////////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
@@ -118,7 +118,7 @@ bool AppSettings::Read()
 			// No need to center, the values are ok
 			pMWS->topLeftValid = true;
 		}
-	
+
 		ini.GetInt(k_szWndWidth, wndWidth);
 		ini.GetInt(k_szWndHeight, wndHeight);
 
@@ -127,7 +127,7 @@ bool AppSettings::Read()
 		{
 			wndX = 0;
 		}
-	
+
 		if( wndY < 0 )
 		{
 			wndY = 0;

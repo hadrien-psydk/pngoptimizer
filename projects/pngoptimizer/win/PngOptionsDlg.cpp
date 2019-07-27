@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////////////
 // This file is part of the PngOptimizer application
 // Copyright (C) Hadrien Nilsson - psydk.org
-// For conditions of distribution and use, see copyright notice in PngOptimizer.h
+// For conditions of distribution and use, see copyright notice in License.txt
 /////////////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
@@ -239,14 +239,14 @@ void PngOptionsDlg::SetColorControls(Color col)
 {
 	m_cbtBkColor.SetColor(col);
 
-	m_lblBkColorTxtDec.SetText("rgb(" 
+	m_lblBkColorTxtDec.SetText("rgb("
 		+ String::FromInt(col.r)
 		+ ","
 		+ String::FromInt(col.g)
 		+ ","
 		+ String::FromInt(col.b)
 		+ ")");
-	
+
 	uint32 val = (col.r << 16) | (col.g << 8) | col.b;
 	m_lblBkColorTxtHex.SetText( "#" + String::FromInt(val, 'x', 6, '0').Right(6) );
 }

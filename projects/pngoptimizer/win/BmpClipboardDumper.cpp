@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////////////
 // This file is part of the PngOptimizer application
 // Copyright (C) Hadrien Nilsson - psydk.org
-// For conditions of distribution and use, see copyright notice in PngOptimizer.h
+// For conditions of distribution and use, see copyright notice in License.txt
 /////////////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
@@ -51,7 +51,7 @@ static bool PrepareDib(chuwin32::DibBitmap& dib, String& strErr)
 		return false;
 	}
 
-	// I don't like this kind of code indentation but there are too much resource alloc/desalloc 
+	// I don't like this kind of code indentation but there are too much resource alloc/desalloc
 	// function calls to use the "quit as soon as possible upon error" strategy.
 	// We test everything in a paranoid mode as sometimes you get a weird bitmap in the clipboard
 	// that you cannot copy (like a MSN messenger smiley copied from the messages window)
@@ -81,7 +81,7 @@ static bool PrepareDib(chuwin32::DibBitmap& dib, String& strErr)
 					{
 						HDC hdcMem = dib.m_hDC;
 						BitBlt(hdcMem, 0, 0, bm.bmWidth, bm.bmHeight, hdcSrc, 0, 0, SRCCOPY);
-						
+
 						bResult = true; // Success !
 					}
 					else
@@ -101,7 +101,7 @@ static bool PrepareDib(chuwin32::DibBitmap& dib, String& strErr)
 			{
 				strErr = k_szSelectObjectFailed;
 			}
-			
+
 			// </CreateCompatibleDC>
 			DeleteDC(hdcSrc);
 		}
@@ -130,7 +130,7 @@ bool BmpClipboardDumper::Dump(POEngine* pEngine)
 	{
 		return false;
 	}
-				
+
 	uint32* const pSrc = dib.m_pBits;
 	const int32 nWidth = dib.GetWidth();
 	const int32 nHeight = dib.GetHeight();
@@ -164,7 +164,7 @@ bool BmpClipboardDumper::Dump(POEngine* pEngine)
 	dd.width = nWidth;
 	dd.height = nHeight;
 	dd.pixelFormat = PF_24bppRgb;
-	
+
 	// Determine the file name
 	DateTime date = DateTime::GetNow();
 	String strDate = date.FormatDate();
@@ -233,7 +233,7 @@ bool BmpClipboardDumper::Dump(POEngine* pEngine)
 	}
 
 	m_strFileName = strFileNameFinal;
-	
+
 	if( m_settings.askForFileName )
 	{
 		// Give the opportunity to the user to change the file name
@@ -247,7 +247,7 @@ bool BmpClipboardDumper::Dump(POEngine* pEngine)
 
 		strFileNameFinal = m_strFileName;
 	}
-	
+
 	if( !Directory::Exists(strDestDir) )
 	{
 		m_strErr = k_szDirectoryDoesNotExists + strDestDir;
@@ -290,7 +290,7 @@ bool BmpClipboardDumper::Dump(POEngine* pEngine)
 			}
 		}
 	}
-	
+
 	if( bResult )
 	{
 		m_strPreviousFileName = m_strFileName;
@@ -315,7 +315,7 @@ String BmpClipboardDumper::GetTempDir() const
 	DWORD nTempPathBufferSize = GetTempPathW(0, NULL);
 	if( nTempPathBufferSize > 0 )
 	{
-		::GetTempPathW(nTempPathBufferSize, strDir.GetUnsafeBuffer(nTempPathBufferSize - 1));	
+		::GetTempPathW(nTempPathBufferSize, strDir.GetUnsafeBuffer(nTempPathBufferSize - 1));
 	}
 	return strDir;
 }

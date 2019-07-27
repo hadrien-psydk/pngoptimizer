@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////////////
 // This file is part of the PngOptimizer application
 // Copyright (C) Hadrien Nilsson - psydk.org
-// For conditions of distribution and use, see copyright notice in PngOptimizer.h
+// For conditions of distribution and use, see copyright notice in License.txt
 /////////////////////////////////////////////////////////////////////////////////////
 
 #ifndef PO_TRACECTL_H
@@ -38,7 +38,7 @@ private:
 		~TextLine();
 	};
 	Array<TextLine> m_lines;
-	
+
 	// Variables used to recompute the max line width
 	int m_maxLineWidthPx;
 	int m_maxLineWidthWhen; // m_lines size when maxLineWidthPx was computed

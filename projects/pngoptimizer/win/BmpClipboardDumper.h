@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////////////
 // This file is part of the PngOptimizer application
 // Copyright (C) Hadrien Nilsson - psydk.org
-// For conditions of distribution and use, see copyright notice in PngOptimizer.h
+// For conditions of distribution and use, see copyright notice in License.txt
 /////////////////////////////////////////////////////////////////////////////////////
 
 #ifndef PO_BMPCLIPBOARDDUMPER_H
@@ -34,7 +34,7 @@ public:
 	String GetFileName() const;
 	String GetFilePath() const;
 
-	// Call those methods after a dsAskForFileName event state 
+	// Call those methods after a dsAskForFileName event state
 	void SetFileName(const String& strFileName);
 	void Abort();
 

@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////////////
 // This file is part of the PngOptimizer application
 // Copyright (C) Hadrien Nilsson - psydk.org
-// For conditions of distribution and use, see copyright notice in PngOptimizer.h
+// For conditions of distribution and use, see copyright notice in License.txt
 /////////////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
@@ -93,11 +93,11 @@ void ScreenshotsOptionsDlg::OnButtonBrowse()
 {
 	DirDlg dlg;
 	dlg.SetTitle(L"Please choose the screenshots directory");
-	
+
 	// Show the directory in the dialog
 	String strDir = m_editDirectory.GetText();
 	FilePath::AddSeparator(strDir, L'\\');
-	
+
 	// The / is a valid path, but Windows does not like it, so we convert it
 	// into something it likes, "D:\" "E:\" etc.
 	strDir = File::GetAbsolutePath(strDir);

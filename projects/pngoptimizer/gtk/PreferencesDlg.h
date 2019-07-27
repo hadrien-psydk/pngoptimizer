@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////////////
 // This file is part of the PngOptimizer application
 // Copyright (C) Hadrien Nilsson - psydk.org
-// For conditions of distribution and use, see copyright notice in PngOptimizer.h
+// For conditions of distribution and use, see copyright notice in License.txt
 /////////////////////////////////////////////////////////////////////////////////////
 
 #ifndef PO_PREFERENCESDLG_H
@@ -55,7 +55,7 @@ protected:
 
 private:
 	bool m_ppSyncInProgress;
-	
+
 private:
 	void OnCheckBkColor();
 	void SetColorControlStates();
