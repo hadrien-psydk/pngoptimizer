@@ -1,4 +1,4 @@
-set POVER=2.6
+set POVER=2.6~next
 
 set ZIP="C:\Program Files\7-Zip\7z.exe" a -tzip -mx=5
 set VCBUILD="C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\devenv"

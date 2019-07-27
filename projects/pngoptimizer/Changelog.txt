@@ -1,7 +1,7 @@
 == PngOptimizer Changelog ==
 
 -----------------
-2019 (2.6)
+2019 (2.6~next)
 
 - change: new GTK+ interface with header bar
 - change: do not overwrite a file if the content stays the same
