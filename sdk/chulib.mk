@@ -91,15 +91,16 @@ OBJS := $(addprefix $(OUTDIR)/,$(OBJS))
 #$(info $(SDK_LIBPATHS))
 #$(info $(CFLAGS))
 
-.PHONY: clean build_deps
+.PHONY: clean
 
-all: build
+all:  build
 
 $(info ----------------------- $(PROJECT_NAME) $(CONFIG) -----------------------)
 
 sdkdir = $(dir $(patsubst %/,%,$(dir $1)))
 
-$(SDK_LIBPATHS): %:
+FORCE: ;
+$(SDK_LIBPATHS): FORCE
 	@$(MAKE) --no-print-directory -C $(call sdkdir,$@)
 
 build: $(OUTPATH)
@@ -117,13 +118,13 @@ $(OUTDIR):
 $(SUBDIRS): $(OUTDIR)
 	@mkdir -p $@
 
-$(PCHPATH): $(SDK_LIBPATHS) stdafx.h
+$(PCHPATH): stdafx.h
 	$(info $(PROJECT_NAME) - stdafx.h (precompiled header))
 	@$(GPP) $(CPPFLAGS) -c stdafx.h -o $(PCHPATH)
 
 $(OBJS): $(PCHPATH)
 
-$(OUTPATH): $(OUTDIR) $(SUBDIRS) $(PCHPATH) $(OBJS)
+$(OUTPATH): $(OUTDIR) $(SUBDIRS) $(PCHPATH) $(OBJS) $(SDK_LIBPATHS)
 ifeq ($(PROJECT_TYPE), lib)
 	$(info creating library $(OUTPATH))
 	@ar rcs $(OUTPATH) $(OBJS)
