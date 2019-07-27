@@ -141,12 +141,6 @@ public:
 		return (value32 & 0x00ffffff) == (other.value32 & 0x00ffffff);
 	}
 
-	Color& operator = (const Color& color)
-	{
-		value32 = color.value32;
-		return *this;
-	}
-
 	bool operator == (const Color& color) const
 	{
 		return (value32 == color.value32);
