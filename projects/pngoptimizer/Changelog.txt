@@ -1,7 +1,7 @@
 == PngOptimizer Changelog ==
 
 -----------------
-2017 (2.6~beta.2)
+2017 (2.6)
 
 - change: do not overwrite a file if the content stays the same
 
