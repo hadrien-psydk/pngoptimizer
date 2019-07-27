@@ -1,7 +1,12 @@
 == PngOptimizer Changelog ==
 
 -----------------
-2019 (2.6~next)
+2019 (2.6.1)
+
+- fixed: compilation warning with gcc9
+
+-----------------
+2019 (2.6)
 
 - change: new GTK+ interface with header bar
 - change: do not overwrite a file if the content stays the same
