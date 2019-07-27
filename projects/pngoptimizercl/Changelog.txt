@@ -1,13 +1,9 @@
 == PngOptimizerCL Changelog ==
 
 -----------------
-2019 (2.6.1)
+2019-07 (2.6.2)
 
 - fixed: compilation warning with gcc9
-
------------------
-2019 (2.6)
-
 - new: added "-KeepPixels" option to just clean a PNG
 - change: do not overwrite a file if the content stays the same
 

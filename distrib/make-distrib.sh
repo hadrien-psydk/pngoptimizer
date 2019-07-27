@@ -1,5 +1,5 @@
 #!/bin/bash
-POVER=2.6.1
+POVER=2.6.2
 
 # Set current directory to the one containing this script
 cd "$(dirname "$0")"
