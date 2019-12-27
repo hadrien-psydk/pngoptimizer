@@ -2,7 +2,8 @@
 
 TEST(Png, Flavours)
 {
-	StringArray fileNames = Directory::GetFileNames("PngSuite", "*.png");
+	StringArray fileNames = Directory::GetFileNames("utfiles/PngSuite", "*.png");
+
 	// Remove the logo file
 	for(int i = fileNames.GetSize() - 1; i >= 0; --i)
 	{
@@ -17,13 +18,14 @@ TEST(Png, Flavours)
 		//////////////////////////////////////
 		// Compute expectations
 		String fileName = fileNames[i];
-		String filePath = FilePath::Combine("PngSuite", fileName);
+		String filePath = FilePath::Combine("utfiles/PngSuite", fileName);
 		String abc = fileName.Mid(0, 3);
 		String ni = fileName.Mid(3, 1);
 		String ctNum = fileName.Mid(4, 1);
 		String dp = fileName.Mid(6, 2);
 
 		SCOPED_TRACE( ("fileName: " + fileName + " - index: " + String::FromInt(i)).GetBuffer());
+		//std::cout << fileName << std::endl;
 
 		bool expectedLoadResult = !abc.StartsWith("x");
 		bool expectedInterlaced = (ni == "i");
