@@ -25,7 +25,6 @@ TEST(Png, Flavours)
 		String dp = fileName.Mid(6, 2);
 
 		SCOPED_TRACE( ("fileName: " + fileName + " - index: " + String::FromInt(i)).GetBuffer());
-		//std::cout << fileName << std::endl;
 
 		bool expectedLoadResult = !abc.StartsWith("x");
 		bool expectedInterlaced = (ni == "i");
