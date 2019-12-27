@@ -2,7 +2,7 @@
 
 TEST(ScanType, Int32)
 {
-	// Cas général
+	// Cas gï¿½nï¿½ral
 	int32 nAdvance = 0;
 	int32 nResult = 0;
 	bool bRet = ScanType(UTF16("123"), nAdvance, 'd', &nResult);
@@ -39,10 +39,10 @@ TEST(ScanType, Int32)
 	nResult = 0;
 	bRet = ScanType(UTF16("+ 123"), nAdvance, 'd', &nResult);
 	ASSERT_TRUE(bRet == false);
-	ASSERT_TRUE(nAdvance == 0); // Doit rester inchangé
-	ASSERT_TRUE(nResult == 0); // Doit rester inchangé
+	ASSERT_TRUE(nAdvance == 0); // Doit rester inchangï¿½
+	ASSERT_TRUE(nResult == 0); // Doit rester inchangï¿½
 
-	// Hexadécimal
+	// Hexadï¿½cimal
 	nAdvance = 0;
 	nResult = 0;
 	bRet = ScanType(UTF16("aA12cF"), nAdvance, 'x', &nResult);
@@ -257,6 +257,29 @@ TEST(RandomTest, Misc)
 	}*/
 }
 
+static void detailedEquals(const String& s1, const String& s2)
+{
+	int len = s1.GetLength();
+	int len2 = s2.GetLength();
+	if( len != len2 )
+	{
+		FAIL() << "different lengths: " << len << " vs. " << len2;
+	}
+	StringArray a1 = s1.SplitByEndlines();
+	StringArray a2 = s2.SplitByEndlines();
+	int count = a1.GetSize();
+	int count2 = a2.GetSize();
+	if( count != count2 )
+	{
+		FAIL() << "different line counts";
+	}
+	if( s1 != s2 )
+	{
+		FAIL() << "different contents";
+	}
+	SUCCEED();
+}
+
 TEST(MemIniFileTest, Dump)
 {
 	MemIniFile ini;
@@ -269,7 +292,7 @@ TEST(MemIniFileTest, Dump)
 
 	ini.SetSection("Screenshots");
 	ini.SetBool("UseDefaultDir", true);
-	ini.SetString("CustomDir", "D:\\Étoile des neiges");
+	ini.SetString("CustomDir", String::FromUtf8Z("~/Ã‰toile des neiges"));
 	ini.SetBool("AskForFileName", false);
 	ini.SetBool("MaximizeCompression", false);
 
@@ -282,14 +305,18 @@ TEST(MemIniFileTest, Dump)
 	ini.SetCommentLine1("PngOptimizer configuration file");
 	ini.SetCommentLine2("This file is encoded in UTF-8");
 
-	ini.Dump("test.ini", false);
-	ini.Dump("test-crlf.ini", true);
+	ASSERT_TRUE( ini.Dump("test-dump.ini", false) );
+	ASSERT_TRUE( ini.Dump("test-crlf-dump.ini", true) );
+
+	String c1 = File::GetTextContent("test-dump.ini", TextEncoding::Utf8());
+	String c2 = File::GetTextContent("utfiles/test.ini", TextEncoding::Utf8());
+	detailedEquals(c1, c2);
 }
 
 TEST(MemIniFileTest, Load)
 {
 	MemIniFile ini;
-	ASSERT_TRUE( ini.Load("test.ini"));
+	ASSERT_TRUE( ini.Load("utfiles/test.ini"));
 
 	ASSERT_TRUE( ini.SetSection("Engine"));
 	
@@ -303,9 +330,9 @@ TEST(MemIniFileTest, Load)
 
 	ASSERT_TRUE( ini.SetSection("Screenshots"));
 	
-	String strCustomDir;
-	ASSERT_TRUE( ini.GetString("CustomDir", strCustomDir));
-	ASSERT_TRUE( strCustomDir == "D:\\Étoile des neiges");
+	String customDir;
+	ASSERT_TRUE( ini.GetString("CustomDir", customDir));
+	ASSERT_EQ(String::FromUtf8Z("~/Ã‰toile des neiges"), customDir);
 
 	ASSERT_TRUE( ini.SetSection("Window"));
 	
