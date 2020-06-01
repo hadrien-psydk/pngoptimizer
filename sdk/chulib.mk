@@ -50,9 +50,16 @@ $(error Bad CONFIG value)
 endif
 
 CXXFLAGS := $(CFLAGS) -Wextra -Wshadow
+CXXFLAGS += -Woverloaded-virtual
+
 # Uncomment for tests. gtk and gtest make it difficult
 # CXXFLAGS +=-Wzero-as-null-pointer-constant
-CXXFLAGS += -Wlogical-op -Woverloaded-virtual
+
+# Add some g++ only warning flags
+ifeq ($(CXX),g++)
+  CXXFLAGS += -Wlogical-op
+endif
+
 CXXFLAGS += -std=c++0x $(addprefix -I,$(INCDIRS))
 
 # Most includes for GTK+ are in /usr/include but some of them are
