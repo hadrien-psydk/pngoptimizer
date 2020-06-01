@@ -49,16 +49,16 @@ else
 $(error Bad CONFIG value)
 endif
 
-CPPFLAGS := $(CFLAGS) -Wextra -Wshadow
+CXXFLAGS := $(CFLAGS) -Wextra -Wshadow
 # Uncomment for tests. gtk and gtest make it difficult
-# CPPFLAGS +=-Wzero-as-null-pointer-constant
-CPPFLAGS += -Wlogical-op -Woverloaded-virtual
-CPPFLAGS += -std=c++0x $(addprefix -I,$(INCDIRS))
+# CXXFLAGS +=-Wzero-as-null-pointer-constant
+CXXFLAGS += -Wlogical-op -Woverloaded-virtual
+CXXFLAGS += -std=c++0x $(addprefix -I,$(INCDIRS))
 
 # Most includes for GTK+ are in /usr/include but some of them are
 # very specific. pkg-config gives us all the needed paths.
 ifeq ($(EXT_DEPS),gtk)
-	CPPFLAGS += $(shell pkg-config --cflags gtk+-3.0)
+	CXXFLAGS += $(shell pkg-config --cflags gtk+-3.0)
 	EXTLIBS += $(shell pkg-config --libs gtk+-3.0)
 endif
 
@@ -120,7 +120,7 @@ $(SUBDIRS): $(OUTDIR)
 
 $(PCHPATH): stdafx.h
 	$(info $(PROJECT_NAME) - stdafx.h (precompiled header))
-	@$(CXX) $(CPPFLAGS) -x c++-header -c stdafx.h -o $(PCHPATH)
+	@$(CXX) $(CXXFLAGS) -x c++-header -c stdafx.h -o $(PCHPATH)
 
 $(OBJS): $(PCHPATH)
 
@@ -137,7 +137,7 @@ endif
 
 $(OUTDIR)/%.o: %.cpp $(PCHPATH)
 	$(info $(PROJECT_NAME) - $<)
-	@$(CXX) $(CPPFLAGS) -c -MMD -MP $< -o $@
+	@$(CXX) $(CXXFLAGS) -c -MMD -MP $< -o $@
 
 $(OUTDIR)/%.o: %.c
 	$(info $(PROJECT_NAME) - $<)
