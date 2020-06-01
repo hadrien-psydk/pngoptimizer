@@ -120,7 +120,7 @@ $(SUBDIRS): $(OUTDIR)
 
 $(PCHPATH): stdafx.h
 	$(info $(PROJECT_NAME) - stdafx.h (precompiled header))
-	@$(CXX) $(CPPFLAGS) -c stdafx.h -o $(PCHPATH)
+	@$(CXX) $(CPPFLAGS) -x c++-header -c stdafx.h -o $(PCHPATH)
 
 $(OBJS): $(PCHPATH)
 
