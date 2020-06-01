@@ -24,8 +24,8 @@ INCDIRS += ../../sdk
 CONFIG ?= debug
 OUTDIR := linux-$(CONFIG)
 
-GCC := gcc
-GPP := g++
+CC  := gcc
+CXX := g++
 LD  := ld
 OBJCOPY := objcopy
 
@@ -120,7 +120,7 @@ $(SUBDIRS): $(OUTDIR)
 
 $(PCHPATH): stdafx.h
 	$(info $(PROJECT_NAME) - stdafx.h (precompiled header))
-	@$(GPP) $(CPPFLAGS) -c stdafx.h -o $(PCHPATH)
+	@$(CXX) $(CPPFLAGS) -c stdafx.h -o $(PCHPATH)
 
 $(OBJS): $(PCHPATH)
 
@@ -130,18 +130,18 @@ ifeq ($(PROJECT_TYPE), lib)
 	@ar rcs $(OUTPATH) $(OBJS)
 else
 	$(info linking application $(OUTPATH))
-	@$(GPP) $(OBJS) $(SDK_LIBPATHS) -Wl,$(LDFLAGS) $(EXTLIBS) -o $(OUTPATH)
+	@$(CXX) $(OBJS) $(SDK_LIBPATHS) -Wl,$(LDFLAGS) $(EXTLIBS) -o $(OUTPATH)
 endif
 
 -include $(subst .o,.d, $(OBJS))
 
 $(OUTDIR)/%.o: %.cpp $(PCHPATH)
 	$(info $(PROJECT_NAME) - $<)
-	@$(GPP) $(CPPFLAGS) -c -MMD -MP $< -o $@
+	@$(CXX) $(CPPFLAGS) -c -MMD -MP $< -o $@
 
 $(OUTDIR)/%.o: %.c
 	$(info $(PROJECT_NAME) - $<)
-	@$(GCC) $(CFLAGS) -c -MMD -MP $< -o $@
+	@$(CC) $(CFLAGS) -c -MMD -MP $< -o $@
 
 $(OUTDIR)/%.png.o: %.png
 	$(info $(PROJECT_NAME) - $< (resource))
