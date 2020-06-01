@@ -20,13 +20,9 @@ const char k_szUnsupportedPixelFormat[]   = "Unsupported pixel format";
 const char k_szCannotLoadFile[]             = "Cannot load file";
 const char k_szFileTooLarge[]               = "File is too large";
 const char k_szUnsupportedFileFormat[]      = "Unsupported file format";
-const char k_szCannotLoadRawSourceContent[] = "Cannot load raw source content";
-const char k_szNotEnoughMemoryToFlattenPaletteImage[] = "Not enough memory to flatten palette image";
-const char k_szNotEnoughMemoryToDeflatePaletteImage[] = "Not enough memory to deflate palette image";
 const char k_szNotEnoughMemoryToConvertTo24Bits[] = "Not enough memory to convert to 24 bits";
 
 const char k_szPathDoesNotExist[]        = "Path does not exist";
-const char k_szCannotGetFileAttributes[] = "Cannot get file attributes";
 const char k_szFileIsReadOnly[]          = "File is read-only";
 const char k_szCannotPerformBackup[]     = "Cannot perform backup, previous backup deletion failed";
 const char k_szCannotPerformBackupRenameFailed[] = "Cannot perform backup, rename failed";
