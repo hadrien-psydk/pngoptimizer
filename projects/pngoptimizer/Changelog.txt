@@ -1,6 +1,9 @@
 == PngOptimizer Changelog ==
 
 -----------------
+2020 (2.7-beta)
+
+-----------------
 2019-07 (2.6.2)
 
 - fixed: compilation warning with gcc9

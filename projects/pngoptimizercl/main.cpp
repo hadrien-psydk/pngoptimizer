@@ -7,7 +7,7 @@
 
 using namespace chustd;
 
-#define PNGO_VERSION "2.6.2"
+#define PNGO_VERSION "2.7-beta"
 
 // Do not write to stdout at all except for the result file
 // when the -stdio flag is used
@@ -66,7 +66,7 @@ static void WriteVersion()
 static void WriteHelp()
 {
 	WriteVersion();
-	Console::WriteLine("Copyright \xA9 2002/2019 Hadrien Nilsson - psydk.org");
+	Console::WriteLine("Copyright \xA9 2002/2020 Hadrien Nilsson - psydk.org");
 	Console::WriteLine("Converts GIF, BMP and TGA files to optimized PNG files.");
 	Console::WriteLine("Optimizes and cleans PNG files.");
 	Console::WriteLine("");
