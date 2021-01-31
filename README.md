@@ -34,7 +34,7 @@ On Linux, `make` accept other targets: clean, run, install, uninstall, cov. Open
 For PngOptimizerCL, do the same except that you should change directory to projects/pngoptimizercl instead.
 
 ### Windows
- 1. Use Microsoft Visual Studio 2015 and open projects/pngoptimizer/PngOptimizer.sln
+ 1. Use Microsoft Visual Studio 2017 and open projects/pngoptimizer/PngOptimizer.sln
  2. Build the solution, in either Debug or Release mode, and for Win32 (x86) or x64.
 
 The final build result, PngOptimizer.exe, is located into the Win32-Debug, Win32-Release,

@@ -10,7 +10,7 @@
 #define PNGO_APPNAME   "PngOptimizer"
 #define PNGO_VERSION   "2.7-beta"
 #define PNGO_WEBSITE   "http://psydk.org/pngoptimizer"
-#define PNGO_COPYRIGHT "Copyright \xC2\xA9 2002/2020 Hadrien Nilsson"
+#define PNGO_COPYRIGHT "Copyright \xC2\xA9 2002/2021 Hadrien Nilsson"
 
 // UI texts
 #define WELCOME_MESSAGE "Drop PNG, GIF, BMP or TGA files here"

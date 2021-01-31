@@ -1,11 +1,12 @@
 set POVER=2.7-beta
 
-set ZIP="C:\Program Files\7-Zip\7z.exe" a -tzip -mx=5
-set VCBUILD="C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\devenv"
+@set ZIP="C:\Program Files\7-Zip\7z.exe" a -tzip -mx=5
+@set WHERE=where /R "%ProgramFiles(x86)%\Microsoft Visual Studio" devenv.com
+@for /F "tokens=* USEBACKQ" %%F in (`%WHERE%`) do @( set VCBUILD="%%F" )
 
 :: Save current directory and change it to the directory of this bat
-setlocal
-cd /d %~dp0
+@setlocal
+@cd /d %~dp0
 
 :: Binaries
 mkdir download
