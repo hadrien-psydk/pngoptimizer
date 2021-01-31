@@ -66,7 +66,7 @@ static void WriteVersion()
 static void WriteHelp()
 {
 	WriteVersion();
-	Console::WriteLine("Copyright \xA9 2002/2020 Hadrien Nilsson - psydk.org");
+	Console::WriteLine("Copyright \xA9 2002/2021 Hadrien Nilsson - psydk.org");
 	Console::WriteLine("Converts GIF, BMP and TGA files to optimized PNG files.");
 	Console::WriteLine("Optimizes and cleans PNG files.");
 	Console::WriteLine("");

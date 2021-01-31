@@ -1,4 +1,4 @@
-== PngOptimizer Changelog ==
+﻿== PngOptimizer Changelog ==
 
 -----------------
 2020 (2.7-beta)
@@ -154,7 +154,7 @@ Private release by Paul Higginbottom
 -----------------
 2006-01-09 (1.5.4 aka 1.54)
 
-- uneeded bKGD chunk inserted when the � Keep background color � option was set.
+- uneeded bKGD chunk inserted when the "Keep background color" option was set.
 
 -----------------
 2006-01-07 (1.5.3 aka 1.53)

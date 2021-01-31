@@ -4,11 +4,12 @@
 
 import os, sys, re, time
 import subprocess
+from pathlib import Path
 
 def cat(path):
-	with open(path) as f:
+	with open(Path(path)) as f:
 		data = f.read()
-	f.close()
+		f.close()
 	return data
 
 def replace_between(path, start, stop, new):
@@ -48,9 +49,9 @@ def replace_between(path, start, stop, new):
 	return True
 
 	'''
-	with open(path, 'wb') as output:
-		output.write(data2.encode('utf-8'))
-	output.close()
+	with open(path, 'w', newline="\n") as output:
+		output.write(data2)
+		output.close()
 	return True
 
 # -----------------------------------------------------------------------------
@@ -68,13 +69,13 @@ os.chdir("../projects")
 
 replace_between("pngoptimizer/Readme.txt", r"Version\s*:\s*", "", version)
 replace_between("pngoptimizer/Changelog.txt",
-	"^-----------------\n2[0-9][0-9][0-9].*(", ")",	version)
+	"^-----------------\n2[0-9][0-9][0-9].*(", ")", version)
 replace_between("pngoptimizer/msgtable.h", r'#define PNGO_VERSION\s*"', '"', version)
 replace_between("pngoptimizer/gtk/pngoptimizer.desktop", "Version=", "", version)
 
 replace_between("pngoptimizercl/Readme.txt", r"Version\s*:\s*", "", version)
 replace_between("pngoptimizercl/Changelog.txt",
-	"^-----------------\n2[0-9][0-9][0-9].*(", ")",	version)
+	"^-----------------\n2[0-9][0-9][0-9].*(", ")", version)
 replace_between("pngoptimizercl/main.cpp", r'#define PNGO_VERSION\s*"', '"', version)
 
 # Update also the year
