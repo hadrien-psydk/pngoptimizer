@@ -82,7 +82,7 @@ TraceCtl::TraceCtl()
 
 TraceCtl::~TraceCtl()
 {
-	if( m_impl->m_hIconFont != nullptr )
+	if( m_impl->m_hIconFont )
 	{
 		DeleteObject(m_impl->m_hIconFont);
 	}
@@ -175,14 +175,14 @@ void TraceCtl::CheckFont()
 	LOGFONTW lf = { 0 };
 	SystemParametersInfo(SPI_GETICONTITLELOGFONT, sizeof(LOGFONT), &lf, 0);
 
-	if( m_impl->m_hFont != nullptr )
+	if( m_impl->m_hFont )
 	{
 		if( LogFontEquals(m_impl->m_iconLogFont, lf) )
 		{
 			// No change
 			return;
 		}
-		if( m_impl->m_hIconFont != nullptr )
+		if( m_impl->m_hIconFont )
 		{
 			DeleteObject(m_impl->m_hIconFont);
 			m_impl->m_hIconFont = nullptr;
@@ -398,7 +398,7 @@ int TraceCtl::OnLButtonDown(WPARAM, LPARAM lParam)
 	int y = GET_Y_LPARAM(lParam);
 
 	TextPiece* pTP = GetLinkFromPoint(x, y);
-	if( pTP != nullptr )
+	if( pTP )
 	{
 		// Transforme le curseur
 		HCURSOR hCurs = LoadCursor(nullptr, IDC_HAND);
@@ -423,7 +423,7 @@ int TraceCtl::OnLButtonUp(WPARAM, LPARAM lParam)
 	m_pDragText = nullptr;
 
 	TextPiece* pTP = GetLinkFromPoint(x, y);
-	if( pTP != nullptr )
+	if( pTP )
 	{
 		// Transforme le curseur
 		HCURSOR hCurs = LoadCursor(nullptr, IDC_HAND);
@@ -439,7 +439,7 @@ int TraceCtl::OnLButtonDblClk(WPARAM, LPARAM lParam)
 	int y = GET_Y_LPARAM(lParam);
 
 	TextPiece* pTP = GetLinkFromPoint(x, y);
-	if( pTP != nullptr )
+	if( pTP )
 	{
 		// Transforme le curseur
 		HCURSOR hCurs = LoadCursor(nullptr, IDC_HAND);
@@ -495,7 +495,7 @@ int TraceCtl::OnMouseMove(WPARAM wParam, LPARAM lParam)
 	}
 
 	TextPiece* pTP = GetLinkFromPoint(x, y);
-	if( pTP != nullptr )
+	if( pTP )
 	{
 		// Transforme le curseur
 		HCURSOR hCurs = LoadCursor(nullptr, IDC_HAND);

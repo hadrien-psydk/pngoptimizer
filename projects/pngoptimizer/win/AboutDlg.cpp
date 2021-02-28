@@ -73,7 +73,7 @@ void AboutDlg::LoadValues()
 /////////////////////////////////////////////////////////////////////////////////////
 bool AboutDlg::StoreValues()
 {
-	if( m_hFont != nullptr )
+	if( m_hFont )
 	{
 		DeleteObject(m_hFont);
 		m_hFont = nullptr;

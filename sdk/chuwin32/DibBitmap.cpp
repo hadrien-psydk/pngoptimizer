@@ -21,7 +21,7 @@ public:
 		if( m_hModule == nullptr )
 		{
 			m_hModule = LoadLibraryA("MSIMG32.dll");
-			if( m_hModule != nullptr )
+			if( m_hModule )
 			{
 				m_pfnAlphaBlend = (PFNAlphaBlend) GetProcAddress(m_hModule, "AlphaBlend");
 			}
@@ -36,7 +36,7 @@ public:
 	}
 	~RetrieveAlphaBlend()
 	{
-		if( m_hModule != nullptr )
+		if( m_hModule )
 		{
 			FreeLibrary(m_hModule);
 		}
@@ -92,7 +92,7 @@ bool DibBitmap::Create(HDC hWndDC, int nWidth, int nHeight, const uint32* pBits/
 	}
 
 	// Copie les pixels de l'image vers le dib
-	if( pBits != nullptr )
+	if( pBits )
 	{
 		const int nImageSizeInBytes = nWidth * nHeight * 4;
 		chustd::Memory::Copy(m_pBits, pBits, nImageSizeInBytes);

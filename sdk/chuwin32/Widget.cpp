@@ -228,7 +228,7 @@ LRESULT CALLBACK Widget::WndProcStatic(HWND hWnd, UINT nMsg, WPARAM wParam, LPAR
 		pWin = (Widget*) pCreateStruct->lpCreateParams;
 
 		// The pointer must given with the CreateWindow
-		ASSERT(pWin != nullptr);
+		ASSERT(pWin);
 		pWin->SetHandle(hWnd);
 	}
 	else
@@ -382,19 +382,19 @@ Rect Widget::GetWindowRectAero() const
 	// Fix the rect that is not correct when the the excutable has a system version < 6.0
 
 	HINSTANCE hDwmapiDll = ::LoadLibraryW(L"dwmapi.dll");
-	if( hDwmapiDll != nullptr )
+	if( hDwmapiDll )
 	{
 		BOOL enabled;
 		PFN_DwmIsCompositionEnabled DwmIsCompositionEnabled;
 		DwmIsCompositionEnabled = (PFN_DwmIsCompositionEnabled) ::GetProcAddress(hDwmapiDll, "DwmIsCompositionEnabled");
-		if( DwmIsCompositionEnabled != nullptr )
+		if( DwmIsCompositionEnabled )
 		{
 			HRESULT hres = DwmIsCompositionEnabled(&enabled);
 			if( SUCCEEDED(hres) && enabled )
 			{
 				PFN_DwmGetWindowAttribute DwmGetWindowAttribute;
 				DwmGetWindowAttribute = (PFN_DwmGetWindowAttribute) ::GetProcAddress(hDwmapiDll, "DwmGetWindowAttribute");
-				if( DwmGetWindowAttribute != nullptr ) 
+				if( DwmGetWindowAttribute ) 
 				{
 					RECT extendedBounds;
 					hres = DwmGetWindowAttribute(m_handle, DWMWA_EXTENDED_FRAME_BOUNDS, &extendedBounds, sizeof(RECT));

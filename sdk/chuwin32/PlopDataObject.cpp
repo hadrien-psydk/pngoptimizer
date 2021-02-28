@@ -301,8 +301,10 @@ HRESULT PlopDataObject::FindFORMATETC(FORMATETC* pfe, Both** ppde, BOOL fAdd)
     *ppde = nullptr;
 	
     // Comparing two DVTARGETDEVICE structures is hard, so we don't even try
-    if (pfe->ptd != nullptr) return DV_E_DVTARGETDEVICE;
-	
+	if( pfe->ptd )
+	{
+		return DV_E_DVTARGETDEVICE;
+	}
     // See if it's in our list
     foreach(m_aFormats, ide)
 	{

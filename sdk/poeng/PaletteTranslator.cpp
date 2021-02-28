@@ -93,7 +93,7 @@ void PaletteTranslator::BuildSortAlpha(Palette& palette, uint32 pColCounts[256])
 	// Overwrite the old palette
 	palette = palNewNew;
 
-	if( pColCounts != nullptr)
+	if( pColCounts )
 	{
 		// Update color counts
 		UpdateCounts(pColCounts);
@@ -271,7 +271,7 @@ void PaletteTranslator::BuildSortLuminance(Palette& palette, uint32* pCounts)
 		conv[n] = uint8(i);
 	}
 	palette = palLumSorted;
-	if( pCounts != nullptr)
+	if( pCounts )
 	{
 		UpdateCounts(pCounts);
 	}
@@ -316,7 +316,7 @@ void PaletteTranslator::BuildDuplicatedColors(Palette& pal, uint32 pColCounts[25
 	MergePalette(result, pal);
 
 	// Update color counts if needed
-	if( pColCounts != nullptr)
+	if( pColCounts )
 	{
 		uint32 newColCounts[256];
 		Memory::Zero32(newColCounts, 256);

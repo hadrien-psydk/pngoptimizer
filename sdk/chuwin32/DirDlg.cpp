@@ -29,7 +29,7 @@ int CALLBACK DirDlg::BrowseCallbackProc(HWND hWnd, UINT uMsg, LPARAM, LPARAM lpD
 	{
 		// wParam == FALSE => lParam == pItemIdList
 		ITEMIDLIST* pidlSel = (ITEMIDLIST*) lpData;
-		if( pidlSel != nullptr )
+		if( pidlSel )
 		{
 			::SendMessage(hWnd, BFFM_SETSELECTION, FALSE, lpData);
 		}
@@ -64,7 +64,7 @@ DialogResp DirDlg::DoModal(const Widget* parent)
 		bi.lParam = LPARAM(pidlSel);    // lpDatat récupéré dans la fonction callback
 		bi.iImage = 0;
 		LPITEMIDLIST pItemIDList = SHBrowseForFolderW(&bi);
-		if( pItemIDList != nullptr )
+		if( pItemIDList )
 		{
 			// Converion ID répertoire sélectionné vers chaîne de carcatères
 			wchar szBuffer2[MAX_PATH];
@@ -78,7 +78,7 @@ DialogResp DirDlg::DoModal(const Widget* parent)
 			pMalloc->Free(pItemIDList);
 		}
 		
-		if( pidlSel != nullptr )
+		if( pidlSel )
 			pMalloc->Free(pidlSel);
 
 		// Release the shell's allocator.

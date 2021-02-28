@@ -196,7 +196,7 @@ bool MemIniFile::Load(const String& filePath)
 				int32 foundAt = str.Find("=", 0);
 				if( foundAt >= 0 )
 				{
-					if( m_pCurrentSection != nullptr )
+					if( m_pCurrentSection )
 					{
 						String strValueName = str.Left(foundAt).Trim();
 						String strValue = str.Mid(foundAt + 1).Trim();
@@ -283,7 +283,7 @@ bool MemIniFile::Dump(const String& filePath, bool bCrLf)
 
 bool MemIniFile::SetSection(const String& strSection)
 {
-	if( m_pCurrentSection != nullptr )
+	if( m_pCurrentSection )
 	{
 		// If we are lucky we are just doing a fast pointer comparison
 		if( m_strCurrentSection == strSection )

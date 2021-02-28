@@ -20,7 +20,7 @@ static LRESULT CALLBACK DlgProcStatic(HWND hDlg, UINT msg, WPARAM wParam, LPARAM
 	{
 		// lParam contains the object pointer given when DialogBoxParamW was called
 		pDlg = (Dialog*) lParam;
-		ASSERT(pDlg != nullptr);
+		ASSERT(pDlg);
 		
 		// Store the pointer for next messages
 		::SetWindowLongPtr(hDlg, DWLP_USER, LONG_PTR(pDlg));
@@ -33,7 +33,7 @@ static LRESULT CALLBACK DlgProcStatic(HWND hDlg, UINT msg, WPARAM wParam, LPARAM
 		pDlg = (Dialog*)::GetWindowLongPtr(hDlg, DWLP_USER);
 	}
 
-	if( pDlg != nullptr )
+	if( pDlg )
 	{
 		if( msg == WM_INITDIALOG )
 		{

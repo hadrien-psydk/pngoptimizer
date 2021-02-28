@@ -479,7 +479,7 @@ bool POApplication::Initialize(HINSTANCE hInstance)
 // Perform cleanup
 POApplication::~POApplication()
 {
-	if( m_pTaskbarList != nullptr )
+	if( m_pTaskbarList )
 	{
 		m_pTaskbarList->Release();
 		m_pTaskbarList = nullptr;

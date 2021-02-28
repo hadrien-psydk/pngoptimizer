@@ -59,15 +59,15 @@ static bool PrepareDib(chuwin32::DibBitmap& dib, String& strErr)
 	bool bResult = false;
 
 	HBITMAP hBitmap = (HBITMAP) GetClipboardData(CF_BITMAP);
-	if( hBitmap != nullptr )
+	if( hBitmap )
 	{
 		// <CreateCompatibleDC>
 		HDC hdcSrc = CreateCompatibleDC(nullptr);
-		if( hdcSrc != nullptr )
+		if( hdcSrc )
 		{
 			// <SelectObject>
 			HBITMAP hOldBitmap = (HBITMAP)::SelectObject(hdcSrc, hBitmap);
-			if( hOldBitmap != nullptr )
+			if( hOldBitmap )
 			{
 				BITMAP bm;
 				Memory::Zero(&bm, sizeof(bm));

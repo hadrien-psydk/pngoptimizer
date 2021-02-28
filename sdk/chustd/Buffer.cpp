@@ -85,7 +85,7 @@ Buffer::Buffer()
 Buffer::Buffer(const Buffer& buf)
 {
 	uint8* pBytes = buf.m_pBytes;
-	if( pBytes != nullptr )
+	if( pBytes )
 	{
 		BufferData::GetPtr(pBytes)->Ref();
 		m_pBytes = pBytes;
@@ -99,7 +99,7 @@ Buffer::Buffer(const Buffer& buf)
 ///////////////////////////////////////////////////////////////////////////////
 Buffer::~Buffer()
 {
-	if( m_pBytes != nullptr )
+	if( m_pBytes )
 	{
 		BufferData::GetPtr(m_pBytes)->Unref();
 		m_pBytes = nullptr;
@@ -110,10 +110,10 @@ Buffer::~Buffer()
 Buffer& Buffer::operator=(const Buffer& buf)
 {
 	uint8* pBytes = buf.m_pBytes;
-	if( pBytes != nullptr )
+	if( pBytes )
 	{
 		BufferData::GetPtr(pBytes)->Ref();
-		if( m_pBytes != nullptr )
+		if( m_pBytes )
 		{
 			BufferData::GetPtr(m_pBytes)->Unref();
 		}
@@ -160,7 +160,7 @@ bool Buffer::SetSize(int size)
 			else
 			{
 				uint8* pBytes2 = BufferData::Alloc(size);
-				if( pBytes2 != nullptr )
+				if( pBytes2 )
 				{
 					int32 oldSize = pData->size;
 					int32 minSize = MIN(oldSize, size);
@@ -193,7 +193,7 @@ bool Buffer::EnsureCapacity(int capacity)
 		return true;
 	}
 	int oldSize = 0;
-	if( m_pBytes != nullptr )
+	if( m_pBytes )
 	{
 		oldSize = BufferData::GetPtr(m_pBytes)->size;
 	};
@@ -209,7 +209,7 @@ bool Buffer::EnsureCapacity(int capacity)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 int Buffer::GetSize() const
 {
-	if( m_pBytes != nullptr )
+	if( m_pBytes )
 	{
 		BufferData* pData = BufferData::GetPtr(m_pBytes);
 		return pData->size;

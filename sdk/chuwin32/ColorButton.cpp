@@ -63,7 +63,7 @@ LRESULT CALLBACK ColorButton::WndProcStatic(HWND hWnd, UINT nMsg, WPARAM wParam,
 		pWin = (ColorButton*) pCreateStruct->lpCreateParams;
 
 		// The pointer must given with the CreateWindow
-		ASSERT(pWin != nullptr);
+		ASSERT(pWin);
 
 		::SetWindowLongPtr(hWnd, GWLP_USERDATA, LONG_PTR(pWin));
 		pWin->m_handle = hWnd;
