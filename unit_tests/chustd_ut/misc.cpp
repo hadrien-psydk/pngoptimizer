@@ -257,13 +257,14 @@ TEST(RandomTest, Misc)
 	}*/
 }
 
-static void detailedEquals(const String& s1, const String& s2)
+static bool detailedEquals(const String& s1, const String& s2, String& msg)
 {
 	int len = s1.GetLength();
 	int len2 = s2.GetLength();
 	if( len != len2 )
 	{
-		FAIL() << "different lengths: " << len << " vs. " << len2;
+		msg = "different lengths: " + String::FromInt(len) + " vs. " + String::FromInt(len2);
+		return false;
 	}
 	StringArray a1 = s1.SplitByEndlines();
 	StringArray a2 = s2.SplitByEndlines();
@@ -271,13 +272,15 @@ static void detailedEquals(const String& s1, const String& s2)
 	int count2 = a2.GetSize();
 	if( count != count2 )
 	{
-		FAIL() << "different line counts";
+		msg = "different line counts";
+		return false;
 	}
 	if( s1 != s2 )
 	{
-		FAIL() << "different contents";
+		msg = "different contents";
+		return false;
 	}
-	SUCCEED();
+	return true;
 }
 
 TEST(MemIniFileTest, Dump)
@@ -305,12 +308,19 @@ TEST(MemIniFileTest, Dump)
 	ini.SetCommentLine1("PngOptimizer configuration file");
 	ini.SetCommentLine2("This file is encoded in UTF-8");
 
-	ASSERT_TRUE( ini.Dump("test-dump.ini", false) );
-	ASSERT_TRUE( ini.Dump("test-crlf-dump.ini", true) );
+	// git may tweak newlines, create two versions in memory of the expected file
+	String expected = File::GetTextContent("utfiles/test.ini", TextEncoding::Utf8());
+	String expectedUnix = expected.UnifyNewlines(String::NT_Unix);
+	String expectedDos = expected.UnifyNewlines(String::NT_Dos);
 
-	String c1 = File::GetTextContent("test-dump.ini", TextEncoding::Utf8());
-	String c2 = File::GetTextContent("utfiles/test.ini", TextEncoding::Utf8());
-	detailedEquals(c1, c2);
+	String msg;
+	ASSERT_TRUE( ini.Dump("test-dump.ini", false) );
+	String dump = File::GetTextContent("test-dump.ini", TextEncoding::Utf8());
+	ASSERT_TRUE( detailedEquals(dump, expectedUnix, msg) ) << msg;
+
+	ASSERT_TRUE( ini.Dump("test-dump-crlf.ini", true) );
+	dump = File::GetTextContent("test-dump-crlf.ini", TextEncoding::Utf8());
+	ASSERT_TRUE( detailedEquals(dump, expectedDos, msg) ) << msg;
 }
 
 TEST(MemIniFileTest, Load)
