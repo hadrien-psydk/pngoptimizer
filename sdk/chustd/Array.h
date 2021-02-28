@@ -475,7 +475,7 @@ void Array<T>::RemoveAt(int index)
 	{
 		// Translate the last elements to the left
 		// memove is needed instead of memcpy in our case
-		Memory::Move(m_paTs + index, m_paTs + index + 1, sizeof(T) * (rightCount - 1) );
+		Memory::Move(m_paTs + index, m_paTs + index + 1, static_cast<int>(sizeof(T)) * (rightCount - 1) );
 	}
 	m_count--;
 }

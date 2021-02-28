@@ -42,11 +42,11 @@ bool MainWnd::Create(const String& title, RECT rcWnd, bool alwaysOnTop,
 	wcex.cbWndExtra     = 0;
 	wcex.hInstance      = hInstance;
 	wcex.hIcon          = LoadIcon(hInstance, (LPCTSTR)IDI_MAIN);
-	wcex.hCursor        = LoadCursor(NULL, IDC_ARROW);
+	wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
 	wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1);
-	wcex.lpszMenuName   = NULL;
+	wcex.lpszMenuName   = nullptr;
 	wcex.lpszClassName  = szClassName;
-	wcex.hIconSm        = NULL;
+	wcex.hIconSm        = nullptr;
 
 	ATOM atom = RegisterClassExW(&wcex);
 	if( atom == 0 )
@@ -66,7 +66,7 @@ bool MainWnd::Create(const String& title, RECT rcWnd, bool alwaysOnTop,
 	}
 	DWORD nStyle = WS_OVERLAPPEDWINDOW;
 
-	if( !CreateEx(nExStyle, szClassName, title.GetBuffer(), nStyle, rcWnd, NULL) )
+	if( !CreateEx(nExStyle, szClassName, title.GetBuffer(), nStyle, rcWnd, nullptr) )
 	{
 		m_strErr = L"CreateEx failed";
 		return false;
@@ -186,7 +186,7 @@ static String GetDraggedFileName(HDROP hDrop, int nFile)
 {
 	String strFileName;
 
-	UINT nLengthNeeded = DragQueryFileW(hDrop, nFile, NULL, 0);
+	UINT nLengthNeeded = DragQueryFileW(hDrop, nFile, nullptr, 0);
 	UINT nRet = DragQueryFileW(hDrop, nFile, strFileName.GetUnsafeBuffer(nLengthNeeded), nLengthNeeded + 1);
 	nRet;
 
@@ -196,7 +196,7 @@ static String GetDraggedFileName(HDROP hDrop, int nFile)
 void MainWnd::OnWmDropFiles(WPARAM wParam, LPARAM)
 {
 	HDROP hDrop = (HDROP) wParam;
-	int fileCount = DragQueryFileW(hDrop, MAX_UINT, NULL, 0);
+	int fileCount = DragQueryFileW(hDrop, MAX_UINT, nullptr, 0);
 
 	m_droppedFilePaths.SetSize(0);
     for(int i = 0; i < fileCount; ++i)
@@ -271,7 +271,7 @@ LRESULT MainWnd::WndProc(UINT nMsg, WPARAM wParam, LPARAM lParam)
 				checkAlwaysOnTop |= m_alwaysOnTop ? MF_CHECKED : MF_UNCHECKED;
 				CheckMenuItem(hSubMenu, IDM_ALWAYSONTOP, checkAlwaysOnTop);
 
-				TrackPopupMenu(hSubMenu, TPM_LEFTALIGN | TPM_RIGHTBUTTON, point.x, point.y, 0, m_handle, NULL);
+				TrackPopupMenu(hSubMenu, TPM_LEFTALIGN | TPM_RIGHTBUTTON, point.x, point.y, 0, m_handle, nullptr);
 			}
 		}
 		break;

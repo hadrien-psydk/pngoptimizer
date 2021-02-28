@@ -24,7 +24,7 @@ public:
 	{
 		RECT rc = {rect.x1, rect.y1, rect.x2, rect.y2 };
 		::SetBkColor(m_hDC, cr);
-		::ExtTextOut(m_hDC, 0, 0, ETO_OPAQUE, &rc, NULL, 0, NULL);
+		::ExtTextOut(m_hDC, 0, 0, ETO_OPAQUE, &rc, nullptr, 0, nullptr);
 	}
 
 	void FillRect(Rect& rect, HBRUSH hbr)

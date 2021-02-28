@@ -14,13 +14,13 @@ namespace chuwin32 {\
 ///////////////////////////////////////////////////////////////////////////////
 static LRESULT CALLBACK DlgProcStatic(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	Dialog* pDlg = NULL;
+	Dialog* pDlg = nullptr;
 
 	if( msg == WM_INITDIALOG )
 	{
 		// lParam contains the object pointer given when DialogBoxParamW was called
 		pDlg = (Dialog*) lParam;
-		ASSERT(pDlg != NULL);
+		ASSERT(pDlg != nullptr);
 		
 		// Store the pointer for next messages
 		::SetWindowLongPtr(hDlg, DWLP_USER, LONG_PTR(pDlg));
@@ -33,7 +33,7 @@ static LRESULT CALLBACK DlgProcStatic(HWND hDlg, UINT msg, WPARAM wParam, LPARAM
 		pDlg = (Dialog*)::GetWindowLongPtr(hDlg, DWLP_USER);
 	}
 
-	if( pDlg != NULL )
+	if( pDlg != nullptr )
 	{
 		if( msg == WM_INITDIALOG )
 		{
@@ -101,7 +101,7 @@ bool Dialog::DoCommand(WIDGET_HANDLE wh, uintptr_t param)
 ///////////////////////////////////////////////////////////////////////////////
 DialogResp Dialog::DoModal(const Window* parent)
 {
-	INT_PTR ret = DialogBoxParamW(GetModuleHandle(NULL),
+	INT_PTR ret = DialogBoxParamW(GetModuleHandle(nullptr),
 		MAKEINTRESOURCE(m_id),
 		parent->GetHandle(),
 		(DLGPROC) DlgProcStatic,

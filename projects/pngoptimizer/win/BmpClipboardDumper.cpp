@@ -45,7 +45,7 @@ static bool PrepareDib(chuwin32::DibBitmap& dib, String& strErr)
 		return false;
 	}
 
-	if( !OpenClipboard(NULL) )
+	if( !OpenClipboard(nullptr) )
 	{
 		strErr = k_szOpenClipboardFailed;
 		return false;
@@ -59,15 +59,15 @@ static bool PrepareDib(chuwin32::DibBitmap& dib, String& strErr)
 	bool bResult = false;
 
 	HBITMAP hBitmap = (HBITMAP) GetClipboardData(CF_BITMAP);
-	if( hBitmap != NULL )
+	if( hBitmap != nullptr )
 	{
 		// <CreateCompatibleDC>
-		HDC hdcSrc = CreateCompatibleDC(NULL);
-		if( hdcSrc != NULL )
+		HDC hdcSrc = CreateCompatibleDC(nullptr);
+		if( hdcSrc != nullptr )
 		{
 			// <SelectObject>
 			HBITMAP hOldBitmap = (HBITMAP)::SelectObject(hdcSrc, hBitmap);
-			if( hOldBitmap != NULL )
+			if( hOldBitmap != nullptr )
 			{
 				BITMAP bm;
 				Memory::Zero(&bm, sizeof(bm));
@@ -77,7 +77,7 @@ static bool PrepareDib(chuwin32::DibBitmap& dib, String& strErr)
 					int32 nWidth = bm.bmWidth;
 					int32 nHeight = bm.bmHeight;
 
-					if( dib.Create(NULL, nWidth, nHeight) )
+					if( dib.Create(nullptr, nWidth, nHeight) )
 					{
 						HDC hdcMem = dib.m_hDC;
 						BitBlt(hdcMem, 0, 0, bm.bmWidth, bm.bmHeight, hdcSrc, 0, 0, SRCCOPY);
@@ -312,7 +312,7 @@ String BmpClipboardDumper::GetTempDir() const
 {
 	String strDir;
 
-	DWORD nTempPathBufferSize = GetTempPathW(0, NULL);
+	DWORD nTempPathBufferSize = GetTempPathW(0, nullptr);
 	if( nTempPathBufferSize > 0 )
 	{
 		::GetTempPathW(nTempPathBufferSize, strDir.GetUnsafeBuffer(nTempPathBufferSize - 1));

@@ -26,7 +26,7 @@ public:
 	uint32* m_pBits;
 
 public:
-	bool Create(HDC hWndDC, int nWidth, int nHeight, const uint32* pBits = NULL);
+	bool Create(HDC hWndDC, int nWidth, int nHeight, const uint32* pBits = nullptr);
 	void Destroy();
 	
 	void Blit(HDC hDestDC, int nDestX = 0, int nDestY = 0) const;

@@ -24,11 +24,11 @@ PlopDropSource::~PlopDropSource()
 
 STDMETHODIMP  PlopDropSource::QueryInterface(REFIID refiid, void FAR* FAR* ppv)
 {
-	*ppv = NULL;
+	*ppv = nullptr;
 	if( ComFromHell::Equals(IID_IUnknown, refiid) || ComFromHell::Equals(IID_IDropSource, refiid) )
 		*ppv=this;
 	
-	if (NULL != *ppv)
+	if (nullptr != *ppv)
 	{
 		((LPUNKNOWN)*ppv)->AddRef();
 		return NOERROR;

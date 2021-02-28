@@ -29,7 +29,7 @@ int CALLBACK DirDlg::BrowseCallbackProc(HWND hWnd, UINT uMsg, LPARAM, LPARAM lpD
 	{
 		// wParam == FALSE => lParam == pItemIdList
 		ITEMIDLIST* pidlSel = (ITEMIDLIST*) lpData;
-		if( pidlSel != NULL )
+		if( pidlSel != nullptr )
 		{
 			::SendMessage(hWnd, BFFM_SETSELECTION, FALSE, lpData);
 		}
@@ -56,7 +56,7 @@ DialogResp DirDlg::DoModal(const Widget* parent)
 
 		BROWSEINFOW bi;
 		bi.hwndOwner = hParent;
-		bi.pidlRoot = NULL;
+		bi.pidlRoot = nullptr;
 		bi.pszDisplayName = szBuffer;
 		bi.lpszTitle = m_title.GetBuffer();
 		bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_NEWDIALOGSTYLE;
@@ -64,7 +64,7 @@ DialogResp DirDlg::DoModal(const Widget* parent)
 		bi.lParam = LPARAM(pidlSel);    // lpDatat récupéré dans la fonction callback
 		bi.iImage = 0;
 		LPITEMIDLIST pItemIDList = SHBrowseForFolderW(&bi);
-		if( pItemIDList != NULL )
+		if( pItemIDList != nullptr )
 		{
 			// Converion ID répertoire sélectionné vers chaîne de carcatères
 			wchar szBuffer2[MAX_PATH];
@@ -78,7 +78,7 @@ DialogResp DirDlg::DoModal(const Widget* parent)
 			pMalloc->Free(pItemIDList);
 		}
 		
-		if( pidlSel != NULL )
+		if( pidlSel != nullptr )
 			pMalloc->Free(pidlSel);
 
 		// Release the shell's allocator.
@@ -103,16 +103,16 @@ LPITEMIDLIST DirDlg::GetPIDLFromPath(const chustd::String& strPath)
 
 		// Convert the path to an ITEMIDLIST.
 		HRESULT hr = pDesktopFolder->ParseDisplayName(
-			NULL,
-			NULL,
+			nullptr,
+			nullptr,
 			olePath,
 			&chEaten,
 			&pidl,
-			NULL);
+			nullptr);
 		if (FAILED(hr))
 		{
 			// Handle error
-			return NULL;
+			return nullptr;
 		}
 		
 		// pidl now contains a pointer to an ITEMIDLIST for .\readme.txt.
@@ -124,7 +124,7 @@ LPITEMIDLIST DirDlg::GetPIDLFromPath(const chustd::String& strPath)
 
 		return pidl;
 	}
-	return NULL;
+	return nullptr;
 }
 
 void DirDlg::SetTitle(const chustd::String& title)

@@ -20,13 +20,13 @@ ATOM ColorButton::RegisterClass(const wchar* pszClassName)
 	wcex.lpfnWndProc	= (WNDPROC)WndProcStatic;
 	wcex.cbClsExtra		= 0;
 	wcex.cbWndExtra		= 0;
-	wcex.hInstance		= GetModuleHandle(NULL);;
-	wcex.hIcon			= NULL;
-	wcex.hCursor		= LoadCursor(NULL, IDC_ARROW);
+	wcex.hInstance		= GetModuleHandle(nullptr);;
+	wcex.hIcon			= nullptr;
+	wcex.hCursor		= LoadCursor(nullptr, IDC_ARROW);
 	wcex.hbrBackground	= (HBRUSH)(COLOR_WINDOW+1);
-	wcex.lpszMenuName	= NULL;
+	wcex.lpszMenuName	= nullptr;
 	wcex.lpszClassName	= pszClassName;
-	wcex.hIconSm		= NULL;
+	wcex.hIconSm		= nullptr;
 
 	return RegisterClassExW(&wcex);
 }
@@ -48,7 +48,7 @@ bool ColorButton::Create(const Rect& rc, const Widget* parent, int id)
 	}
 
 	m_handle = CreateWindowExW(0, szClassName, L"", WS_BORDER|WS_TABSTOP|WS_CHILD|WS_VISIBLE,
-		rc.x1, rc.y1, rc.x2-rc.x1, rc.y2-rc.y1, parent->GetHandle(), HMENU( LongToHandle(id)), NULL, this);
+		rc.x1, rc.y1, rc.x2-rc.x1, rc.y2-rc.y1, parent->GetHandle(), HMENU( LongToHandle(id)), nullptr, this);
 	return m_handle != 0;
 }
 
@@ -63,7 +63,7 @@ LRESULT CALLBACK ColorButton::WndProcStatic(HWND hWnd, UINT nMsg, WPARAM wParam,
 		pWin = (ColorButton*) pCreateStruct->lpCreateParams;
 
 		// The pointer must given with the CreateWindow
-		ASSERT(pWin != NULL);
+		ASSERT(pWin != nullptr);
 
 		::SetWindowLongPtr(hWnd, GWLP_USERDATA, LONG_PTR(pWin));
 		pWin->m_handle = hWnd;
@@ -98,8 +98,8 @@ static bool DoColorDialog(HWND hWnd, Color& col)
 	cc.lpCustColors = acr;
 	cc.Flags = CC_RGBINIT | CC_FULLOPEN;
 	cc.lCustData = 0;
-	cc.lpfnHook = NULL;
-	cc.lpTemplateName = NULL;
+	cc.lpfnHook = nullptr;
+	cc.lpTemplateName = nullptr;
 
 	if( !::ChooseColorW(&cc) )
 	{
@@ -160,7 +160,7 @@ LRESULT ColorButton::WndProc(UINT msg, WPARAM wParam, LPARAM lParam)
 	}
 	else if( msg == WM_ENABLE )
 	{
-		InvalidateRect(m_handle, NULL, TRUE);
+		InvalidateRect(m_handle, nullptr, TRUE);
 	}
 	return DefWindowProc(m_handle, msg, wParam, lParam);
 }
@@ -169,7 +169,7 @@ LRESULT ColorButton::WndProc(UINT msg, WPARAM wParam, LPARAM lParam)
 void ColorButton::SetColor(chustd::Color cr)
 {
 	m_color = cr;
-	InvalidateRect(m_handle, NULL, TRUE);
+	InvalidateRect(m_handle, nullptr, TRUE);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -27,11 +27,11 @@ HGLOBAL POTraceCtl::CreateDropFilesW(const String& strUrl)
 
 	// Allocate memory from the heap for the DROPFILES struct.
 	HGLOBAL hgDrop = GlobalAlloc( GHND | GMEM_SHARE, nBufferSize);
-	if( NULL == hgDrop )
+	if( nullptr == hgDrop )
 		return 0;
 
 	DROPFILES* pDrop = (DROPFILES*) GlobalLock(hgDrop);
-	if( NULL == pDrop )
+	if( nullptr == pDrop )
 	{
 		GlobalFree(hgDrop);
 		return 0;
@@ -61,7 +61,7 @@ int POTraceCtl::OnLinkDragBegin(const String& strUrl)
 
 	FORMATETC etc;
 	etc.cfFormat = CF_HDROP;	// CLIPFORMAT
-	etc.ptd = NULL;				// DVTARGETDEVICE*
+	etc.ptd = nullptr;				// DVTARGETDEVICE*
 	etc.dwAspect = DVASPECT_CONTENT;	// DWORD
 	etc.lindex = -1;			// LONG
 	etc.tymed = TYMED_HGLOBAL;	// DWORD
@@ -69,7 +69,7 @@ int POTraceCtl::OnLinkDragBegin(const String& strUrl)
 	STGMEDIUM med;
 	med.tymed = TYMED_HGLOBAL;
 	med.hGlobal = hgDrop;
-	med.pUnkForRelease = NULL;
+	med.pUnkForRelease = nullptr;
 
 	IDataObject* pDataObject = new PlopDataObject;
 	if( pDataObject )

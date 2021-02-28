@@ -131,7 +131,7 @@ bool ResourceVersion::GetVersion(int& nA, int& nB, int& nC, int& nD)
 	wchar szFileName[MAX_PATH];
 
 	DWORD dw = GetModuleFileNameW(
-		NULL,    // handle to module
+		nullptr,    // handle to module
 		szFileName,  // file name of module
 		MAX_PATH         // size of buffer
 		);
@@ -172,7 +172,7 @@ bool ResourceVersion::GetVersion(const chustd::String& filePath, int& nA, int& n
 	char    szGetName[256];
 	lstrcpyA(szGetName, "\\");
 	
-	LPVOID pVer = NULL;
+	LPVOID pVer = nullptr;
 	UINT   nVerLength = 0;
 	BOOL bRet = VerQueryValueA(pData, szGetName, &pVer, &nVerLength);
 	

@@ -100,7 +100,7 @@ void Widget::CenterWindow(bool avoidHide)
 {
 	RECT rectParent;
 	HWND hParent = GetParent();
-	if( hParent == NULL )
+	if( hParent == nullptr )
 	{
 		::GetWindowRect(GetDesktopWindow(), &rectParent);
 	}
@@ -178,7 +178,7 @@ void Widget::SetTextInt(int value)
 bool Widget::CreateEx(uint32 nExStyle, const wchar* pszClassName, const wchar* pszTitle, uint32 nStyle,
 	int x, int y, int w, int h, HWND hParent, HMENU hMenu)
 {
-	HINSTANCE hInstance = GetModuleHandle(NULL);
+	HINSTANCE hInstance = GetModuleHandle(nullptr);
 
 	m_handle = CreateWindowExW(
 		nExStyle, // extended window style
@@ -228,7 +228,7 @@ LRESULT CALLBACK Widget::WndProcStatic(HWND hWnd, UINT nMsg, WPARAM wParam, LPAR
 		pWin = (Widget*) pCreateStruct->lpCreateParams;
 
 		// The pointer must given with the CreateWindow
-		ASSERT(pWin != NULL);
+		ASSERT(pWin != nullptr);
 		pWin->SetHandle(hWnd);
 	}
 	else
@@ -382,19 +382,19 @@ Rect Widget::GetWindowRectAero() const
 	// Fix the rect that is not correct when the the excutable has a system version < 6.0
 
 	HINSTANCE hDwmapiDll = ::LoadLibraryW(L"dwmapi.dll");
-	if( hDwmapiDll != NULL )
+	if( hDwmapiDll != nullptr )
 	{
 		BOOL enabled;
 		PFN_DwmIsCompositionEnabled DwmIsCompositionEnabled;
 		DwmIsCompositionEnabled = (PFN_DwmIsCompositionEnabled) ::GetProcAddress(hDwmapiDll, "DwmIsCompositionEnabled");
-		if( DwmIsCompositionEnabled != NULL )
+		if( DwmIsCompositionEnabled != nullptr )
 		{
 			HRESULT hres = DwmIsCompositionEnabled(&enabled);
 			if( SUCCEEDED(hres) && enabled )
 			{
 				PFN_DwmGetWindowAttribute DwmGetWindowAttribute;
 				DwmGetWindowAttribute = (PFN_DwmGetWindowAttribute) ::GetProcAddress(hDwmapiDll, "DwmGetWindowAttribute");
-				if( DwmGetWindowAttribute != NULL ) 
+				if( DwmGetWindowAttribute != nullptr ) 
 				{
 					RECT extendedBounds;
 					hres = DwmGetWindowAttribute(m_handle, DWMWA_EXTENDED_FRAME_BOUNDS, &extendedBounds, sizeof(RECT));

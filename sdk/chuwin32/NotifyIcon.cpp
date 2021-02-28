@@ -5,7 +5,7 @@ using namespace chuwin32;
 
 NotifyIcon::NotifyIcon()
 {
-	m_hWndOwner = NULL;
+	m_hWndOwner = nullptr;
 }
 
 NotifyIcon::~NotifyIcon()

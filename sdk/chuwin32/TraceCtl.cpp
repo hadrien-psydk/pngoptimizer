@@ -24,8 +24,8 @@ struct SpecificImpl
 
 	SpecificImpl()
 	{
-		m_hFont = NULL;
-		m_hIconFont = NULL;
+		m_hFont = nullptr;
+		m_hIconFont = nullptr;
 		memset(&m_iconLogFont, 0, sizeof(m_iconLogFont));
 	}
 };
@@ -82,7 +82,7 @@ TraceCtl::TraceCtl()
 
 TraceCtl::~TraceCtl()
 {
-	if( m_impl->m_hIconFont != NULL )
+	if( m_impl->m_hIconFont != nullptr )
 	{
 		DeleteObject(m_impl->m_hIconFont);
 	}
@@ -97,7 +97,7 @@ bool TraceCtl::Create(int x, int y, int width, int height, HWND hParentWnd, int 
 
 	static const wchar szClassName[] = L"chuwin32 TraceCtl Window Class";
 	
-	HINSTANCE hInstance = GetModuleHandle(NULL);
+	HINSTANCE hInstance = GetModuleHandle(nullptr);
 
 	WNDCLASSEXW wcex;
 	wcex.cbSize         = sizeof(WNDCLASSEX); 
@@ -106,12 +106,12 @@ bool TraceCtl::Create(int x, int y, int width, int height, HWND hParentWnd, int 
 	wcex.cbClsExtra     = 0;
 	wcex.cbWndExtra     = 0;
 	wcex.hInstance      = hInstance;
-	wcex.hIcon          = NULL;
-	wcex.hCursor        = LoadCursor(NULL, IDC_ARROW);
+	wcex.hIcon          = nullptr;
+	wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
 	wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1);
-	wcex.lpszMenuName   = NULL;
+	wcex.lpszMenuName   = nullptr;
 	wcex.lpszClassName  = szClassName;
-	wcex.hIconSm        = NULL;
+	wcex.hIconSm        = nullptr;
 
 	ATOM atom = RegisterClassExW(&wcex);
 	if( atom == 0 )
@@ -175,22 +175,22 @@ void TraceCtl::CheckFont()
 	LOGFONTW lf = { 0 };
 	SystemParametersInfo(SPI_GETICONTITLELOGFONT, sizeof(LOGFONT), &lf, 0);
 
-	if( m_impl->m_hFont != NULL )
+	if( m_impl->m_hFont != nullptr )
 	{
 		if( LogFontEquals(m_impl->m_iconLogFont, lf) )
 		{
 			// No change
 			return;
 		}
-		if( m_impl->m_hIconFont != NULL )
+		if( m_impl->m_hIconFont != nullptr )
 		{
 			DeleteObject(m_impl->m_hIconFont);
-			m_impl->m_hIconFont = NULL;
+			m_impl->m_hIconFont = nullptr;
 		}
 	}
 	m_impl->m_iconLogFont = lf;
 	m_impl->m_hIconFont = CreateFontIndirect(&lf);
-	if( m_impl->m_hIconFont == NULL )
+	if( m_impl->m_hIconFont == nullptr )
 	{
 		SetFont( (HFONT) GetStockObject(DEFAULT_GUI_FONT));
 	}
@@ -896,7 +896,7 @@ void TraceCtl::DoAddText(const TextPiece& tp, int lineIndex)
 	UpdateScrollSizeVert();
 	UpdateScrollSizeHorz();
 	
-	InvalidateRect(m_handle, NULL, FALSE);
+	InvalidateRect(m_handle, nullptr, FALSE);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -951,7 +951,7 @@ uint32 TraceCtl::GetNewScrollPos32(int nSBType, HWND hScrollBar)
     // First determine if the user scrolled a scroll bar control
     // on the window or scrolled the window itself
 	HWND hWndScroll;
-	if( hScrollBar == NULL )
+	if( hScrollBar == nullptr )
 		hWndScroll = m_handle;
 	else
 		hWndScroll = hScrollBar;
@@ -1012,7 +1012,7 @@ int TraceCtl::OnVScroll(WPARAM wParam, LPARAM lParam)
 	//const int nAfter = GetScrollPos(SB_VERT);
 	//const int nDelta = nBefore - nAfter;
 	
-	InvalidateRect(m_handle, NULL, FALSE);
+	InvalidateRect(m_handle, nullptr, FALSE);
 	return 0;
 }
 
@@ -1112,7 +1112,7 @@ int TraceCtl::OnHScroll(WPARAM wParam, LPARAM lParam)
 	//const int nAfter = GetScrollPos(SB_HORZ);
 	//const int nDelta = nBefore - nAfter;
 	
-	InvalidateRect(m_handle, NULL, FALSE);
+	InvalidateRect(m_handle, nullptr, FALSE);
 	return 0;
 }
 

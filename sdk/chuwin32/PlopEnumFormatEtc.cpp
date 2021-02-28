@@ -26,13 +26,13 @@ PlopEnumFormatEtc::~PlopEnumFormatEtc()
 STDMETHODIMP  PlopEnumFormatEtc::QueryInterface(REFIID refiid, void FAR * FAR* ppv)
 {
 	//	 OutputDebugString("PlopEnumFormatEtc::QueryInterface()\n");
-	*ppv = NULL;
+	*ppv = nullptr;
 	if( ComFromHell::Equals(IID_IUnknown, refiid) || ComFromHell::Equals(IID_IEnumFORMATETC, refiid) )
 	{
 		*ppv = this;
 	}
 	
-	if( NULL != *ppv )
+	if( nullptr != *ppv )
 	{
 		((LPUNKNOWN)*ppv)->AddRef();
 		return NOERROR;
@@ -59,13 +59,13 @@ STDMETHODIMP PlopEnumFormatEtc::Next( ULONG celt, LPFORMATETC lpFormatEtc, ULONG
 {
 	ULONG cReturn = 0L;
 	
-	if(celt <=0 ||lpFormatEtc == NULL || m_iCur >= m_aFormats.GetSize())
+	if(celt <=0 ||lpFormatEtc == nullptr || m_iCur >= m_aFormats.GetSize())
 		return ResultFromScode(S_FALSE);
 	
-	if(pceltFetched == NULL && celt != 1)
+	if(pceltFetched == nullptr && celt != 1)
 		return ResultFromScode(S_FALSE);
 	
-	if(pceltFetched!=NULL)
+	if(pceltFetched!=nullptr)
 		*pceltFetched =0;
 	
 	while (m_iCur < m_aFormats.GetSize() && celt > 0)
@@ -74,7 +74,7 @@ STDMETHODIMP PlopEnumFormatEtc::Next( ULONG celt, LPFORMATETC lpFormatEtc, ULONG
 		cReturn++;
 		celt--;
 	}
-	if (NULL != pceltFetched)
+	if (nullptr != pceltFetched)
 		*pceltFetched = (cReturn - celt);
 	return ResultFromScode(S_OK);
 }

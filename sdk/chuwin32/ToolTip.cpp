@@ -33,16 +33,16 @@ bool ToolTip::Create(HWND hwndParent)
 		return false;
 	}
 
-	HINSTANCE hInstance = GetModuleHandle(NULL);
+	HINSTANCE hInstance = GetModuleHandle(nullptr);
 
-	m_handle = CreateWindowEx(NULL, TOOLTIPS_CLASS, NULL,
+	m_handle = CreateWindowEx(0, TOOLTIPS_CLASS, nullptr,
                             WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP,
                             CW_USEDEFAULT, CW_USEDEFAULT,
                             CW_USEDEFAULT, CW_USEDEFAULT,
-                            hwndParent, NULL, hInstance,
-                            NULL);
+                            hwndParent, nullptr, hInstance,
+                            nullptr);
 
-	if( m_handle == NULL )
+	if( m_handle == nullptr )
 	{
 		return false;
 	}

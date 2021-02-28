@@ -44,7 +44,7 @@ void CheckButton::OnCommand(uintptr_t)
 ///////////////////////////////////////////////////////////////////////////////
 bool EditBox::Create(const Rect& rc, const Widget* parent, int id)
 {
-	HINSTANCE hInstance = GetModuleHandle(NULL);
+	HINSTANCE hInstance = GetModuleHandle(nullptr);
 
 	int nExStyle = WS_EX_CLIENTEDGE;
 	int nStyle = WS_TABSTOP | WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL;
@@ -61,10 +61,10 @@ bool EditBox::Create(const Rect& rc, const Widget* parent, int id)
 		parent->GetHandle(),		// handle to parent or owner window
 		HMENU( LongToHandle(id)),		// menu handle or child identifier
 		hInstance,		// handle to application instance (Windows NT/2000/XP: This value is ignored)
-		NULL		// window-creation data
+		nullptr		// window-creation data
 		);
 
-	return m_handle != NULL;
+	return m_handle != nullptr;
 }
 
 void EditBox::SetSel(int start, int stop)
@@ -147,7 +147,7 @@ int Slider::GetPos()
 ///////////////////////////////////////////////////////////////////////////////
 bool SysLink::Create(const Rect& rc, const Widget* parent, int id)
 {
-	HINSTANCE hInstance = GetModuleHandle(NULL);
+	HINSTANCE hInstance = GetModuleHandle(nullptr);
 
 	int nStyle = WS_TABSTOP | WS_CHILD | WS_VISIBLE;
 
@@ -156,10 +156,10 @@ bool SysLink::Create(const Rect& rc, const Widget* parent, int id)
 		parent->GetHandle(),	
 		HMENU( LongToHandle(id)),
 		hInstance, // handle to application instance (Windows NT/2000/XP: This value is ignored)
-		NULL // window-creation data
+		nullptr // window-creation data
 		);
 	SetHandle(handle);
-	return handle != NULL;
+	return handle != nullptr;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -170,7 +170,7 @@ void SysLink::OnCommand(uintptr_t param)
 	LITEM item = pNMLink->item;
 	if( item.iLink == 0 )
 	{
-		ShellExecute(NULL, L"open", item.szUrl, NULL, NULL, SW_SHOW);
+		ShellExecute(nullptr, L"open", item.szUrl, nullptr, nullptr, SW_SHOW);
 	}
 }
 
