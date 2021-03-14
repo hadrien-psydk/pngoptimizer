@@ -86,17 +86,11 @@ bool AppSettings::Read(POEngineSettings& pos, BmpcdSettings* pBs, MainWndSetting
 		ini.GetInt(k_szWndWidth, wndWidth);
 		ini.GetInt(k_szWndHeight, wndHeight);
 
-		// Reajust rect if needed
-		if( wndX < 0 )
-		{
-			wndX = 0;
-		}
+		// We do not readjust x and y here, we will do it later after looking
+		// at monitor details. Also, Aero now includes the shadow as part of the
+		// window so to reach actual coordinates (0,0) we need to use negative values.
 
-		if( wndY < 0 )
-		{
-			wndY = 0;
-		}
-
+		// Readjust with and height if needed
 		if( wndWidth <= 50 )
 		{
 			wndWidth = defaultWidth;

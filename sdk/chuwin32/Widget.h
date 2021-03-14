@@ -52,6 +52,7 @@ public:
 	void Show(CmdShow cs = CS_Show);
 	void Hide() { Show(CS_Hide); }
 	void CenterWindow(bool avoidHide = false);
+	void EnsureVisible();
 	void SetText(const chustd::String& str);
 	void SetTextInt(int value);
 	chustd::String GetText() const;

@@ -394,10 +394,10 @@ bool POApplication::Initialize(HINSTANCE hInstance)
 	m_hMutexPngOptimizer = CreateMutex(nullptr, TRUE, k_szMutexName);
 	int nLastError = ::GetLastError();
 
-	bool bOneInstanceAlreadyRunning = false;
+	bool oneInstanceAlreadyRunning = false;
 	if( m_hMutexPngOptimizer != 0 && nLastError == ERROR_ALREADY_EXISTS )
 	{
-		bOneInstanceAlreadyRunning = true;
+		oneInstanceAlreadyRunning = true;
 	}
 	///////////////////////////////////////////////////////////////////////
 
@@ -411,7 +411,7 @@ bool POApplication::Initialize(HINSTANCE hInstance)
 	bool centerWindow = !mws.topLeftValid;
 	bool alwaysOnTop = mws.alwaysOnTop;
 
-	if( bOneInstanceAlreadyRunning )
+	if( oneInstanceAlreadyRunning )
 	{
 		ChangeRectBecauseOfOverlap(rcWnd);
 
@@ -435,6 +435,16 @@ bool POApplication::Initialize(HINSTANCE hInstance)
 
 	OnMainWndListCleared();
 	m_mainwnd.Show(CS_Show);
+
+	if( !centerWindow )
+	{
+		// Ensure visible will only work correctly if the window is visible
+		// An annoying design change in Windows 10 made GetWindowRect() unreliable
+		// because it takes into account drop shadows. It means a window at x=0
+		// won't be really located at the most-left side of the screen, its shadow will.
+		m_mainwnd.EnsureVisible();
+	}
+
 	m_mainwnd.Update();
 
 	m_pTaskbarList = nullptr;

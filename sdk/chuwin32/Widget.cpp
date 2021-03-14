@@ -162,6 +162,78 @@ void Widget::CenterWindow(bool avoidHide)
 	MoveWindow(m_handle, nX, nY, nWidth, nHeight, TRUE);
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////
+// Make the Window fully visible.
+// Take into account that annoying behavior of windows 10 where the shadow is part
+// of the window rect.
+////////////////////////////////////////////////////////////////////////////////////////////
+void Widget::EnsureVisible()
+{
+	Rect rect = GetWindowRect();
+
+	// Get the best monitor to display the window
+	RECT winRect = { rect.x1, rect.y1, rect.x2, rect.y2 };
+	HMONITOR hm = MonitorFromRect(&winRect, MONITOR_DEFAULTTONEAREST);
+	MONITORINFO mi = { 0 };
+	mi.cbSize = sizeof(mi);
+	if (!GetMonitorInfo(hm, &mi))
+	{
+		return;
+	}
+	Rect rectAero = GetWindowRectAero();
+	int borderLeft = rect.x1 - rectAero.x1;
+	int borderTop = rect.y1 - rectAero.y1;
+	int borderRight = (rectAero.x2 - rect.x2);
+	int borderBottom = (rectAero.y2 - rect.y2);
+
+	const int monWidth = mi.rcWork.right - mi.rcWork.left;
+	const int monHeight = mi.rcWork.bottom - mi.rcWork.top;
+
+	int minX = mi.rcWork.left;
+	int maxX = mi.rcWork.right;
+	int minY = mi.rcWork.top;
+	int maxY = mi.rcWork.bottom;
+
+	int width = rectAero.Width();
+	int height = rectAero.Height();
+
+	if (width > monWidth)
+	{
+		width = monWidth;
+	}
+	if (height > monHeight)
+	{
+		height = monHeight;
+	}
+
+	int x = rectAero.x1;
+	int y = rectAero.y1;
+
+	if (rectAero.x1 < minX)
+	{
+		x = minX;
+	}
+	if (rectAero.x2 > maxX)
+	{
+		x = maxX - width;
+	}
+	if (rectAero.y1 < minY)
+	{
+		y = minY;
+	}
+	if (rectAero.y2 > maxY)
+	{
+		y = maxY - height;
+	}
+	x = x + borderLeft;
+	y = y + borderTop;
+	width = width - borderLeft - borderRight;
+	height = height - borderTop - borderBottom;
+	const int w = rect.Width();
+	const int h = rect.Height();
+	MoveWindow(m_handle, x, y, width, height, TRUE);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 void Widget::SetText(const chustd::String& str)
 {
@@ -372,6 +444,7 @@ Rect Widget::GetWindowRect() const
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // GetWindowRect and MoveWindow do not behave correctly if we provide the executable with a version < 6.0
+// Works only when the window is visible, otherwise returns the same rect than GetWindowRect.
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 Rect Widget::GetWindowRectAero() const
 {
