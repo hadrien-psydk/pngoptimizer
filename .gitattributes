@@ -1,0 +1,4 @@
+*.c   text
+*.cpp text
+*.h   text
+*.png binary
