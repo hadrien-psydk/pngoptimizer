@@ -334,6 +334,7 @@ public:
 
 	///////////////////////////////////////////////
 	static bool IsIndexed(PixelFormat pf);
+	static bool IsGray(PixelFormat);
 	static int32 SizeofPixelInBits(PixelFormat epf);
 	static int32 ComputeByteWidth(PixelFormat epf, int32 width);
 	static bool PackPixels(Buffer& pixels, int width, int height, PixelFormat pixelFormat);

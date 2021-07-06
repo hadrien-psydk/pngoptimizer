@@ -388,6 +388,36 @@ bool POEngine::TryToConvertIndexedToBlackAndWhite(PngDumpData& dd)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+// Finds an unused gray in a grayscale palette
+// Returns -1 if all 256 levels are used
+static int FindUnusedGray(const Palette& pal)
+{
+	// In this array, put a non-zero value when the grayscale value is used
+	// When alpha is 0, we can consider that the level is unused
+	uint8 used[256];
+	memset(used, 0, sizeof(used));
+	for(int i = 0; i < pal.m_count; ++i)
+	{
+		used[pal.m_colors[i].r] |= pal.m_colors[i].a;
+	}
+
+	// Select the first unused level
+	int level = 0;
+	for(; level < 256; ++level)
+	{
+		if( !used[level] )
+		{
+			break;
+		}
+	}
+	if( level >= 256 )
+	{
+		return -1;
+	}
+	return level;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 // Checks if the image can be converted to greyscale. Converts if possible.
 // The palette must be sorted by alpha [0 to 255]
 bool POEngine::TryToConvertIndexedToGreyscale(PngDumpData& dd)
@@ -422,7 +452,18 @@ bool POEngine::TryToConvertIndexedToGreyscale(PngDumpData& dd)
 			return false;
 		}
 		dd.useTransparentColor = true;
-		dd.tRNS.grey = dd.palette.m_colors[0].r;
+
+		// We may have the same exact gray in the palette, but with different
+		// alphas. So we should not reuse the first palette color blindly.
+		// Let's find a unused gray. Because there can only be 256 entries in
+		// the palette, it means we have the guaranty to find at least one
+		// unused gray.
+		dd.tRNS.grey = static_cast<uint8>(FindUnusedGray(dd.palette));
+
+		// Apply the special gray level for the first color in order to
+		// get the correct result when converting indices at the
+		// end of this function
+		dd.palette.m_colors[0].SetRgb(dd.tRNS.grey, dd.tRNS.grey, dd.tRNS.grey);
 	}
 	else
 	{

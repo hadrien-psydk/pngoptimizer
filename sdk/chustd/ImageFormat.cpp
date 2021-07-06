@@ -143,6 +143,22 @@ ImageFormat::~ImageFormat()
 }
 
 ////////////////////////////////////////////////////
+bool ImageFormat::IsGray(PixelFormat pf)
+{
+	switch(pf)
+	{
+	case PF_1bppGrayScale:
+	case PF_2bppGrayScale:
+	case PF_4bppGrayScale:
+	case PF_8bppGrayScale:
+	case PF_16bppGrayScale:
+		return true;
+	default:
+	break;
+	}
+	return false;
+}
+
 bool ImageFormat::IsIndexed(PixelFormat pf)
 {
 	return pf == PF_1bppIndexed || pf == PF_2bppIndexed || pf == PF_4bppIndexed || pf == PF_8bppIndexed;
