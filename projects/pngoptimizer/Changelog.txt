@@ -1,9 +1,10 @@
 ﻿== PngOptimizer Changelog ==
 
 -----------------
-2021 (2.7-beta)
+2021-11 (2.7)
 
 - change: ensure the window is fully visible on Windows
+- fixed: bad conversion of palette mode PNGs to grayscale 
 
 -----------------
 2019-07 (2.6.2)

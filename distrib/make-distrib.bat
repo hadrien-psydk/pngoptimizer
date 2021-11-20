@@ -1,4 +1,4 @@
-set POVER=2.7-beta
+set POVER=2.7
 
 @set ZIP="C:\Program Files\7-Zip\7z.exe" a -tzip -mx=5
 @set WHERE=where /R "%ProgramFiles(x86)%\Microsoft Visual Studio" devenv.com

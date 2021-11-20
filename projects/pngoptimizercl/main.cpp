@@ -7,7 +7,7 @@
 
 using namespace chustd;
 
-#define PNGO_VERSION "2.7-beta"
+#define PNGO_VERSION "2.7"
 
 // Do not write to stdout at all except for the result file
 // when the -stdio flag is used

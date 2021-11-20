@@ -1,7 +1,9 @@
 == PngOptimizerCL Changelog ==
 
 -----------------
-2020 (2.7-beta)
+2021-11 (2.7)
+
+- fixed: bad conversion of palette mode PNGs to grayscale 
 
 -----------------
 2019-07 (2.6.2)
