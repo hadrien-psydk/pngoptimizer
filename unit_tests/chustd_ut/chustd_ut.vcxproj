@@ -51,7 +51,7 @@
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectName>chustd_UT</ProjectName>
+    <ProjectName>chustd_ut</ProjectName>
     <ProjectGuid>{5507EB42-1785-4F8C-9600-DB6F008B97E4}</ProjectGuid>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>

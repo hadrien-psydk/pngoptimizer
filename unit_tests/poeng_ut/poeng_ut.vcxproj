@@ -45,7 +45,7 @@
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectName>poeng_UT</ProjectName>
+    <ProjectName>poeng_ut</ProjectName>
     <ProjectGuid>{5507EB42-1785-4F8C-9600-DB6F008B97E4}</ProjectGuid>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
