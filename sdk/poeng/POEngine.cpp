@@ -463,7 +463,11 @@ bool POEngine::TryToConvertIndexedToGreyscale(PngDumpData& dd)
 		// Apply the special gray level for the first color in order to
 		// get the correct result when converting indices at the
 		// end of this function
-		dd.palette.m_colors[0].SetRgb(dd.tRNS.grey, dd.tRNS.grey, dd.tRNS.grey);
+		dd.palette.m_colors[0].SetRgb(
+			static_cast<uint8>(dd.tRNS.grey),
+			static_cast<uint8>(dd.tRNS.grey),
+			static_cast<uint8>(dd.tRNS.grey)
+			);
 	}
 	else
 	{
