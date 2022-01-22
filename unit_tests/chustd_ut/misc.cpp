@@ -2,7 +2,7 @@
 
 TEST(ScanType, Int32)
 {
-	// Cas g�n�ral
+	// General case
 	int32 nAdvance = 0;
 	int32 nResult = 0;
 	bool bRet = ScanType(UTF16("123"), nAdvance, 'd', &nResult);
@@ -10,7 +10,7 @@ TEST(ScanType, Int32)
 	ASSERT_TRUE(nAdvance == 3);
 	ASSERT_TRUE(nResult == 123);
 
-	// Avec espaces
+	// With espaces
 	nAdvance = 0;
 	nResult = 0;
 	bRet = ScanType(UTF16(" \t\n\r 123"), nAdvance, 'd', &nResult);
@@ -18,7 +18,7 @@ TEST(ScanType, Int32)
 	ASSERT_TRUE(nAdvance == 8);
 	ASSERT_TRUE(nResult == 123);
 
-	// Avec signe +
+	// with sign +
 	nAdvance = 0;
 	nResult = 0;
 	bRet = ScanType(UTF16("+123"), nAdvance, 'd', &nResult);
@@ -26,7 +26,7 @@ TEST(ScanType, Int32)
 	ASSERT_TRUE(nAdvance == 4);
 	ASSERT_TRUE(nResult == 123);
 
-	// Avec signe -
+	// With sign -
 	nAdvance = 0;
 	nResult = 0;
 	bRet = ScanType(UTF16("-123"), nAdvance, 'd', &nResult);
@@ -34,15 +34,15 @@ TEST(ScanType, Int32)
 	ASSERT_TRUE(nAdvance == 4);
 	ASSERT_TRUE(nResult == -123);
 
-	// Avec signe + et une espace
+	// With sign + and a space
 	nAdvance = 0;
 	nResult = 0;
 	bRet = ScanType(UTF16("+ 123"), nAdvance, 'd', &nResult);
 	ASSERT_TRUE(bRet == false);
-	ASSERT_TRUE(nAdvance == 0); // Doit rester inchang�
-	ASSERT_TRUE(nResult == 0); // Doit rester inchang�
+	ASSERT_TRUE(nAdvance == 0); // Must stay unchanged
+	ASSERT_TRUE(nResult == 0); // Must stay unchanged
 
-	// Hexad�cimal
+	// Hexadecimal
 	nAdvance = 0;
 	nResult = 0;
 	bRet = ScanType(UTF16("aA12cF"), nAdvance, 'x', &nResult);
@@ -295,7 +295,7 @@ TEST(MemIniFileTest, Dump)
 
 	ini.SetSection("Screenshots");
 	ini.SetBool("UseDefaultDir", true);
-	ini.SetString("CustomDir", String::FromUtf8Z("~/Étoile des neiges"));
+	ini.SetString("CustomDir", String::FromUtf8Z("~/\xC3\x89toile des neiges"));
 	ini.SetBool("AskForFileName", false);
 	ini.SetBool("MaximizeCompression", false);
 
@@ -342,7 +342,7 @@ TEST(MemIniFileTest, Load)
 	
 	String customDir;
 	ASSERT_TRUE( ini.GetString("CustomDir", customDir));
-	ASSERT_EQ(String::FromUtf8Z("~/Étoile des neiges"), customDir);
+	ASSERT_EQ(String::FromUtf8Z("~/\xC3\x89toile des neiges"), customDir);
 
 	ASSERT_TRUE( ini.SetSection("Window"));
 	

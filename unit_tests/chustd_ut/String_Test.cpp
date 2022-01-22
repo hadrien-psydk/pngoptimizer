@@ -7,22 +7,22 @@ TEST(String, Trim)
 	String str2 = str1.Trim();
 	ASSERT_TRUE(str1.GetBuffer() == str2.GetBuffer());
 
-	// Trim gauche
+	// Trim left
 	String str3 = "  abc";
 	String str4 = str3.Trim();
 	ASSERT_TRUE(str4 == "abc");
 
-	// Trim droite
+	// Trim right
 	String str5 = "abc  ";
 	String str6 = str5.Trim();
 	ASSERT_TRUE(str6 == "abc");
 
-	// Trim double
+	// Trim both
 	String str7 = "  abc  ";
 	String str8 = str7.Trim();
 	ASSERT_TRUE(str8 == "abc");
 
-	// Trim multi-caractères
+	// Trim multi-characters
 	String str9 = " \r\n\t abc \n\t\r ";
 	String strA = str9.Trim();
 	ASSERT_TRUE(strA == "abc");

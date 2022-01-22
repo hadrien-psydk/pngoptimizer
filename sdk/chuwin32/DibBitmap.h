@@ -13,12 +13,7 @@ namespace chuwin32 {
 
 typedef BOOL (WINAPI *PFNAlphaBlend)(HDC,int,int,int,int,HDC,int,int,int,int,BLENDFUNCTION);
 
-// ATTENTION !!!!!!!!!!!!!!!!!!!
-// Sous Windows 98 le nombre de DIB Bitmaps créées maximum tourne autour de 700
-// (Même si les bitmaps sont très petites et qu'elles tiennent *largement* en mémoire)
-// Si ce nombre dépasse, la création échoue
-
-class DibBitmap  
+class DibBitmap
 {
 public:
 	HBITMAP m_hBitmap;

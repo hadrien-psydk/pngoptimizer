@@ -42,7 +42,7 @@ public:
 	static void Write(const String& str)     { Stdout().Write(str); }
 	static void WriteLine(const String& str) { Stdout().WriteLine(str); }
 
-	// Gets an input string from the user. The user must validate its data with the « Enter » key.
+	// Gets an input string from the user. The user must validate its data with the 'Enter' key.
 	// Returns true if an input string could be get
 	static bool WaitForInput(String& str);
 

@@ -102,7 +102,7 @@ bool DibBitmap::Create(HDC hWndDC, int nWidth, int nHeight, const uint32* pBits/
 	m_nWidth = nWidth;
 	m_nHeight = nHeight;
 
-	// Crée un device context pour notre buffer
+	// Create a device context for our buffer
 	m_hDC = CreateCompatibleDC(hWndDC);
 	if( m_hDC == nullptr )
 	{
