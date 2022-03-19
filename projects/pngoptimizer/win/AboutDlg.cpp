@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////////////
 // This file is part of the PngOptimizer application
 // Copyright (C) Hadrien Nilsson - psydk.org
-// For conditions of distribution and use, see copyright notice in PngOptimizer.h
+// For conditions of distribution and use, see copyright notice in License.txt
 /////////////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
@@ -13,7 +13,7 @@
 /////////////////////////////////////////////////////////////////////////////////////
 AboutDlg::AboutDlg() : Dialog(IDD_ABOUT)
 {
-	m_hFont = NULL;
+	m_hFont = nullptr;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -23,7 +23,7 @@ static HFONT CreateBoldWindowFont(Window wnd)
 	LOGFONTW font = { 0 };
 	::GetObject(hFont, sizeof(font), &font);
 	font.lfWeight = FW_BOLD;
-	return CreateFontIndirectW(&font); 
+	return CreateFontIndirectW(&font);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@ bool AboutDlg::SetupUI()
 	version = version + String(PNGO_VERSION);
 #if defined(_M_X64)
 	version = version + String(" (x64)");
-#elif defined(_M_IX86)  
+#elif defined(_M_IX86)
 	version = version + String(" (x86)");
 #endif
 	wndVer.SetText(version);
@@ -44,7 +44,7 @@ bool AboutDlg::SetupUI()
 	labelCopyright.SetText( String::FromUtf8Z(PNGO_COPYRIGHT) );
 
 	// Make the main text bold
-	m_hFont = CreateBoldWindowFont(wndVer); 
+	m_hFont = CreateBoldWindowFont(wndVer);
 	wndVer.SetFont(m_hFont, false);
 
 	Window wnd = GetItem(IDC_STATIC_URL);
@@ -73,10 +73,10 @@ void AboutDlg::LoadValues()
 /////////////////////////////////////////////////////////////////////////////////////
 bool AboutDlg::StoreValues()
 {
-	if( m_hFont != NULL )
+	if( m_hFont )
 	{
 		DeleteObject(m_hFont);
-		m_hFont = NULL;
+		m_hFont = nullptr;
 	}
 	return true;
 }

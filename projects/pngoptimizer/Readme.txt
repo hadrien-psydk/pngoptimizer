@@ -1,5 +1,5 @@
 -----------------------------------------------------------------------------
-  PngOptimizer - Copyright (C) 2002/2017 Hadrien Nilsson - psydk.org
+  PngOptimizer - Copyright (C) 2002/2021 Hadrien Nilsson - psydk.org
 -----------------------------------------------------------------------------
 
   This program is free software; you can redistribute it and/or modify
@@ -19,7 +19,7 @@
 
 Platform  : Windows/Linux - x86/x64
 Licence   : GNU GPL 2
-Version   : 2.6-beta
+Version   : 2.7
 Home page : http://psydk.org/pngoptimizer
 Contact   : pngoptimizer@psydk.org
 
@@ -82,7 +82,7 @@ For advanced PNG options, perform a right click to display a context menu.
 * Ignore animated GIFs *
 
  If a GIF is animated, PngOptimizer will convert it to APNG (Animated PNG).
- If you enble this option, PngOptimzer will ignore the file.
+ If you enable this option, PngOptimzer will ignore the file.
 
 * Keep file date *
 

@@ -92,7 +92,7 @@ const Palette& Gif::GetPalette() const
 	if( frameCount > 0 )
 	{
 		const GifAnimFrame* pFrame = m_apFrames[0];
-		if( pFrame->m_pPalette != nullptr )
+		if( pFrame->m_pPalette )
 		{
 			return *(pFrame->m_pPalette);
 		}
@@ -298,7 +298,7 @@ bool Gif::LoadFromFile(IFile& file)
 
 				pFrame->m_transparentIndex = m_transparentColorIndex;
 
-				if( pFrame->m_pPalette != nullptr )
+				if( pFrame->m_pPalette )
 				{
 					pFrame->m_pPalette->m_colors[ m_transparentColorIndex ].SetAlpha(0);
 				}

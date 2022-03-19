@@ -1,7 +1,7 @@
-﻿/////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////
 // This file is part of the PngOptimizer application
 // Copyright (C) Hadrien Nilsson - psydk.org
-// For conditions of distribution and use, see copyright notice in PngOptimizer.h
+// For conditions of distribution and use, see copyright notice in License.txt
 /////////////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
@@ -14,18 +14,24 @@ static const char k_szFileComment2[] = "This file is encoded in UTF-8";
 
 static const char k_szSectionEngine[]         = "Engine";
 
+/*
+// Not implemented for Gnome
 static const char k_szSectionScreenshots[]      = "Screenshots";
 static const char k_szShotUseDefaultDir[]       = "UseDefaultDir";
 static const char k_szShotCustomDir[]           = "CustomDir";
 static const char k_szShotMaximizeCompression[] = "MaximizeCompression";
 static const char k_szShotAskForFileName[]      = "AskForFileName";
+*/
 
+/*
+// Not implemented for Gnome
 static const char k_szSectionWindow[]  = "Window";
 static const char k_szWndX[]           = "X";
 static const char k_szWndY[]           = "Y";
 static const char k_szWndWidth[]       = "Width";
 static const char k_szWndHeight[]      = "Height";
 static const char k_szWndAlwaysOnTop[] = "AlwaysOnTop";
+*/
 
 ///////////////////////////////////////////////////////////////////////////////
 AppSettings& AppSettings::GetInstance()
@@ -118,7 +124,7 @@ bool AppSettings::Read()
 			// No need to center, the values are ok
 			pMWS->topLeftValid = true;
 		}
-	
+
 		ini.GetInt(k_szWndWidth, wndWidth);
 		ini.GetInt(k_szWndHeight, wndHeight);
 
@@ -127,7 +133,7 @@ bool AppSettings::Read()
 		{
 			wndX = 0;
 		}
-	
+
 		if( wndY < 0 )
 		{
 			wndY = 0;

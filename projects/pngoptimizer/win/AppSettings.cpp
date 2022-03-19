@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////////////
 // This file is part of the PngOptimizer application
 // Copyright (C) Hadrien Nilsson - psydk.org
-// For conditions of distribution and use, see copyright notice in PngOptimizer.h
+// For conditions of distribution and use, see copyright notice in License.txt
 /////////////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
@@ -82,21 +82,15 @@ bool AppSettings::Read(POEngineSettings& pos, BmpcdSettings* pBs, MainWndSetting
 			// No need to center, the values are ok
 			pMws->topLeftValid = true;
 		}
-	
+
 		ini.GetInt(k_szWndWidth, wndWidth);
 		ini.GetInt(k_szWndHeight, wndHeight);
 
-		// Reajust rect if needed
-		if( wndX < 0 )
-		{
-			wndX = 0;
-		}
-	
-		if( wndY < 0 )
-		{
-			wndY = 0;
-		}
+		// We do not readjust x and y here, we will do it later after looking
+		// at monitor details. Also, Aero now includes the shadow as part of the
+		// window so to reach actual coordinates (0,0) we need to use negative values.
 
+		// Readjust with and height if needed
 		if( wndWidth <= 50 )
 		{
 			wndWidth = defaultWidth;

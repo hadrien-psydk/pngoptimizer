@@ -26,39 +26,6 @@ const float32 Math::fSqrt2_32     = 1.4142135623730950488016887242097f;
 const float32 Math::fSqrt3_32     = 1.7320508075688772935274463415059f;
 const float32 Math::fSqrt3Div2_32 = 0.8660254037844386f;
 
-/*
-
-  TODO: uncomment once sqrt is implemented
-
-// Solve a second degree equation ax² + bx + c = 0
-// Returns true if one solution at least exists
-bool Math::ResolveQuadraticEquation(const float64 a, const float64 b, const float64 c,
-		float64& dRoot1, float64& dRoot2)
-{
-	if( a == 0 )
-	{
-		// First degree equation
-		if( b == 0 )
-		{
-			return false;
-		}
-		dRoot1 = -c / b;
-		return true;
-	}
-
-	float64 dDelta = b * b - 4 * a * c;
-	if( dDelta < 0 )
-		return false;
-
-	float64 dDeltaSqr = sqrt(dDelta);
-	float64 dInv2a = 1 / (2 * a);
-	dRoot1 = (-b + dDeltaSqr) * dInv2a;
-	dRoot2 = (-b - dDeltaSqr) * dInv2a;
-
-	return true;
-}
-*/
-
 #define ISQRT_STEP(k) s = t + r; r >>= 1; if (s <= v) { v -= s; r |= t;}
 uint32 Math::IntegerSqrt(uint32 v)
 {

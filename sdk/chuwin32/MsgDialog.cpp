@@ -18,7 +18,7 @@ MsgDialog::MsgDialog(const String& content, const String& title,
 
 DialogResp MsgDialog::DoModal(const Window* parent)
 {
-	HWND hParent = NULL;
+	HWND hParent = nullptr;
 	if( parent )
 	{
 		hParent = parent->GetHandle();

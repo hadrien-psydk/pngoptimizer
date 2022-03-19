@@ -1,8 +1,9 @@
 # Use Ubuntu as build environment
-FROM ubuntu:17.10 AS build
+FROM ubuntu:20.04 AS build
 
 # Install dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
       build-essential \
       libgtk-3-dev
 

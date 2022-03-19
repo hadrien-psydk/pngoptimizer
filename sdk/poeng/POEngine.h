@@ -88,7 +88,7 @@ public:
 	bool WarmUp();
 	void EnableUnicodeArrow();
 
-	static chustd::Color ColorFromTextType(TextType tt);
+	static chustd::Color ColorFromTextType(TextType tt, bool darkTheme = false);
 
 	POEngine();
 	virtual ~POEngine();

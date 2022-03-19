@@ -1,26 +1,13 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of the pngoptimizercl application
-// Copyright (C) 2002/2013 Hadrien Nilsson - psydk.org
-//
-// pngoptimizercl is free software; you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
-// (at your option) any later version.
-//
-// Foobar is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Foobar; if not, write to the Free Software
-// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-//
-///////////////////////////////////////////////////////////////////////////////
+// This file is part of the PngOptimizerCL application
+// Copyright (C) Hadrien Nilsson - psydk.org
+// For conditions of distribution and use, see copyright notice in License.txt
+/////////////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
 
 using namespace chustd;
+
+#define PNGO_VERSION "2.7"
 
 // Do not write to stdout at all except for the result file
 // when the -stdio flag is used
@@ -67,7 +54,7 @@ public:
 
 static void WriteVersion()
 {
-	String version = "PngOptimizerCL 2.6-beta";
+	String version = "PngOptimizerCL " PNGO_VERSION;
 #if defined(_M_X64)
 	version = version + String(" (x64)");
 #elif defined(_M_IX86)
@@ -79,7 +66,7 @@ static void WriteVersion()
 static void WriteHelp()
 {
 	WriteVersion();
-	Console::WriteLine("Copyright \xA9 2002/2016 Hadrien Nilsson - psydk.org");
+	Console::WriteLine("Copyright \xA9 2002/2021 Hadrien Nilsson - psydk.org");
 	Console::WriteLine("Converts GIF, BMP and TGA files to optimized PNG files.");
 	Console::WriteLine("Optimizes and cleans PNG files.");
 	Console::WriteLine("");

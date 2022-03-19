@@ -690,3 +690,42 @@ TEST(POEngine, NoNeedlessOverwrite)
 	ASSERT_TRUE( File::SetReadOnly(filePath, false) );
 	ASSERT_TRUE( File::Delete(filePath) );
 }
+
+// Test that when converting from palette to gray we consider
+// same grays with different alphas as different colors
+TEST(POEngine, PaletteSameGrayDifferentAlpha)
+{
+	const uint8 data[] = {
+		1, 1, 1,
+		1, 0, 1,
+		1, 1, 1
+	};
+	PngDumpData dd;
+	dd.pixelFormat = PF_8bppIndexed;
+	dd.width = 3;
+	dd.height = 3;
+	dd.pixels.Assign(data, 9);
+	dd.palette.m_count = 2;
+	dd.palette[0] = Color(8, 8, 8, 0);
+	dd.palette[1] = Color(8, 8, 8, 255);
+
+	POEngine engine;
+	ASSERT_TRUE(engine.OptimizeExternalBuffer(dd, "result.png"));
+
+	Png png;
+	ASSERT_TRUE(png.Load("result.png"));
+	ASSERT_EQ(3, png.GetWidth());
+	ASSERT_EQ(3, png.GetHeight());
+	ASSERT_TRUE(ImageFormat::IsGray(png.GetPixelFormat()));
+	ASSERT_TRUE(png.HasSimpleTransparency());
+	ASSERT_EQ(0, png.GetGreyTransIndex());
+
+	auto pixels = png.GetPixels();
+	ImageFormat::UnpackPixels(pixels, 3, 3, png.GetPixelFormat());
+	const uint8 expected[] = {
+		8, 8, 8,
+		8, 0, 8,
+		8, 8, 8
+	};
+	ASSERT_TRUE(memcmp(pixels.GetReadPtr(), expected, 9) == 0);
+}

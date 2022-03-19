@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////////////
 // This file is part of the PngOptimizer application
 // Copyright (C) Hadrien Nilsson - psydk.org
-// For conditions of distribution and use, see copyright notice in PngOptimizer.h
+// For conditions of distribution and use, see copyright notice in License.txt
 /////////////////////////////////////////////////////////////////////////////////////
 
 #ifndef PO_WIDGETS_H
@@ -14,7 +14,7 @@ class Widget
 {
 public:
 	Widget() : m_handle(nullptr) {}
-	WIDGET_HANDLE GetHandle() { return m_handle; }
+	WIDGET_HANDLE GetHandle() const { return m_handle; }
 	void SetFocus();
 	void Enable(bool);
 protected:

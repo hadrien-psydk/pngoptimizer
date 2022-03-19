@@ -30,13 +30,13 @@ PlopDataObject::~PlopDataObject()
 
 STDMETHODIMP  PlopDataObject::QueryInterface(REFIID refiid, void FAR* FAR* ppv)
 {
-	*ppv = NULL;
+	*ppv = nullptr;
 	if( ComFromHell::Equals(IID_IUnknown, refiid) || ComFromHell::Equals(IID_IDataObject, refiid) )
 	{
 		*ppv = this;
 	}
 	
-	if( NULL != *ppv )
+	if( nullptr != *ppv )
 	{
 		((LPUNKNOWN)*ppv)->AddRef();
 		return NOERROR;
@@ -78,13 +78,13 @@ IUnknown *GetCanonicalIUnknown(IUnknown *punk)
 //IDataObject members
 STDMETHODIMP PlopDataObject::SetData(LPFORMATETC pFE, LPSTGMEDIUM pSM, BOOL fRelease)
 {
-	if( pFE == NULL && pSM == NULL )
+	if( pFE == nullptr && pSM == nullptr )
 		return E_INVALIDARG;
 	
 	if (!fRelease) 
 		return E_NOTIMPL;
 	
-	Both* pde = NULL;
+	Both* pde = nullptr;
 	HRESULT hres = FindFORMATETC(pFE, &pde, TRUE);
 	if (SUCCEEDED(hres))
 	{
@@ -110,7 +110,7 @@ STDMETHODIMP PlopDataObject::SetData(LPFORMATETC pFE, LPSTGMEDIUM pSM, BOOL fRel
 			GetCanonicalIUnknown(static_cast<IDataObject*>(this)))
 		{
 			pde->m_sm.pUnkForRelease->Release();
-			pde->m_sm.pUnkForRelease = NULL;
+			pde->m_sm.pUnkForRelease = nullptr;
 		}
 	}
 	return hres;
@@ -175,7 +175,7 @@ STDMETHODIMP PlopDataObject::GetData(LPFORMATETC pFE, LPSTGMEDIUM pSM)
 #if 0
 	///////////////////////////////////////////
 	// Ancien code
-	pSM->hGlobal = NULL;
+	pSM->hGlobal = nullptr;
 	
 	foreach(m_aFormats, i)
 	{
@@ -218,7 +218,7 @@ STDMETHODIMP PlopDataObject::GetData(LPFORMATETC pFE, LPSTGMEDIUM pSM)
 
 STDMETHODIMP PlopDataObject::GetDataHere(LPFORMATETC pFE, LPSTGMEDIUM pSM)
 {
-	if(pFE == NULL ||pSM == NULL)
+	if(pFE == nullptr ||pSM == nullptr)
 		return E_INVALIDARG;
 	
 	return E_NOTIMPL;
@@ -226,7 +226,7 @@ STDMETHODIMP PlopDataObject::GetDataHere(LPFORMATETC pFE, LPSTGMEDIUM pSM)
 
 STDMETHODIMP PlopDataObject::QueryGetData(LPFORMATETC lpFormat)
 { 
-	Both* pde = NULL;
+	Both* pde = nullptr;
 	return FindFORMATETC(lpFormat, &pde, FALSE);
 
 #if 0
@@ -270,10 +270,10 @@ STDMETHODIMP PlopDataObject::EnumFormatEtc(DWORD dwDir, LPENUMFORMATETC FAR *pEn
 	}
 	else if( dwDir == DATADIR_SET )
 	{
-		pEnum = NULL;
+		pEnum = nullptr;
 	}
 
-	if( pEnum == NULL )
+	if( pEnum == nullptr )
 	{
 		return E_NOTIMPL;
 	}
@@ -298,11 +298,13 @@ STDMETHODIMP PlopDataObject::EnumDAdvise(LPENUMSTATDATA FAR* /*ppenumAdvise*/)
 
 HRESULT PlopDataObject::FindFORMATETC(FORMATETC* pfe, Both** ppde, BOOL fAdd)
 {
-    *ppde = NULL;
+    *ppde = nullptr;
 	
     // Comparing two DVTARGETDEVICE structures is hard, so we don't even try
-    if (pfe->ptd != NULL) return DV_E_DVTARGETDEVICE;
-	
+	if( pfe->ptd )
+	{
+		return DV_E_DVTARGETDEVICE;
+	}
     // See if it's in our list
     foreach(m_aFormats, ide)
 	{
@@ -334,7 +336,7 @@ HRESULT PlopDataObject::FindFORMATETC(FORMATETC* pfe, Both** ppde, BOOL fAdd)
 
 HGLOBAL GlobalClone(HGLOBAL hglobIn)
 {
-	HGLOBAL hglobOut = NULL;
+	HGLOBAL hglobOut = nullptr;
 	
 	LPVOID pvIn = GlobalLock(hglobIn);
 	if (pvIn)
@@ -356,7 +358,7 @@ HRESULT PlopDataObject::AddRefStgMedium(STGMEDIUM* pstgmIn, STGMEDIUM* pstgmOut,
     HRESULT hres = S_OK;
     STGMEDIUM stgmOut = *pstgmIn;
 	
-    if (pstgmIn->pUnkForRelease == NULL &&
+    if (pstgmIn->pUnkForRelease == nullptr &&
         !(pstgmIn->tymed & (TYMED_ISTREAM | TYMED_ISTORAGE)))
 	{
         if (fCopyIn)

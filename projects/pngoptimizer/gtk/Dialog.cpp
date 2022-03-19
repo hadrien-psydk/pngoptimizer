@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////////////
 // This file is part of the PngOptimizer application
 // Copyright (C) Hadrien Nilsson - psydk.org
-// For conditions of distribution and use, see copyright notice in PngOptimizer.h
+// For conditions of distribution and use, see copyright notice in License.txt
 /////////////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
@@ -36,11 +36,16 @@ DialogResp Dialog::DoModal(Window* parent)
 	}
 
 	auto button_ok = GetItem("button_ok");
+	auto button_apply = GetItem("button_apply");
 	auto button_cancel = GetItem("button_cancel");
-	
+
 	if( button_ok )
 	{
 		g_signal_connect(button_ok, "clicked", G_CALLBACK(OnOkClicked), this);
+	}
+	if( button_apply )
+	{
+		g_signal_connect(button_apply, "clicked", G_CALLBACK(OnOkClicked), this);
 	}
 	if( button_cancel )
 	{

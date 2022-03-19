@@ -12,7 +12,7 @@ namespace chuwin32 {
 
 ContextMenu::ContextMenu()
 {
-	m_hMenu = NULL;
+	m_hMenu = nullptr;
 	m_position = TPM_LEFTALIGN;
 }
 
@@ -27,7 +27,7 @@ ContextMenu::~ContextMenu()
 bool ContextMenu::Create()
 {
 	m_hMenu = CreatePopupMenu();
-	if( m_hMenu == NULL )
+	if( m_hMenu == nullptr )
 	{
 		return false;
 	}
@@ -48,7 +48,7 @@ void ContextMenu::Show(int x, int y, const Widget* owner)
 {
 	UINT nFlags = m_position;
 	nFlags |= TPM_RIGHTBUTTON;
-	BOOL bOk = TrackPopupMenu(m_hMenu, nFlags, x, y, 0, owner->GetHandle(), NULL);
+	BOOL bOk = TrackPopupMenu(m_hMenu, nFlags, x, y, 0, owner->GetHandle(), nullptr);
 	bOk;
 }
 

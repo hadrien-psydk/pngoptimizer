@@ -54,7 +54,7 @@ bool ChunkedFile::BeginChunkWrite(uint32 chunkName)
 		return false;
 
 	// Crc for this new chunk, updated for each call to Write
-	// The CRC does not includes the « sizeof » field, and anyway we could not include this sizeof field
+	// The CRC does not includes the 'sizeof' field, and anyway we could not include this sizeof field
 	// now as we don't know its value yet. Thank you the PNG standard.
 	InitCrc(m_crc);
 

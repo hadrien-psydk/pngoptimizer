@@ -851,11 +851,11 @@ bool File::SetReadOnly(const String& filePath, bool readOnly)
 
 	if( readOnly )
 	{
-		dwAttributes |= FILE_ATTRIBUTES_READONLY;
+		dwAttributes |= FILE_ATTRIBUTE_READONLY;
 	}
 	else
 	{
-		dwAttributes &= ~FILE_ATTRIBUTES_READONLY;
+		dwAttributes &= ~FILE_ATTRIBUTE_READONLY;
 	}
 	return ::SetFileAttributesW(filePath.GetBuffer(), dwAttributes) != FALSE;
 

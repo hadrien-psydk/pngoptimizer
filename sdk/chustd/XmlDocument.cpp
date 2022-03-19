@@ -1120,7 +1120,7 @@ bool XmlDocument::ParseDocument(XmlElement* pParentNode)
 				if( pParentNode == &m_docnode )
 				{
 					// This is the root of the document !
-					if( GetDocumentElement() != nullptr )
+					if( GetDocumentElement() )
 					{
 						// Error, only one root in an xml document
 						m_strLastError = "More than one root in document";
@@ -1173,7 +1173,7 @@ bool XmlDocument::LoadFromContent(const ByteArray& aContent)
 	// We may not know the exact encoding, but we know enough to parse the header, and
 	// get additional character encoding information.
 	const TextEncoding* pTmpTextEncoding = GetTemporaryEncoding();
-	ASSERT(pTmpTextEncoding != nullptr);
+	ASSERT(pTmpTextEncoding);
 
 	m_charGiver.SetEncoding(pTmpTextEncoding);
 
@@ -1283,7 +1283,7 @@ XmlDocument::CharGiver::ExtractStatus XmlDocument::CharGiver::ExtractChar(int& c
 XmlDocument::CharGiver::ExtractStatus XmlDocument::CharGiver::GetNextChar(int& codePoint)
 {
 	// The encoding should be set with SetEncoding before calling this function
-	ASSERT(m_pTextEncoding != nullptr);
+	ASSERT(m_pTextEncoding);
 
 	uint32 charLength;
 	ExtractStatus eStatus = ExtractChar(codePoint, charLength);

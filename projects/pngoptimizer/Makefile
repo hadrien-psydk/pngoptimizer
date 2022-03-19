@@ -1,7 +1,7 @@
 PROJECT_NAME := pngoptimizer
 PROJECT_TYPE := app
 PROJECT_FILES := gtk/*.cpp
-PROJECT_FILES += gtk/logo48.png gtk/pngoptions.glade
+PROJECT_FILES += gtk/logo48.png gtk/preferences.glade
 SDK_DEPS := poeng chustd
 EXT_DEPS := gtk
 

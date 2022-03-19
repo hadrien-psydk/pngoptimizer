@@ -16,7 +16,7 @@ namespace chustd {
 enum PixelFormat
 {
 	PF_Unknown,
-	
+
 	PF_1bppGrayScale,
 	PF_2bppGrayScale,
 	PF_4bppGrayScale,
@@ -106,6 +106,11 @@ public:
 		value32 = 0xff000000;
 	}
 
+	Color(const int(&v)[3])
+	{
+		value32 = (255 << 24) | (v[0] << 16) | (v[1] << 8) | v[2];
+	}
+
 	Color(uint32 rx, uint32 gx, uint32 bx, uint32 ax = 255)
 	{
 		value32 = (ax << 24) | (rx << 16) | (gx << 8) | bx;
@@ -134,12 +139,6 @@ public:
 	bool IsEqualRgb(Color other)
 	{
 		return (value32 & 0x00ffffff) == (other.value32 & 0x00ffffff);
-	}
-
-	Color& operator = (const Color& color)
-	{
-		value32 = color.value32;
-		return *this;
 	}
 
 	bool operator == (const Color& color) const
@@ -252,7 +251,7 @@ public:
 	virtual const Palette& GetPalette() const = 0;
 	virtual const Buffer& GetPixels() const = 0;
 	virtual ~IImage() {}
-	
+
 	///////////////////////////////////////////////////////
 	// Implemented if needed in the derived class
 	//
@@ -275,7 +274,7 @@ public:
 		DispNone = 0,              // Same as APNG_DISPOSE_OP_NONE
 		DispClearToTransBlack = 1, // Same as APNG_DISPOSE_OP_BACKGROUND
 		DispRestoreToPrevious = 2, // Same as APNG_DISPOSE_OP_PREVIOUS
-		
+
 		DispClearToBkColor, // (GIF) May become deprecated as browsers interpret that as DispClearToTransBlack
 	};
 
@@ -335,6 +334,7 @@ public:
 
 	///////////////////////////////////////////////
 	static bool IsIndexed(PixelFormat pf);
+	static bool IsGray(PixelFormat);
 	static int32 SizeofPixelInBits(PixelFormat epf);
 	static int32 ComputeByteWidth(PixelFormat epf, int32 width);
 	static bool PackPixels(Buffer& pixels, int width, int height, PixelFormat pixelFormat);
@@ -374,16 +374,16 @@ public:
 	virtual int32 GetFrameCount() const;
 	virtual const AnimFrame* GetAnimFrame(int index) const;
 	virtual int32 GetLoopCount() const; // 0 = infinite
-	
+
 	///////////////////////////////////////////////////////
-	
+
 protected:
 	int32 m_width;
 	int32 m_height;
 	int32 m_lastError; // Last error number
 
 	Buffer m_pixels;
-	
+
 protected:
 	void FlipVertical();
 	void SetAlphaFullOpaque();

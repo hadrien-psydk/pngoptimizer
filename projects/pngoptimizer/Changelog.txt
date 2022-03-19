@@ -1,8 +1,16 @@
-== PngOptimizer Changelog ==
+﻿== PngOptimizer Changelog ==
 
 -----------------
-2017 (2.6-beta)
+2021-11 (2.7)
 
+- change: ensure the window is fully visible on Windows
+- fixed: bad conversion of palette mode PNGs to grayscale 
+
+-----------------
+2019-07 (2.6.2)
+
+- fixed: compilation warning with gcc9
+- change: new GTK+ interface with header bar
 - change: do not overwrite a file if the content stays the same
 
 -----------------
@@ -149,7 +157,7 @@ Private release by Paul Higginbottom
 -----------------
 2006-01-09 (1.5.4 aka 1.54)
 
-- uneeded bKGD chunk inserted when the � Keep background color � option was set.
+- uneeded bKGD chunk inserted when the "Keep background color" option was set.
 
 -----------------
 2006-01-07 (1.5.3 aka 1.53)

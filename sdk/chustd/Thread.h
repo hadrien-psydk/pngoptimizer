@@ -11,6 +11,12 @@ namespace chustd {
 
 class ThreadFunction;
 
+struct ThreadStartArg
+{
+	int (*pfn)(void*);
+	void* userArg;
+};
+
 ///////////////////////////////////////
 class Thread
 {
@@ -29,6 +35,7 @@ public:
 
 private:
 	void* m_handle;
+	ThreadStartArg m_startArg;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

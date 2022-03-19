@@ -113,7 +113,7 @@ String::String(const wchar* psz, int length)
 String::String(const String& str)
 {
 	m_pszBuffer = str.m_pszBuffer;
-	ASSERT(m_pszBuffer != nullptr);
+	ASSERT(m_pszBuffer);
 	
 	StringData* pData = GetData();
 	if( pData != StringData::GetNullInstance() )
@@ -140,7 +140,7 @@ void String::SetBuffer(const wchar* pBuffer, int length)
 {
 	Unref();
 
-	if( pBuffer != nullptr && length != 0 )
+	if( pBuffer && length != 0 )
 	{
 		m_pszBuffer = StringData::CreateInstance(length);
 		Memory::Copy16(m_pszBuffer, pBuffer, length);
@@ -317,7 +317,7 @@ String String::ToUpperCase() const
 			uint8 subCode = uint8(codePoint & 0x00ff);
 
 			const uint16* const pPage = pPages[page];
-			if( pPage != nullptr && pPage[subCode] != 0 )
+			if( pPage && pPage[subCode] != 0 )
 			{
 				codePoint = pPage[subCode];
 			}
@@ -325,7 +325,7 @@ String String::ToUpperCase() const
 			{
 				// Find unconditionnal 1:N mapping
 				const uint16* pMulti = UnicodeCaseMapping::CodeUnitToUpperMulti( uint16(codePoint));
-				if( pMulti != nullptr )
+				if( pMulti )
 				{
 					for(int iNew = 0; iNew < 3; ++iNew)
 					{
@@ -377,7 +377,7 @@ String String::ToLowerCase() const
 			uint8 subCode = uint8(codePoint & 0x00ff);
 
 			const uint16* const pPage = pPages[page];
-			if( pPage != nullptr && pPage[subCode] != 0 )
+			if( pPage && pPage[subCode] != 0 )
 			{
 				codePoint = pPage[subCode];
 			}
@@ -385,7 +385,7 @@ String String::ToLowerCase() const
 			{
 				// Find unconditionnal 1:N mapping
 				const uint16* pMulti = UnicodeCaseMapping::CodeUnitToLowerMulti( uint16(codePoint));
-				if( pMulti != nullptr )
+				if( pMulti )
 				{
 					for(int iNew = 0; iNew < 3; ++iNew)
 					{
@@ -500,7 +500,7 @@ const String operator + (const wchar* psz, const String& str2)
 bool String::IsBinaryEqual(const wchar* psz) const
 {
 	const int thisLength = GetData()->GetLength();
-	const int length = (psz != nullptr) ? SZLength(psz) : 0;
+	const int length = psz ? SZLength(psz) : 0;
 	
 	if( thisLength == 0 && length == 0 )
 		return true;

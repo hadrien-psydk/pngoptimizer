@@ -1,7 +1,7 @@
-﻿/////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////
 // This file is part of the PngOptimizer application
 // Copyright (C) Hadrien Nilsson - psydk.org
-// For conditions of distribution and use, see copyright notice in PngOptimizer.h
+// For conditions of distribution and use, see copyright notice in License.txt
 /////////////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
@@ -9,6 +9,23 @@
 
 #include "AppSettings.h"
 
+static void WinAction_OnActivate(GSimpleAction*, GVariant*, gpointer userData)
+{
+	WinAction* that = reinterpret_cast<WinAction*>(userData);
+	that->Activate.Fire();
+}
+
+void WinAction::Create(Window* win, const char* id)
+{
+	auto hwin = win->GetHandle();
+
+	auto action = g_simple_action_new(id, nullptr);
+	g_signal_connect(action, "activate", G_CALLBACK(WinAction_OnActivate), this);
+	g_action_map_add_action(G_ACTION_MAP(hwin), G_ACTION(action));
+	g_object_unref(action);
+}
+
+///////////////////////////////////////////////////////////////////////////////
 static void OnDragDataReceived(GtkWidget*, GdkDragContext* context,
 	int /* x */, int /* y */,
     GtkSelectionData* seldata, guint /*info*/, guint time,
@@ -35,7 +52,7 @@ static void OnDragDataReceived(GtkWidget*, GdkDragContext* context,
 				g_free(path);
 			}
 			i++;
-		}	
+		}
 	 	g_strfreev(uris);
 	}
 	bool success = !arg.IsEmpty();
@@ -44,7 +61,7 @@ static void OnDragDataReceived(GtkWidget*, GdkDragContext* context,
 
 	if( arg.IsEmpty() )
 		return;
- 
+
 	MainWnd* that = reinterpret_cast<MainWnd*>(userData);
 	that->FilesDropped.Fire(arg);
 }
@@ -73,18 +90,14 @@ static void OnWindowStateEvent(GtkWidget*, GdkEvent* event, gpointer /*userData*
 	}*/
 }
 
-static void OnDeleteEvent(GtkWidget* /*widget*/, GdkEvent*, gpointer)
+MainWnd::MainWnd()
 {
-	//GdkWindow* gw = gtk_widget_get_window(widget);
-	//GdkWindowState state = gdk_window_get_state(gw);
-	//printf("delete-event %08x\n", (unsigned int)(state));
-
-	gtk_main_quit();
+	m_pGtkApp = nullptr;
 }
 
-void MainWnd::OnOptions()
+void MainWnd::OnPreferences()
 {
-	PngOptionsDlg dlg;
+	PreferencesDlg dlg;
 	dlg.m_settings = AppSettings::GetInstance().GetPOSettings();
 	if( dlg.DoModal(this) != DialogResp::Ok )
 		return;
@@ -105,9 +118,10 @@ void MainWnd::OnAbout()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-bool MainWnd::Create(const char* welcomeMsg)
+bool MainWnd::Create(GtkApplication* pGtkApp, const char* welcomeMsg)
 {
-	auto window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	auto window = gtk_application_window_new(pGtkApp);
+	//auto window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	m_handle = window;
 
 	//const MainWndSettings& mwsettings = AppSettings::GetInstance().GetMWSettings();
@@ -117,7 +131,31 @@ bool MainWnd::Create(const char* welcomeMsg)
 	gtk_window_set_default_size(GTK_WINDOW(window), 580, 300);
 	gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
 
-	GtkTargetEntry targets[] = {
+	////////////////////////////
+	// Header bar
+	auto headerBar = gtk_header_bar_new();
+	gtk_header_bar_set_title(GTK_HEADER_BAR(headerBar), "PngOptimizer");
+	gtk_header_bar_set_show_close_button(GTK_HEADER_BAR(headerBar), true);
+
+	auto hamburgerButton = gtk_menu_button_new();
+	auto hamburgerImage = gtk_image_new_from_icon_name("open-menu-symbolic", GTK_ICON_SIZE_BUTTON);
+	gtk_button_set_image(GTK_BUTTON(hamburgerButton), hamburgerImage);
+	gtk_header_bar_pack_end(GTK_HEADER_BAR(headerBar), hamburgerButton);
+
+	auto clearButton = gtk_button_new_from_icon_name("edit-clear-all-symbolic",
+		GTK_ICON_SIZE_SMALL_TOOLBAR);
+	gtk_header_bar_pack_end(GTK_HEADER_BAR(headerBar), clearButton);
+
+	m_btHamburger = hamburgerButton;
+	m_btClear = clearButton;
+
+	gtk_window_set_titlebar(GTK_WINDOW(window), headerBar);
+
+	m_btClear.Clicked.Connect(this, &MainWnd::OnClear);
+
+	////////////////////////////
+	// Drag and drop
+	const GtkTargetEntry targets[] = {
 		{ const_cast<char*>("text/uri-list"), GTK_TARGET_OTHER_APP, 0xb00b00 }
 	};
 
@@ -127,35 +165,49 @@ bool MainWnd::Create(const char* welcomeMsg)
 	g_signal_connect(window, "drag-data-received",
         G_CALLBACK(OnDragDataReceived), this);
 
-	g_signal_connect(window, "window-state-event", 
+	g_signal_connect(window, "window-state-event",
 		G_CALLBACK(OnWindowStateEvent), this);
 
 	////////////////////////////
-	// Context menu
-	m_ctm.Create();
-	auto mi0 = m_ctm.AddItem("Options...");
-	m_ctm.AddSeparator();
-	auto mi1 = m_ctm.AddItem("Clear");
-	m_ctm.AddSeparator();
-	auto mi2 = m_ctm.AddItem("About");
-	m_ctm.Install(this);
+	// Hamburger menu
+	auto menu = g_menu_new();
+  	g_menu_append(menu, "Preferences", "win.preferences");
+  	g_menu_append(menu, "About", "win.about");
+	auto popover = gtk_popover_new_from_model(hamburgerButton, G_MENU_MODEL(menu));
 
-	mi0->Activate.Connect(this, &MainWnd::OnOptions);
-	mi1->Activate.Connect(this, &MainWnd::OnClear);
-	mi2->Activate.Connect(this, &MainWnd::OnAbout);
-	
+	gtk_menu_button_set_popover(GTK_MENU_BUTTON(hamburgerButton), popover);
+
+	m_actPreferences.Create(this, "preferences");
+	m_actPreferences.Activate.Connect(this, &MainWnd::OnPreferences);
+
+	m_actAbout.Create(this, "about");
+	m_actAbout.Activate.Connect(this, &MainWnd::OnAbout);
+
 	//////////////////////////
 	m_traceCtl.Create(this, welcomeMsg);
 
-	g_signal_connect(window, "delete-event", G_CALLBACK(OnDeleteEvent), this);
-
-	g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), this);
-	gtk_widget_show_all(window);
-
+	gtk_widget_show(window);
 	return true;
 }
 
 void MainWnd::AddText(const chustd::String& text, Color cr)
 {
 	m_traceCtl.AddText(text, cr);
+}
+
+ThemeInfo MainWnd::GetThemeInfo() const
+{
+	ThemeInfo ti;
+
+	GdkRGBA col;
+	// Look up the default text color in the theme
+	GtkStyleContext* styleContext = gtk_widget_get_style_context(GetHandle());
+	gtk_style_context_get_color(styleContext, GTK_STATE_FLAG_NORMAL, &col);
+	double lum = 0.2 * col.red + 0.7 * col.green + 0.1 * col.blue;
+	ti.darkThemeUsed = bool(lum > 0.3);
+	uint8 r = static_cast<uint8>(col.red * 255);
+	uint8 g = static_cast<uint8>(col.green * 255);
+	uint8 b = static_cast<uint8>(col.blue * 255);
+	ti.normalColor = Color(r, g, b);
+	return ti;
 }

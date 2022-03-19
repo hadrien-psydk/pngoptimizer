@@ -21,15 +21,15 @@ DirDlg::~DirDlg()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Permet de se placer tout de suite dans un répertoire à l'init
-// lpData contient l'ID du répertoire
+// Allows going immediately into a specific directory at init
+// lpData contains the directory ID
 int CALLBACK DirDlg::BrowseCallbackProc(HWND hWnd, UINT uMsg, LPARAM, LPARAM lpData)
 {
 	if(uMsg == BFFM_INITIALIZED)
 	{
 		// wParam == FALSE => lParam == pItemIdList
 		ITEMIDLIST* pidlSel = (ITEMIDLIST*) lpData;
-		if( pidlSel != NULL )
+		if( pidlSel )
 		{
 			::SendMessage(hWnd, BFFM_SETSELECTION, FALSE, lpData);
 		}
@@ -56,17 +56,17 @@ DialogResp DirDlg::DoModal(const Widget* parent)
 
 		BROWSEINFOW bi;
 		bi.hwndOwner = hParent;
-		bi.pidlRoot = NULL;
+		bi.pidlRoot = nullptr;
 		bi.pszDisplayName = szBuffer;
 		bi.lpszTitle = m_title.GetBuffer();
 		bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_NEWDIALOGSTYLE;
 		bi.lpfn = BrowseCallbackProc; // Fonction callback
-		bi.lParam = LPARAM(pidlSel);    // lpDatat récupéré dans la fonction callback
+		bi.lParam = LPARAM(pidlSel);  // lpData got from callback function
 		bi.iImage = 0;
 		LPITEMIDLIST pItemIDList = SHBrowseForFolderW(&bi);
-		if( pItemIDList != NULL )
+		if( pItemIDList )
 		{
-			// Converion ID répertoire sélectionné vers chaîne de carcatères
+			// Convert selected directory ID to a string
 			wchar szBuffer2[MAX_PATH];
 			if( ::SHGetPathFromIDListW(pItemIDList, szBuffer2) )
 			{ 
@@ -78,7 +78,7 @@ DialogResp DirDlg::DoModal(const Widget* parent)
 			pMalloc->Free(pItemIDList);
 		}
 		
-		if( pidlSel != NULL )
+		if( pidlSel )
 			pMalloc->Free(pidlSel);
 
 		// Release the shell's allocator.
@@ -103,16 +103,16 @@ LPITEMIDLIST DirDlg::GetPIDLFromPath(const chustd::String& strPath)
 
 		// Convert the path to an ITEMIDLIST.
 		HRESULT hr = pDesktopFolder->ParseDisplayName(
-			NULL,
-			NULL,
+			nullptr,
+			nullptr,
 			olePath,
 			&chEaten,
 			&pidl,
-			NULL);
+			nullptr);
 		if (FAILED(hr))
 		{
 			// Handle error
-			return NULL;
+			return nullptr;
 		}
 		
 		// pidl now contains a pointer to an ITEMIDLIST for .\readme.txt.
@@ -124,7 +124,7 @@ LPITEMIDLIST DirDlg::GetPIDLFromPath(const chustd::String& strPath)
 
 		return pidl;
 	}
-	return NULL;
+	return nullptr;
 }
 
 void DirDlg::SetTitle(const chustd::String& title)

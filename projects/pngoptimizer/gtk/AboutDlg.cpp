@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////////////
 // This file is part of the PngOptimizer application
 // Copyright (C) Hadrien Nilsson - psydk.org
-// For conditions of distribution and use, see copyright notice in PngOptimizer.h
+// For conditions of distribution and use, see copyright notice in License.txt
 /////////////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
@@ -42,6 +42,9 @@ bool AboutDlg::SetupUI()
 	gtk_about_dialog_set_website(dialog, PNGO_WEBSITE);
 	gtk_about_dialog_set_website_label(dialog, PNGO_WEBSITE);
 	gtk_about_dialog_set_wrap_license(dialog, TRUE);
+
+	static const gchar* authors[] = { "Hadrien Nilsson", nullptr };
+	gtk_about_dialog_set_authors(dialog, authors);
 
 	m_handle = GTK_WIDGET(dialog);
 

@@ -1,10 +1,15 @@
 == PngOptimizerCL Changelog ==
 
 -----------------
-2017 (2.6-beta)
+2021-11 (2.7)
 
+- fixed: bad conversion of palette mode PNGs to grayscale 
+
+-----------------
+2019-07 (2.6.2)
+
+- fixed: compilation warning with gcc9
 - new: added "-KeepPixels" option to just clean a PNG
-
 - change: do not overwrite a file if the content stays the same
 
 -----------------

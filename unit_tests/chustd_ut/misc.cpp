@@ -2,7 +2,7 @@
 
 TEST(ScanType, Int32)
 {
-	// Cas général
+	// General case
 	int32 nAdvance = 0;
 	int32 nResult = 0;
 	bool bRet = ScanType(UTF16("123"), nAdvance, 'd', &nResult);
@@ -10,7 +10,7 @@ TEST(ScanType, Int32)
 	ASSERT_TRUE(nAdvance == 3);
 	ASSERT_TRUE(nResult == 123);
 
-	// Avec espaces
+	// With espaces
 	nAdvance = 0;
 	nResult = 0;
 	bRet = ScanType(UTF16(" \t\n\r 123"), nAdvance, 'd', &nResult);
@@ -18,7 +18,7 @@ TEST(ScanType, Int32)
 	ASSERT_TRUE(nAdvance == 8);
 	ASSERT_TRUE(nResult == 123);
 
-	// Avec signe +
+	// with sign +
 	nAdvance = 0;
 	nResult = 0;
 	bRet = ScanType(UTF16("+123"), nAdvance, 'd', &nResult);
@@ -26,7 +26,7 @@ TEST(ScanType, Int32)
 	ASSERT_TRUE(nAdvance == 4);
 	ASSERT_TRUE(nResult == 123);
 
-	// Avec signe -
+	// With sign -
 	nAdvance = 0;
 	nResult = 0;
 	bRet = ScanType(UTF16("-123"), nAdvance, 'd', &nResult);
@@ -34,15 +34,15 @@ TEST(ScanType, Int32)
 	ASSERT_TRUE(nAdvance == 4);
 	ASSERT_TRUE(nResult == -123);
 
-	// Avec signe + et une espace
+	// With sign + and a space
 	nAdvance = 0;
 	nResult = 0;
 	bRet = ScanType(UTF16("+ 123"), nAdvance, 'd', &nResult);
 	ASSERT_TRUE(bRet == false);
-	ASSERT_TRUE(nAdvance == 0); // Doit rester inchangé
-	ASSERT_TRUE(nResult == 0); // Doit rester inchangé
+	ASSERT_TRUE(nAdvance == 0); // Must stay unchanged
+	ASSERT_TRUE(nResult == 0); // Must stay unchanged
 
-	// Hexadécimal
+	// Hexadecimal
 	nAdvance = 0;
 	nResult = 0;
 	bRet = ScanType(UTF16("aA12cF"), nAdvance, 'x', &nResult);
@@ -257,6 +257,32 @@ TEST(RandomTest, Misc)
 	}*/
 }
 
+static bool detailedEquals(const String& s1, const String& s2, String& msg)
+{
+	int len = s1.GetLength();
+	int len2 = s2.GetLength();
+	if( len != len2 )
+	{
+		msg = "different lengths: " + String::FromInt(len) + " vs. " + String::FromInt(len2);
+		return false;
+	}
+	StringArray a1 = s1.SplitByEndlines();
+	StringArray a2 = s2.SplitByEndlines();
+	int count = a1.GetSize();
+	int count2 = a2.GetSize();
+	if( count != count2 )
+	{
+		msg = "different line counts";
+		return false;
+	}
+	if( s1 != s2 )
+	{
+		msg = "different contents";
+		return false;
+	}
+	return true;
+}
+
 TEST(MemIniFileTest, Dump)
 {
 	MemIniFile ini;
@@ -269,7 +295,7 @@ TEST(MemIniFileTest, Dump)
 
 	ini.SetSection("Screenshots");
 	ini.SetBool("UseDefaultDir", true);
-	ini.SetString("CustomDir", "D:\\Étoile des neiges");
+	ini.SetString("CustomDir", String::FromUtf8Z("~/\xC3\x89toile des neiges"));
 	ini.SetBool("AskForFileName", false);
 	ini.SetBool("MaximizeCompression", false);
 
@@ -282,14 +308,25 @@ TEST(MemIniFileTest, Dump)
 	ini.SetCommentLine1("PngOptimizer configuration file");
 	ini.SetCommentLine2("This file is encoded in UTF-8");
 
-	ini.Dump("test.ini", false);
-	ini.Dump("test-crlf.ini", true);
+	// git may tweak newlines, create two versions in memory of the expected file
+	String expected = File::GetTextContent("utfiles/test.ini", TextEncoding::Utf8());
+	String expectedUnix = expected.UnifyNewlines(String::NT_Unix);
+	String expectedDos = expected.UnifyNewlines(String::NT_Dos);
+
+	String msg;
+	ASSERT_TRUE( ini.Dump("test-dump.ini", false) );
+	String dump = File::GetTextContent("test-dump.ini", TextEncoding::Utf8());
+	ASSERT_TRUE( detailedEquals(dump, expectedUnix, msg) ) << msg;
+
+	ASSERT_TRUE( ini.Dump("test-dump-crlf.ini", true) );
+	dump = File::GetTextContent("test-dump-crlf.ini", TextEncoding::Utf8());
+	ASSERT_TRUE( detailedEquals(dump, expectedDos, msg) ) << msg;
 }
 
 TEST(MemIniFileTest, Load)
 {
 	MemIniFile ini;
-	ASSERT_TRUE( ini.Load("test.ini"));
+	ASSERT_TRUE( ini.Load("utfiles/test.ini"));
 
 	ASSERT_TRUE( ini.SetSection("Engine"));
 	
@@ -303,9 +340,9 @@ TEST(MemIniFileTest, Load)
 
 	ASSERT_TRUE( ini.SetSection("Screenshots"));
 	
-	String strCustomDir;
-	ASSERT_TRUE( ini.GetString("CustomDir", strCustomDir));
-	ASSERT_TRUE( strCustomDir == "D:\\Étoile des neiges");
+	String customDir;
+	ASSERT_TRUE( ini.GetString("CustomDir", customDir));
+	ASSERT_EQ(String::FromUtf8Z("~/\xC3\x89toile des neiges"), customDir);
 
 	ASSERT_TRUE( ini.SetSection("Window"));
 	

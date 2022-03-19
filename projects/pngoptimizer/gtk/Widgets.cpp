@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////////////
 // This file is part of the PngOptimizer application
 // Copyright (C) Hadrien Nilsson - psydk.org
-// For conditions of distribution and use, see copyright notice in PngOptimizer.h
+// For conditions of distribution and use, see copyright notice in License.txt
 /////////////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
@@ -103,7 +103,7 @@ int EditBox::GetTextInt() const
 ///////////////////////////////////////////////////////////////////////////////
 void Button::operator=(WIDGET_HANDLE handle)
 {
-	m_handle = handle;	
+	m_handle = handle;
 	g_signal_connect(m_handle, "clicked", G_CALLBACK(OnClicked), this);
 }
 
@@ -151,7 +151,7 @@ void ComboBox::SetText(const chustd::String& text)
 void ColorButton::operator=(WIDGET_HANDLE handle)
 {
 	m_handle = handle;
-	g_signal_connect(m_handle, "color-set", G_CALLBACK(OnColorSet), this);	
+	g_signal_connect(m_handle, "color-set", G_CALLBACK(OnColorSet), this);
 }
 
 void ColorButton::SetColor(chustd::Color cr)

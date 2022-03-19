@@ -1,10 +1,10 @@
 # This the Makefile fragment to be included by SDK, Projects and UnitTests Makefiles
 #
 # Makefile inputs:
-# PROJECT_NAME    same as directory name
-# PROJECT_TYPE    lib or app
-# PROJECT_FILES   all files or wildcard like *.cpp
-# SDK_DEPS        needed library names in sdk/
+# PROJECT_NAME    same as directory name
+# PROJECT_TYPE    lib or app
+# PROJECT_FILES   all files or wildcard like *.cpp
+# SDK_DEPS        needed library names in sdk/
 # EXT_DEPS        external libraries, like gtk got GTK+
 # INCDIRS         additional include directories
 # DESTDIR         optional directory when installing/uninstalling
@@ -16,7 +16,7 @@
 # clean           cleans current project and its dependencies
 # rebuild         cleans then builds
 # run             runs the application
-# cov             creates coverage files. make CONFIG=coverage should have been called
+# cov             creates coverage files. make CONFIG=coverage should have been called
 # install         install the application
 # uninstall       uninstall the application
 
@@ -24,8 +24,8 @@ INCDIRS += ../../sdk
 CONFIG ?= debug
 OUTDIR := linux-$(CONFIG)
 
-GCC := gcc
-GPP := g++
+CC  := gcc
+CXX := g++
 LD  := ld
 OBJCOPY := objcopy
 
@@ -49,16 +49,23 @@ else
 $(error Bad CONFIG value)
 endif
 
-CPPFLAGS := $(CFLAGS) -Wextra -Wshadow
-# Uncomment for tests. gtk and gtest make it difficult
-# CPPFLAGS +=-Wzero-as-null-pointer-constant
-CPPFLAGS += -Wlogical-op -Woverloaded-virtual
-CPPFLAGS += -std=c++0x $(addprefix -I,$(INCDIRS))
+CXXFLAGS := $(CFLAGS) -Wextra -Wshadow
+CXXFLAGS += -Woverloaded-virtual
+
+# Uncomment for tests. gtk and gtest make it difficult
+# CXXFLAGS +=-Wzero-as-null-pointer-constant
+
+# Add some g++ only warning flags
+ifeq ($(CXX),g++)
+  CXXFLAGS += -Wlogical-op
+endif
+
+CXXFLAGS += -std=c++0x $(addprefix -I,$(INCDIRS))
 
 # Most includes for GTK+ are in /usr/include but some of them are
 # very specific. pkg-config gives us all the needed paths.
 ifeq ($(EXT_DEPS),gtk)
-	CPPFLAGS += $(shell pkg-config --cflags gtk+-3.0)
+	CXXFLAGS += $(shell pkg-config --cflags gtk+-3.0)
 	EXTLIBS += $(shell pkg-config --libs gtk+-3.0)
 endif
 
@@ -91,63 +98,65 @@ OBJS := $(addprefix $(OUTDIR)/,$(OBJS))
 #$(info $(SDK_LIBPATHS))
 #$(info $(CFLAGS))
 
-all: build_deps build
+.PHONY: clean
 
-welcome_msg:
-	$(info ----------------------- $(PROJECT_NAME) $(CONFIG) -----------------------)
+all:  build
 
-build_deps:
-ifneq ($(PROJECT_TYPE), lib)
-	@for dir in $(SDK_DIRS); do $(MAKE) --no-print-directory -C $$dir || exit; done
-endif
+$(info ----------------------- $(PROJECT_NAME) $(CONFIG) -----------------------)
 
-build: welcome_msg $(OUTDIR) $(SUBDIRS) $(OUTPATH)
+sdkdir = $(dir $(patsubst %/,%,$(dir $1)))
 
-clean: clean_deps welcome_msg
-	$(info cleaning...)
-	@rm -rf $(OUTDIR)
+FORCE: ;
+$(SDK_LIBPATHS): FORCE
+	@$(MAKE) --no-print-directory -C $(call sdkdir,$@)
 
-clean_deps:
+build: $(OUTPATH)
+
+clean:
 ifneq ($(PROJECT_TYPE), lib)
 	@for dir in $(SDK_DIRS); do $(MAKE) --no-print-directory -C $$dir clean; done
 endif
+	$(info cleaning...)
+	@rm -rf $(OUTDIR)
 
 $(OUTDIR):
-	@mkdir $(OUTDIR)
+	@mkdir -p $(OUTDIR)
 
-$(SUBDIRS):
-	@mkdir $@
+$(SUBDIRS): $(OUTDIR)
+	@mkdir -p $@
 
-$(OUTPATH): $(SDK_LIBPATHS) $(PCHPATH) $(OBJS)
+$(PCHPATH): stdafx.h
+	$(info $(PROJECT_NAME) - stdafx.h (precompiled header))
+	@$(CXX) $(CXXFLAGS) -x c++-header -c stdafx.h -o $(PCHPATH)
+
+$(OBJS): $(PCHPATH)
+
+$(OUTPATH): $(OUTDIR) $(SUBDIRS) $(PCHPATH) $(OBJS) $(SDK_LIBPATHS)
 ifeq ($(PROJECT_TYPE), lib)
 	$(info creating library $(OUTPATH))
 	@ar rcs $(OUTPATH) $(OBJS)
 else
 	$(info linking application $(OUTPATH))
-	@$(GPP) $(OBJS) $(SDK_LIBPATHS) -Wl,$(LDFLAGS) $(EXTLIBS) -o $(OUTPATH)
+	@$(CXX) $(OBJS) $(SDK_LIBPATHS) -Wl,$(LDFLAGS) $(EXTLIBS) -o $(OUTPATH)
 endif
-
-$(PCHPATH): stdafx.h
-	$(info stdafx.h (precompiled header))
-	@$(GPP) $(CPPFLAGS) -c stdafx.h -o $(PCHPATH)
 
 -include $(subst .o,.d, $(OBJS))
 
 $(OUTDIR)/%.o: %.cpp $(PCHPATH)
-	$(info $<)
-	@$(GPP) $(CPPFLAGS) -c -MMD $< -o $@
+	$(info $(PROJECT_NAME) - $<)
+	@$(CXX) $(CXXFLAGS) -c -MMD -MP $< -o $@
 
 $(OUTDIR)/%.o: %.c
-	$(info $<)
-	@$(GCC) $(CFLAGS) -c -MMD $< -o $@
+	$(info $(PROJECT_NAME) - $<)
+	@$(CC) $(CFLAGS) -c -MMD -MP $< -o $@
 
 $(OUTDIR)/%.png.o: %.png
-	$(info $< (resource))
+	$(info $(PROJECT_NAME) - $< (resource))
 	@$(LD) -r -o $@ -z noexecstack --format=binary $<
 	@$(OBJCOPY) --rename-section .data=.rodata,alloc,load,readonly,data,contents $@
 
 $(OUTDIR)/%.glade.o: %.glade
-	$(info $< (resource))
+	$(info $(PROJECT_NAME) - $< (resource))
 	@$(LD) -r -o $@ -z noexecstack --format=binary $<
 	@$(OBJCOPY) --rename-section .data=.rodata,alloc,load,readonly,data,contents $@
 

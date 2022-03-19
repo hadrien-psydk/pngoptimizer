@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////////////
 // This file is part of the PngOptimizer application
 // Copyright (C) Hadrien Nilsson - psydk.org
-// For conditions of distribution and use, see copyright notice in PngOptimizer.h
+// For conditions of distribution and use, see copyright notice in License.txt
 /////////////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
@@ -28,10 +28,10 @@ static const char k_szCreatingAndOptimizing[] = "Creating & Optimizing ";
 ///////////////////////////////////////////////////////////////////////////////
 POApplication::POApplication()
 {
-	m_hInstance = NULL;
-	m_hAccel = NULL;
-	m_hMutexPngOptimizer = NULL;
-	m_pTaskbarList = NULL;
+	m_hInstance = nullptr;
+	m_hAccel = nullptr;
+	m_hMutexPngOptimizer = nullptr;
+	m_pTaskbarList = nullptr;
 }
 
 //////////////////////////////////////////////////////////////
@@ -128,8 +128,8 @@ void POApplication::ChangeRectBecauseOfOverlap(RECT& rcWnd)
 	// We divide the desktop screen into 4 zones, in order to decide
 	// the direction of the offset to apply to the new rectangle
 
-	int nScreenWidth = GetDeviceCaps(NULL, HORZRES);
-	int nScreenHeight = GetDeviceCaps(NULL, VERTRES);
+	int nScreenWidth = GetDeviceCaps(nullptr, HORZRES);
+	int nScreenHeight = GetDeviceCaps(nullptr, VERTRES);
 
 	const int nOffset = 16;
 	if( rcWnd.left < nScreenWidth / 2 )
@@ -383,7 +383,7 @@ bool POApplication::Initialize(HINSTANCE hInstance)
 	m_hInstance = hInstance;
 
 	// Necessary to enable PngOptimizer as a drag-and-drop source :-p
-	OleInitialize(NULL);
+	OleInitialize(nullptr);
 
 	InitCommonControls();
 
@@ -391,13 +391,13 @@ bool POApplication::Initialize(HINSTANCE hInstance)
 	// Get previous instance window rect, in order to avoid a total overlap with the new instance window
 	static const wchar k_szMutexName[] = L"PngOptimizer mutex";
 
-	m_hMutexPngOptimizer = CreateMutex(NULL, TRUE, k_szMutexName);
+	m_hMutexPngOptimizer = CreateMutex(nullptr, TRUE, k_szMutexName);
 	int nLastError = ::GetLastError();
 
-	bool bOneInstanceAlreadyRunning = false;
+	bool oneInstanceAlreadyRunning = false;
 	if( m_hMutexPngOptimizer != 0 && nLastError == ERROR_ALREADY_EXISTS )
 	{
-		bOneInstanceAlreadyRunning = true;
+		oneInstanceAlreadyRunning = true;
 	}
 	///////////////////////////////////////////////////////////////////////
 
@@ -411,7 +411,7 @@ bool POApplication::Initialize(HINSTANCE hInstance)
 	bool centerWindow = !mws.topLeftValid;
 	bool alwaysOnTop = mws.alwaysOnTop;
 
-	if( bOneInstanceAlreadyRunning )
+	if( oneInstanceAlreadyRunning )
 	{
 		ChangeRectBecauseOfOverlap(rcWnd);
 
@@ -435,13 +435,23 @@ bool POApplication::Initialize(HINSTANCE hInstance)
 
 	OnMainWndListCleared();
 	m_mainwnd.Show(CS_Show);
+
+	if( !centerWindow )
+	{
+		// Ensure visible will only work correctly if the window is visible
+		// An annoying design change in Windows 10 made GetWindowRect() unreliable
+		// because it takes into account drop shadows. It means a window at x=0
+		// won't be really located at the most-left side of the screen, its shadow will.
+		m_mainwnd.EnsureVisible();
+	}
+
 	m_mainwnd.Update();
 
-	m_pTaskbarList = NULL;
-	HRESULT hres = CoCreateInstance(CLSID_TaskbarList, NULL, CLSCTX_ALL, IID_ITaskbarList3, (void**)&m_pTaskbarList);
+	m_pTaskbarList = nullptr;
+	HRESULT hres = CoCreateInstance(CLSID_TaskbarList, nullptr, CLSCTX_ALL, IID_ITaskbarList3, (void**)&m_pTaskbarList);
 	if( hres != S_OK )
 	{
-		m_pTaskbarList = NULL; // To be sure
+		m_pTaskbarList = nullptr; // To be sure
 	}
 
 	DoConnections();
@@ -479,10 +489,10 @@ bool POApplication::Initialize(HINSTANCE hInstance)
 // Perform cleanup
 POApplication::~POApplication()
 {
-	if( m_pTaskbarList != NULL )
+	if( m_pTaskbarList )
 	{
 		m_pTaskbarList->Release();
-		m_pTaskbarList = NULL;
+		m_pTaskbarList = nullptr;
 	}
 	if( m_hAccel )
 	{
@@ -505,7 +515,7 @@ int POApplication::Run()
 	HWND hMainWnd = m_mainwnd.GetHandle();
 
 	MSG msg;
-	while( GetMessage(&msg, NULL, 0, 0))
+	while( GetMessage(&msg, nullptr, 0, 0))
 	{
 		// Keyboard shortcuts are targeted to the main window, so the main window handle is given
 		// to TranslateAccelerator
