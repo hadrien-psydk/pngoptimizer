@@ -51,6 +51,19 @@ The SDK libraries have subdirectories where build files are stored:
  * linux-debug for Linux 64-bit debug version
  * linux-release for Linux 64-bit release version
 
+### Docker
+To build the Docker image for PngOptimizerCL, call from a Docker command line:
+
+ * `docker build -t pngoptimizercl .`
+
+You can then invoke PngOptimizerCL directly using Docker:
+
+ * `docker run --rm -v "$(pwd):$(pwd)" pngoptimizercl "$(pwd)/my_file.png"`
+
+You can also directly use my prebuild image and skip the first step:
+
+ * `docker run --rm -v "$(pwd):$(pwd)" genezys/pngoptimizercl "$(pwd)/my_file.png"`
+
 ## Packaging
 To build all and create the packages to be downloaded, call from a terminal:
  * On Windows: `distrib/make-distrib.bat`

@@ -1,0 +1,14 @@
+/.dockerignore
+/.git
+/.gitignore
+/.vscode
+/distrib/deb
+/distrib/tgz
+/distrib/snap
+/distrib/download
+/Dockerfile
+/linux-debug/
+/linux-release/
+/linux-coverage/
+/README.md
+/unit_tests

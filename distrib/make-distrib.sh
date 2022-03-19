@@ -89,4 +89,3 @@ dpkg-deb --build $PODEBDIR
 # Move the .deb in the parent directory
 mv -v $PODEBDIR.deb ./download
 tput sgr0
-
